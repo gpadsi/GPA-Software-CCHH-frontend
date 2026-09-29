@@ -1,0 +1,9 @@
+{
+  "name": "Capital Humano",
+  "short_name": "Capital Humano",
+  "start_url": ".",
+  "display": "standalone",
+  "description": "El espacio de las personas de Grupo GPA.",
+  "prefer_related_applications": false,
+  "icons": [{"src": "assets/lib/core/design_system/company-logo.png", "sizes": "1275x825", "type": "image/png", "purpose": "any"}]
+}

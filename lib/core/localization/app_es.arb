@@ -1,0 +1,18 @@
+{
+  "@@locale": "es",
+  "appTitle": "Capital Humano",
+  "comingSoonTitle": "Sin información registrada",
+  "comingSoonMessage": "Todavía no se ha capturado información en esta sección.",
+  "workspaceTitle": "Recursos Humanos de Grupo GPA",
+  "workspaceSubtitle": "Consulta expedientes, estructura organizacional, puestos y contratos del personal.",
+  "loginTitle": "Portal de Capital Humano",
+  "loginSubtitle": "Ingresa tu usuario y contraseña para continuar.",
+  "usernameLabel": "Usuario",
+  "passwordLabel": "Contraseña",
+  "usernameRequired": "Escribe tu usuario.",
+  "passwordRequired": "Escribe tu contraseña.",
+  "showPassword": "Mostrar contraseña",
+  "hidePassword": "Ocultar contraseña",
+  "signIn": "Iniciar sesión",
+  "loginHelp": "Si necesitas acceso, contacta al equipo de Capital Humano."
+}
