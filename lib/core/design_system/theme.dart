@@ -6,9 +6,7 @@ import 'spacing.dart';
 import 'typography.dart';
 
 abstract final class AppTheme {
-  // static final (no un getter): ColorScheme.fromSeed hace conversión de
-  // espacio de color (HCT) para generar toda la paleta tonal — calcularlo
-  // una sola vez por vida de la app, no en cada acceso a AppTheme.light.
+  // El tema se construye una sola vez durante la ejecución de la app.
   static final ThemeData light = _build();
 
   static ThemeData _build() {
@@ -22,6 +20,17 @@ abstract final class AppTheme {
       onSurface: AppColors.text,
       error: AppColors.error,
       outline: AppColors.border,
+      outlineVariant: AppColors.border,
+      // Mantiene chips, diálogos y selectores dentro de la misma paleta.
+      primaryContainer: AppColors.primarySurface,
+      onPrimaryContainer: AppColors.primary,
+      secondaryContainer: AppColors.primarySurface,
+      onSecondaryContainer: AppColors.primary,
+      surfaceContainerLowest: AppColors.surface,
+      surfaceContainerLow: AppColors.surface,
+      surfaceContainer: AppColors.surface,
+      surfaceContainerHigh: AppColors.surface,
+      surfaceContainerHighest: AppColors.primarySurface,
     );
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
