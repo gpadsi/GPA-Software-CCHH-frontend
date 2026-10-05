@@ -1,3 +1,4 @@
+import 'package:capital_humano_front/core/network/table_query.dart';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/features/locations/data/location_models.dart';
 import 'package:capital_humano_front/features/locations/data/locations_repository.dart';
@@ -48,6 +49,7 @@ const grandchildNode = OrganizationNode(
 const companyA = Company(id: 'c1', organizationNode: 'root');
 
 class FakeOrganizationsRepository extends OrganizationsRepository {
+  TableQuery lastQuery = const TableQuery();
   FakeOrganizationsRepository() : super(Dio());
   final requestedPages = <int>[];
   Object? failure;
@@ -77,7 +79,11 @@ class FakeOrganizationsRepository extends OrganizationsRepository {
   }
 
   @override
-  Future<ApiPage<Company>> companies(int page) async {
+  Future<ApiPage<Company>> companies(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastQuery = query;
     requestedPages.add(page);
     if (failure != null) throw failure!;
     return ApiPage(
@@ -92,9 +98,62 @@ class FakeOrganizationsRepository extends OrganizationsRepository {
 
   @override
   Future<OrganizationNode> node(String id) async => rootNode;
+
+  OrganizationNode? savedNode;
+  bool? nodeCreated;
+  String? deletedNode;
+  Company? updatedCompany;
+  String? updatedCompanyName;
+  Company? createdCompany;
+  String? createdCompanyName;
+  String? createdCompanyCode;
+  int? createdCompanyLevel;
+
+  @override
+  Future<OrganizationNode> saveNode(
+    OrganizationNode node, {
+    required bool creating,
+  }) async {
+    if (failure != null) throw failure!;
+    savedNode = node;
+    nodeCreated = creating;
+    return node;
+  }
+
+  @override
+  Future<void> deleteNode(String id) async {
+    if (failure != null) throw failure!;
+    deletedNode = id;
+  }
+
+  @override
+  Future<void> updateCompany(
+    Company company, {
+    required OrganizationNode node,
+    required String name,
+  }) async {
+    if (failure != null) throw failure!;
+    updatedCompany = company;
+    updatedCompanyName = name;
+  }
+
+  @override
+  Future<void> createCompany({
+    required int empresaLevel,
+    required String code,
+    required String name,
+    required Company company,
+  }) async {
+    if (failure != null) throw failure!;
+    createdCompanyLevel = empresaLevel;
+    createdCompanyCode = code;
+    createdCompanyName = name;
+    createdCompany = company;
+  }
 }
 
 class FakeLocationsRepository extends LocationsRepository {
+  TableQuery lastQuery = const TableQuery();
   FakeLocationsRepository() : super(Dio());
   LocationKind? savedKind;
   LocationRecord? saved;
@@ -107,7 +166,12 @@ class FakeLocationsRepository extends LocationsRepository {
     LocationKind.areas: [areaA],
   };
   @override
-  Future<ApiPage<LocationRecord>> list(LocationKind kind, int page) async {
+  Future<ApiPage<LocationRecord>> list(
+    LocationKind kind,
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(count: items[kind]!.length, results: [...items[kind]!]);
   }

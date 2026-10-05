@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../design_system/colors.dart';
 import '../design_system/motion.dart';
@@ -19,6 +20,11 @@ class AppTextField extends StatefulWidget {
     this.textInputAction,
     this.onFieldSubmitted,
     this.enabled = true,
+    this.readOnly = false,
+    this.maxLines = 1,
+    this.minLines,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   final String label;
@@ -33,6 +39,16 @@ class AppTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
   final bool enabled;
+
+  /// Se ve y se puede seleccionar el texto, pero no se edita (a diferencia de
+  /// `enabled: false`, que lo atenúa como si no estuviera disponible).
+  final bool readOnly;
+
+  /// Varias líneas: `maxLines: null, minLines: 3` crece con el contenido.
+  final int? maxLines;
+  final int? minLines;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -75,6 +91,13 @@ class _AppTextFieldState extends State<AppTextField> {
       onChanged: widget.onChanged,
       obscureText: widget.obscureText,
       enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      maxLines: widget.maxLines,
+      minLines: widget.minLines,
+      keyboardType:
+          widget.keyboardType ??
+          (widget.maxLines == 1 ? null : TextInputType.multiline),
+      inputFormatters: widget.inputFormatters,
       enableSuggestions: !widget.obscureText,
       autocorrect: false,
       validator: widget.validator,

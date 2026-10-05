@@ -1,9 +1,14 @@
+import 'package:capital_humano_front/core/network/table_query.dart';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/features/positions/data/position_models.dart';
 import 'package:capital_humano_front/features/positions/data/positions_repository.dart';
 import 'package:dio/dio.dart';
 
-const orgNodeA = RefEntry(id: 'org1', code: 'GPA-CEI-01', name: 'CEI Aerospace Group');
+const orgNodeA = RefEntry(
+  id: 'org1',
+  code: 'GPA-CEI-01',
+  name: 'CEI Aerospace Group',
+);
 const areaRefA = RefEntry(id: 'area1', code: 'A1', name: 'Producción');
 const puestoCatalogA = PositionCatalogEntry(
   id: 1,
@@ -62,6 +67,7 @@ const posicionA = Posicion(
 );
 
 class FakePositionsRepository extends PositionsRepository {
+  TableQuery lastQuery = const TableQuery();
   FakePositionsRepository() : super(Dio());
   Object? failure;
   Posicion? saved;
@@ -76,7 +82,11 @@ class FakePositionsRepository extends PositionsRepository {
   }
 
   @override
-  Future<ApiPage<Posicion>> list(int page) async {
+  Future<ApiPage<Posicion>> list(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(count: posiciones.length, results: [...posiciones]);
   }
@@ -106,6 +116,20 @@ class FakePositionsRepository extends PositionsRepository {
           result;
     }
     return result;
+  }
+
+  PositionCatalogEntry? savedPuesto;
+  bool? puestoCreated;
+
+  @override
+  Future<PositionCatalogEntry> savePuesto(
+    PositionCatalogEntry puesto, {
+    required bool creating,
+  }) async {
+    if (failure != null) throw failure!;
+    savedPuesto = puesto;
+    puestoCreated = creating;
+    return puesto;
   }
 
   @override

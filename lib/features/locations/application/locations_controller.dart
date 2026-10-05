@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/location_models.dart';
 import '../data/locations_repository.dart';
 part 'locations_controller.g.dart';
@@ -17,8 +18,11 @@ LocationsRepository locationsRepository(Ref ref) {
 Future<ApiPage<LocationRecord>> locationPage(
   Ref ref,
   LocationKind kind,
-  int pageIndex,
-) => ref.watch(locationsRepositoryProvider).list(kind, pageIndex + 1);
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref
+    .watch(locationsRepositoryProvider)
+    .list(kind, pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<LocationCatalog> locationCatalog(Ref ref) =>

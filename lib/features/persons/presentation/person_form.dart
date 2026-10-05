@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
+import '../../../core/widgets/form_panel.dart';
 import '../application/persons_controller.dart';
 import '../data/person_models.dart';
 
@@ -87,8 +86,9 @@ class _PersonFormState extends ConsumerState<PersonForm> {
     super.dispose();
   }
 
-  String? _requiredText(String? value) =>
-      value == null || value.trim().isEmpty ? 'Este dato es obligatorio.' : null;
+  String? _requiredText(String? value) => value == null || value.trim().isEmpty
+      ? 'Este dato es obligatorio.'
+      : null;
 
   String? _optional(String controllerText) =>
       controllerText.trim().isEmpty ? null : controllerText.trim();
@@ -149,79 +149,18 @@ class _PersonFormState extends ConsumerState<PersonForm> {
   @override
   Widget build(BuildContext context) {
     final catalogs = ref.watch(personCatalogsProvider);
-    return PopScope(
-      canPop: !_busy,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(AppSpacing.md),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640, maxHeight: 720),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  0,
-                ),
-                child: Text(
-                  widget.persona == null ? 'Agregar persona' : 'Editar persona',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: catalogs.when(
-                    data: _fields,
-                    loading: () => const FeatureLoading(),
-                    error: (error, _) => FeatureError(
-                      error: error,
-                      onRetry: () => ref.invalidate(personCatalogsProvider),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (_error != null) ...[
-                      Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                    Wrap(
-                      alignment: WrapAlignment.end,
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        AppButton(
-                          label: 'Cancelar',
-                          variant: AppButtonVariant.secondary,
-                          onPressed: _busy
-                              ? null
-                              : () => Navigator.of(context).pop(),
-                        ),
-                        AppButton(
-                          label: 'Guardar',
-                          isLoading: _busy,
-                          onPressed: catalogs.hasValue ? _save : null,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+    return AppFormPanel(
+      title: widget.persona == null ? 'Agregar persona' : 'Editar persona',
+      busy: _busy,
+      error: _error,
+      canSave: catalogs.hasValue,
+      onSave: _save,
+      child: catalogs.when(
+        data: _fields,
+        loading: () => const FeatureLoading(),
+        error: (error, _) => FeatureError(
+          error: error,
+          onRetry: () => ref.invalidate(personCatalogsProvider),
         ),
       ),
     );
@@ -273,17 +212,31 @@ class _PersonFormState extends ConsumerState<PersonForm> {
             ),
             if (_birthDate != null)
               TextButton(
-                onPressed: _busy ? null : () => setState(() => _birthDate = null),
+                onPressed: _busy
+                    ? null
+                    : () => setState(() => _birthDate = null),
                 child: const Text('Quitar'),
               ),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(label: 'CURP (opcional)', controller: _curp, enabled: !_busy),
+        AppTextField(
+          label: 'CURP (opcional)',
+          controller: _curp,
+          enabled: !_busy,
+        ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(label: 'NSS (opcional)', controller: _nss, enabled: !_busy),
+        AppTextField(
+          label: 'NSS (opcional)',
+          controller: _nss,
+          enabled: !_busy,
+        ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(label: 'RFC (opcional)', controller: _rfc, enabled: !_busy),
+        AppTextField(
+          label: 'RFC (opcional)',
+          controller: _rfc,
+          enabled: !_busy,
+        ),
         const SizedBox(height: AppSpacing.md),
         _select(
           'Género (opcional)',
@@ -310,7 +263,9 @@ class _PersonFormState extends ConsumerState<PersonForm> {
           contentPadding: EdgeInsets.zero,
           title: const Text('Tiene hijos'),
           value: _hasChildren,
-          onChanged: _busy ? null : (value) => setState(() => _hasChildren = value),
+          onChanged: _busy
+              ? null
+              : (value) => setState(() => _hasChildren = value),
         ),
         const SizedBox(height: AppSpacing.lg),
         _sectionTitle('Contacto'),
@@ -339,7 +294,11 @@ class _PersonFormState extends ConsumerState<PersonForm> {
           enabled: !_busy,
         ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(label: 'Ciudad (opcional)', controller: _city, enabled: !_busy),
+        AppTextField(
+          label: 'Ciudad (opcional)',
+          controller: _city,
+          enabled: !_busy,
+        ),
         const SizedBox(height: AppSpacing.md),
         AppTextField(
           label: 'Municipio (opcional)',
@@ -347,7 +306,11 @@ class _PersonFormState extends ConsumerState<PersonForm> {
           enabled: !_busy,
         ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(label: 'Estado (opcional)', controller: _state, enabled: !_busy),
+        AppTextField(
+          label: 'Estado (opcional)',
+          controller: _state,
+          enabled: !_busy,
+        ),
         const SizedBox(height: AppSpacing.md),
         AppTextField(
           label: 'Estado de nacimiento (opcional)',

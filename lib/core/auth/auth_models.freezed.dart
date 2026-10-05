@@ -560,9 +560,282 @@ as String?,
 
 
 /// @nodoc
+mixin _$SessionRole {
+
+ String get code; String get name;
+/// Create a copy of SessionRole
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SessionRoleCopyWith<SessionRole> get copyWith => _$SessionRoleCopyWithImpl<SessionRole>(this as SessionRole, _$identity);
+
+  /// Serializes this SessionRole to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as SessionRole;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionRole&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.name, _this.name) || other.name == _this.name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as SessionRole;
+  return Object.hash(runtimeType,_this.code,_this.name);
+}
+
+@override
+String toString() {
+  final _this = this as SessionRole;
+  return 'SessionRole(code: ${_this.code}, name: ${_this.name})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SessionRoleCopyWith<$Res>  {
+  factory $SessionRoleCopyWith(SessionRole value, $Res Function(SessionRole) _then) = _$SessionRoleCopyWithImpl;
+@useResult
+$Res call({
+ String code, String name
+});
+
+
+
+
+}
+/// @nodoc
+class _$SessionRoleCopyWithImpl<$Res>
+    implements $SessionRoleCopyWith<$Res> {
+  _$SessionRoleCopyWithImpl(this._self, this._then);
+
+  final SessionRole _self;
+  final $Res Function(SessionRole) _then;
+
+/// Create a copy of SessionRole
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? code = null,Object? name = null,}) {
+  return _then(SessionRole(
+code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SessionRole].
+extension SessionRolePatterns on SessionRole {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SessionRole value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SessionRole() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SessionRole value)  $default,){
+final _that = this;
+switch (_that) {
+case _SessionRole():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SessionRole value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SessionRole() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String code,  String name)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SessionRole() when $default != null:
+return $default(_that.code,_that.name);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String code,  String name)  $default,) {final _that = this;
+switch (_that) {
+case _SessionRole():
+return $default(_that.code,_that.name);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String code,  String name)?  $default,) {final _that = this;
+switch (_that) {
+case _SessionRole() when $default != null:
+return $default(_that.code,_that.name);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SessionRole implements SessionRole {
+  const _SessionRole({required this.code, required this.name});
+  factory _SessionRole.fromJson(Map<String, dynamic> json) => _$SessionRoleFromJson(json);
+
+@override final  String code;
+@override final  String name;
+
+/// Create a copy of SessionRole
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SessionRoleCopyWith<_SessionRole> get copyWith => __$SessionRoleCopyWithImpl<_SessionRole>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SessionRoleToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionRole&&(identical(other.code, code) || other.code == code)&&(identical(other.name, name) || other.name == name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,code,name);
+}
+
+@override
+String toString() {
+    return 'SessionRole(code: $code, name: $name)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SessionRoleCopyWith<$Res> implements $SessionRoleCopyWith<$Res> {
+  factory _$SessionRoleCopyWith(_SessionRole value, $Res Function(_SessionRole) _then) = __$SessionRoleCopyWithImpl;
+@override @useResult
+$Res call({
+ String code, String name
+});
+
+
+
+
+}
+/// @nodoc
+class __$SessionRoleCopyWithImpl<$Res>
+    implements _$SessionRoleCopyWith<$Res> {
+  __$SessionRoleCopyWithImpl(this._self, this._then);
+
+  final _SessionRole _self;
+  final $Res Function(_SessionRole) _then;
+
+/// Create a copy of SessionRole
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? code = null,Object? name = null,}) {
+  return _then(_SessionRole(
+code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$SessionUser {
 
- String get id; String get username; String get email;@JsonKey(name: 'first_name') String get firstName;@JsonKey(name: 'last_name') String get lastName;@JsonKey(name: 'is_active') bool get isActive;
+ String get id; String get username; String get email;@JsonKey(name: 'first_name') String get firstName;@JsonKey(name: 'last_name') String get lastName;@JsonKey(name: 'is_active') bool get isActive; SessionRole? get role;@JsonKey(name: 'can_manage_hr') bool get canManageHr;
 /// Create a copy of SessionUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -576,20 +849,20 @@ $SessionUserCopyWith<SessionUser> get copyWith => _$SessionUserCopyWithImpl<Sess
 @override
 bool operator ==(Object other) {
   final _this = this as SessionUser;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionUser&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.username, _this.username) || other.username == _this.username)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.firstName, _this.firstName) || other.firstName == _this.firstName)&&(identical(other.lastName, _this.lastName) || other.lastName == _this.lastName)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionUser&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.username, _this.username) || other.username == _this.username)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.firstName, _this.firstName) || other.firstName == _this.firstName)&&(identical(other.lastName, _this.lastName) || other.lastName == _this.lastName)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive)&&(identical(other.role, _this.role) || other.role == _this.role)&&(identical(other.canManageHr, _this.canManageHr) || other.canManageHr == _this.canManageHr));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as SessionUser;
-  return Object.hash(runtimeType,_this.id,_this.username,_this.email,_this.firstName,_this.lastName,_this.isActive);
+  return Object.hash(runtimeType,_this.id,_this.username,_this.email,_this.firstName,_this.lastName,_this.isActive,_this.role,_this.canManageHr);
 }
 
 @override
 String toString() {
   final _this = this as SessionUser;
-  return 'SessionUser(id: ${_this.id}, username: ${_this.username}, email: ${_this.email}, firstName: ${_this.firstName}, lastName: ${_this.lastName}, isActive: ${_this.isActive})';
+  return 'SessionUser(id: ${_this.id}, username: ${_this.username}, email: ${_this.email}, firstName: ${_this.firstName}, lastName: ${_this.lastName}, isActive: ${_this.isActive}, role: ${_this.role}, canManageHr: ${_this.canManageHr})';
 }
 
 
@@ -600,11 +873,11 @@ abstract mixin class $SessionUserCopyWith<$Res>  {
   factory $SessionUserCopyWith(SessionUser value, $Res Function(SessionUser) _then) = _$SessionUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String username, String email,@JsonKey(name: 'first_name') String firstName,@JsonKey(name: 'last_name') String lastName,@JsonKey(name: 'is_active') bool isActive
+ String id, String username, String email,@JsonKey(name: 'first_name') String firstName,@JsonKey(name: 'last_name') String lastName,@JsonKey(name: 'is_active') bool isActive, SessionRole? role,@JsonKey(name: 'can_manage_hr') bool canManageHr
 });
 
 
-
+$SessionRoleCopyWith<$Res>? get role;
 
 }
 /// @nodoc
@@ -617,7 +890,7 @@ class _$SessionUserCopyWithImpl<$Res>
 
 /// Create a copy of SessionUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? isActive = null,Object? role = freezed,Object? canManageHr = null,}) {
   return _then(SessionUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -625,10 +898,24 @@ as String,email: null == email ? _self.email : email // ignore: cast_nullable_to
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,role: freezed == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as SessionRole?,canManageHr: null == canManageHr ? _self.canManageHr : canManageHr // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
+/// Create a copy of SessionUser
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SessionRoleCopyWith<$Res>? get role {
+    if (_self.role == null) {
+    return null;
+  }
 
+  return $SessionRoleCopyWith<$Res>(_self.role!, (value) {
+    return _then(_self.copyWith(role: value));
+  });
+}
 }
 
 
@@ -710,10 +997,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive,  SessionRole? role, @JsonKey(name: 'can_manage_hr')  bool canManageHr)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SessionUser() when $default != null:
-return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive);case _:
+return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive,_that.role,_that.canManageHr);case _:
   return orElse();
 
 }
@@ -731,10 +1018,10 @@ return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastNa
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive,  SessionRole? role, @JsonKey(name: 'can_manage_hr')  bool canManageHr)  $default,) {final _that = this;
 switch (_that) {
 case _SessionUser():
-return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive);case _:
+return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive,_that.role,_that.canManageHr);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -751,10 +1038,10 @@ return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastNa
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String email, @JsonKey(name: 'first_name')  String firstName, @JsonKey(name: 'last_name')  String lastName, @JsonKey(name: 'is_active')  bool isActive,  SessionRole? role, @JsonKey(name: 'can_manage_hr')  bool canManageHr)?  $default,) {final _that = this;
 switch (_that) {
 case _SessionUser() when $default != null:
-return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive);case _:
+return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastName,_that.isActive,_that.role,_that.canManageHr);case _:
   return null;
 
 }
@@ -766,7 +1053,7 @@ return $default(_that.id,_that.username,_that.email,_that.firstName,_that.lastNa
 @JsonSerializable()
 
 class _SessionUser extends SessionUser {
-  const _SessionUser({required this.id, required this.username, required this.email, @JsonKey(name: 'first_name') required this.firstName, @JsonKey(name: 'last_name') required this.lastName, @JsonKey(name: 'is_active') required this.isActive}): super._();
+  const _SessionUser({required this.id, required this.username, required this.email, @JsonKey(name: 'first_name') required this.firstName, @JsonKey(name: 'last_name') required this.lastName, @JsonKey(name: 'is_active') required this.isActive, this.role, @JsonKey(name: 'can_manage_hr') this.canManageHr = false}): super._();
   factory _SessionUser.fromJson(Map<String, dynamic> json) => _$SessionUserFromJson(json);
 
 @override final  String id;
@@ -775,6 +1062,8 @@ class _SessionUser extends SessionUser {
 @override@JsonKey(name: 'first_name') final  String firstName;
 @override@JsonKey(name: 'last_name') final  String lastName;
 @override@JsonKey(name: 'is_active') final  bool isActive;
+@override final  SessionRole? role;
+@override@JsonKey(name: 'can_manage_hr') final  bool canManageHr;
 
 /// Create a copy of SessionUser
 /// with the given fields replaced by the non-null parameter values.
@@ -789,18 +1078,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionUser&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionUser&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.role, role) || other.role == role)&&(identical(other.canManageHr, canManageHr) || other.canManageHr == canManageHr));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,username,email,firstName,lastName,isActive);
+    return Object.hash(runtimeType,id,username,email,firstName,lastName,isActive,role,canManageHr);
 }
 
 @override
 String toString() {
-    return 'SessionUser(id: $id, username: $username, email: $email, firstName: $firstName, lastName: $lastName, isActive: $isActive)';
+    return 'SessionUser(id: $id, username: $username, email: $email, firstName: $firstName, lastName: $lastName, isActive: $isActive, role: $role, canManageHr: $canManageHr)';
 }
 
 
@@ -811,11 +1100,11 @@ abstract mixin class _$SessionUserCopyWith<$Res> implements $SessionUserCopyWith
   factory _$SessionUserCopyWith(_SessionUser value, $Res Function(_SessionUser) _then) = __$SessionUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username, String email,@JsonKey(name: 'first_name') String firstName,@JsonKey(name: 'last_name') String lastName,@JsonKey(name: 'is_active') bool isActive
+ String id, String username, String email,@JsonKey(name: 'first_name') String firstName,@JsonKey(name: 'last_name') String lastName,@JsonKey(name: 'is_active') bool isActive, SessionRole? role,@JsonKey(name: 'can_manage_hr') bool canManageHr
 });
 
 
-
+@override $SessionRoleCopyWith<$Res>? get role;
 
 }
 /// @nodoc
@@ -828,7 +1117,7 @@ class __$SessionUserCopyWithImpl<$Res>
 
 /// Create a copy of SessionUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? isActive = null,Object? role = freezed,Object? canManageHr = null,}) {
   return _then(_SessionUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -836,11 +1125,25 @@ as String,email: null == email ? _self.email : email // ignore: cast_nullable_to
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,role: freezed == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as SessionRole?,canManageHr: null == canManageHr ? _self.canManageHr : canManageHr // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
 
+/// Create a copy of SessionUser
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SessionRoleCopyWith<$Res>? get role {
+    if (_self.role == null) {
+    return null;
+  }
 
+  return $SessionRoleCopyWith<$Res>(_self.role!, (value) {
+    return _then(_self.copyWith(role: value));
+  });
+}
 }
 
 /// @nodoc

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/feature_page.dart';
+import '../../../core/widgets/app_overlays.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../application/persons_controller.dart';
 import '../data/person_models.dart';
 import 'contacto_urgencia_form.dart';
@@ -34,9 +37,8 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
   }
 
   Future<void> _editPersona(Persona persona) async {
-    final saved = await showDialog<bool>(
+    final saved = await showAppPanel<bool>(
       context: context,
-      barrierDismissible: false,
       builder: (_) => PersonForm(persona: persona),
     );
     if (saved == true && mounted) _refresh();
@@ -85,7 +87,10 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
             ),
             const SizedBox(height: AppSpacing.lg),
             switch (_tab) {
-              0 => _GeneralTab(persona: persona, onEdit: () => _editPersona(persona)),
+              0 => _GeneralTab(
+                persona: persona,
+                onEdit: () => _editPersona(persona),
+              ),
               1 => _ContactosTab(personaId: persona.id),
               _ => _PerfilTab(personaId: persona.id),
             },
@@ -104,6 +109,7 @@ class _GeneralTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final catalogs = ref.watch(personCatalogsProvider);
+    final canManage = ref.watch(canManageHrProvider);
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -118,12 +124,13 @@ class _GeneralTab extends ConsumerWidget {
                 'Datos generales',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              AppButton(
-                label: 'Editar',
-                icon: Icons.edit_outlined,
-                variant: AppButtonVariant.secondary,
-                onPressed: onEdit,
-              ),
+              if (canManage)
+                AppButton(
+                  label: 'Editar',
+                  icon: Icons.edit_outlined,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: onEdit,
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -141,14 +148,23 @@ class _GeneralTab extends ConsumerWidget {
             data: (data) => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _field('Género', PersonCatalogs.nameIn(data.generos, persona.gender)),
+                _field(
+                  'Género',
+                  PersonCatalogs.nameIn(data.generos, persona.gender),
+                ),
                 _field(
                   'Estado civil',
-                  PersonCatalogs.nameIn(data.estadosCiviles, persona.maritalStatus),
+                  PersonCatalogs.nameIn(
+                    data.estadosCiviles,
+                    persona.maritalStatus,
+                  ),
                 ),
                 _field(
                   'Escolaridad',
-                  PersonCatalogs.nameIn(data.escolaridades, persona.educationLevel),
+                  PersonCatalogs.nameIn(
+                    data.escolaridades,
+                    persona.educationLevel,
+                  ),
                 ),
               ],
             ),
@@ -177,7 +193,10 @@ class _GeneralTab extends ConsumerWidget {
       children: [
         SizedBox(
           width: 180,
-          child: Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+          child: Text(
+            label,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
         ),
         Expanded(
           child: Text(
@@ -198,9 +217,8 @@ class _ContactosTab extends ConsumerWidget {
     WidgetRef ref, [
     ContactoUrgencia? contacto,
   ]) async {
-    final saved = await showDialog<bool>(
+    final saved = await showAppPanel<bool>(
       context: context,
-      barrierDismissible: false,
       builder: (_) =>
           ContactoUrgenciaForm(personaId: personaId, contacto: contacto),
     );
@@ -212,60 +230,50 @@ class _ContactosTab extends ConsumerWidget {
     WidgetRef ref,
     ContactoUrgencia contacto,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        title: const Text('Eliminar contacto de urgencia'),
-        content: Text('¿Eliminar a «${contacto.name}»?'),
-        actions: [
-          AppButton(
-            label: 'Cancelar',
-            variant: AppButtonVariant.secondary,
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          AppButton(
-            label: 'Eliminar',
-            variant: AppButtonVariant.danger,
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      ),
+    final deleted = await showConfirmDialog(
+      context,
+      title: 'Eliminar contacto de urgencia',
+      message:
+          '¿Eliminar a «${contacto.name}»? Esta acción no se puede deshacer.',
+      onConfirm: () =>
+          ref.read(personsRepositoryProvider).deleteContacto(contacto.id),
     );
-    if (confirmed == true) {
-      await ref.read(personsRepositoryProvider).deleteContacto(contacto.id);
-      ref.invalidate(contactosDePersonaProvider(personaId));
-    }
+    if (deleted) ref.invalidate(contactosDePersonaProvider(personaId));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contactos = ref.watch(contactosDePersonaProvider(personaId));
+    final canManage = ref.watch(canManageHrProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: AppButton(
-            label: 'Agregar contacto',
-            icon: Icons.add,
-            onPressed: () => _edit(context, ref),
+        if (canManage) ...[
+          Align(
+            alignment: Alignment.centerRight,
+            child: AppButton(
+              label: 'Agregar contacto',
+              icon: Icons.add,
+              onPressed: () => _edit(context, ref),
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
+        ],
         contactos.when(
           skipLoadingOnRefresh: false,
           loading: () => const FeatureLoading(),
           error: (error, _) => FeatureError(
             error: error,
-            onRetry: () => ref.invalidate(contactosDePersonaProvider(personaId)),
+            onRetry: () =>
+                ref.invalidate(contactosDePersonaProvider(personaId)),
           ),
           data: (items) => items.isEmpty
               ? const AppCard(
                   child: EmptyState(
                     icon: Icons.contact_phone_outlined,
                     title: 'Sin contactos de urgencia',
-                    message: 'Todavía no se ha capturado ninguno para esta persona.',
+                    message:
+                        'Todavía no se ha capturado ninguno para esta persona.',
                   ),
                 )
               : Column(
@@ -282,25 +290,33 @@ class _ContactosTab extends ConsumerWidget {
                                   children: [
                                     Text(
                                       contacto.name,
-                                      style: Theme.of(context).textTheme.titleSmall,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall,
                                     ),
                                     Text(
                                       '${contacto.relationship} · ${contacto.phone}',
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
                                     ),
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                tooltip: 'Editar a ${contacto.name}',
-                                onPressed: () => _edit(context, ref, contacto),
-                                icon: const Icon(Icons.edit_outlined),
-                              ),
-                              IconButton(
-                                tooltip: 'Eliminar a ${contacto.name}',
-                                onPressed: () => _delete(context, ref, contacto),
-                                icon: const Icon(Icons.delete_outline),
-                              ),
+                              if (canManage) ...[
+                                IconButton(
+                                  tooltip: 'Editar a ${contacto.name}',
+                                  onPressed: () =>
+                                      _edit(context, ref, contacto),
+                                  icon: const Icon(Icons.edit_outlined),
+                                ),
+                                IconButton(
+                                  tooltip: 'Eliminar a ${contacto.name}',
+                                  onPressed: () =>
+                                      _delete(context, ref, contacto),
+                                  icon: const Icon(Icons.delete_outline),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -323,9 +339,8 @@ class _PerfilTab extends ConsumerWidget {
     List<PersonCatalogEntry> tiposSangre, [
     PerfilMedico? perfil,
   ]) async {
-    final saved = await showDialog<bool>(
+    final saved = await showAppPanel<bool>(
       context: context,
-      barrierDismissible: false,
       builder: (_) => PerfilMedicoForm(
         personaId: personaId,
         tiposSangre: tiposSangre,
@@ -339,28 +354,37 @@ class _PerfilTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final perfil = ref.watch(perfilMedicoDePersonaProvider(personaId));
     final catalogs = ref.watch(personCatalogsProvider);
+    final canManage = ref.watch(canManageHrProvider);
     return catalogs.when(
       skipLoadingOnRefresh: false,
       loading: () => const FeatureLoading(),
-      error: (error, _) =>
-          FeatureError(error: error, onRetry: () => ref.invalidate(personCatalogsProvider)),
+      error: (error, _) => FeatureError(
+        error: error,
+        onRetry: () => ref.invalidate(personCatalogsProvider),
+      ),
       data: (catalogData) => perfil.when(
         skipLoadingOnRefresh: false,
         loading: () => const FeatureLoading(),
         error: (error, _) => FeatureError(
           error: error,
-          onRetry: () => ref.invalidate(perfilMedicoDePersonaProvider(personaId)),
+          onRetry: () =>
+              ref.invalidate(perfilMedicoDePersonaProvider(personaId)),
         ),
         data: (data) => AppCard(
           child: data == null
               ? EmptyState(
                   icon: Icons.medical_information_outlined,
                   title: 'Sin perfil médico capturado',
-                  message: 'Agrega el tipo de sangre y las alergias de esta persona.',
-                  action: AppButton(
-                    label: 'Agregar perfil médico',
-                    onPressed: () => _edit(context, ref, catalogData.tiposSangre),
-                  ),
+                  message: canManage
+                      ? 'Agrega el tipo de sangre y las alergias de esta persona.'
+                      : 'Todavía no se ha capturado.',
+                  action: canManage
+                      ? AppButton(
+                          label: 'Agregar perfil médico',
+                          onPressed: () =>
+                              _edit(context, ref, catalogData.tiposSangre),
+                        )
+                      : null,
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -375,13 +399,18 @@ class _PerfilTab extends ConsumerWidget {
                           'Perfil médico',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        AppButton(
-                          label: 'Editar',
-                          icon: Icons.edit_outlined,
-                          variant: AppButtonVariant.secondary,
-                          onPressed: () =>
-                              _edit(context, ref, catalogData.tiposSangre, data),
-                        ),
+                        if (canManage)
+                          AppButton(
+                            label: 'Editar',
+                            icon: Icons.edit_outlined,
+                            variant: AppButtonVariant.secondary,
+                            onPressed: () => _edit(
+                              context,
+                              ref,
+                              catalogData.tiposSangre,
+                              data,
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),

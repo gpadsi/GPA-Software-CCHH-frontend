@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 
+import '../../../core/network/api_failure.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import 'position_models.dart';
 
 class PositionsRepository {
@@ -38,8 +40,16 @@ class PositionsRepository {
     );
   }
 
-  Future<ApiPage<Posicion>> list(int page) =>
-      fetchPage(api, 'positions/posiciones/', Posicion.fromJson, page: page);
+  Future<ApiPage<Posicion>> list(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) => fetchPage(
+    api,
+    'positions/posiciones/',
+    Posicion.fromJson,
+    page: page,
+    query: query,
+  );
 
   // Todas las posiciones, sin paginar — solo para el selector de "reporta
   // a" (línea de reporte), que necesita elegir entre cualquier Posición
@@ -70,4 +80,35 @@ class PositionsRepository {
 
   Future<void> delete(String id) =>
       api.delete<void>('positions/posiciones/$id/');
+
+  // Los puestos se crean y editan pero no se borran: una Posición apunta a
+  // cada uno. Lo que ya no se usa se desactiva.
+  Future<PositionCatalogEntry> savePuesto(
+    PositionCatalogEntry puesto, {
+    required bool creating,
+  }) async {
+    final payload = {
+      'name': puesto.name,
+      'is_active': puesto.isActive,
+      'es_gerencia_de_unidad': puesto.esGerenciaDeUnidad,
+    };
+    final response = creating
+        ? await api.post<Map<String, dynamic>>(
+            'positions/puestos/',
+            data: payload,
+          )
+        : await api.patch<Map<String, dynamic>>(
+            'positions/puestos/${puesto.id}/',
+            data: payload,
+          );
+    return PositionCatalogEntry.fromJson(response.data!);
+  }
 }
+
+/// Mensaje para una falla al guardar un puesto: el motivo del servidor si lo
+/// da (ej. "Ya existe un puesto con ese nombre.").
+String puestoMutationError(Object error) =>
+    validationDetail(error, labels: const {'name': 'Nombre'}) ??
+    (error is DioException && error.response?.statusCode == 403
+        ? 'Tu cuenta no tiene permiso para modificar puestos.'
+        : apiErrorMessage(error));

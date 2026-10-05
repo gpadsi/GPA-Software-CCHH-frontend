@@ -3,15 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/jefe_inmediato_card.dart';
 import '../../../core/network/jefe_inmediato.dart';
 import '../application/employment_controller.dart';
+import '../data/employment_models.dart';
+import 'empleado_form.dart';
 
 const _noCapturado = 'No capturado';
 final _displayDate = DateFormat.yMMMd('es_MX');
@@ -26,9 +30,25 @@ class EmpleadoDetailPage extends ConsumerWidget {
     ref.invalidate(jefeInmediatoProvider(empleadoId));
   }
 
+  Future<void> _edit(
+    BuildContext context,
+    WidgetRef ref,
+    Empleado empleado,
+  ) async {
+    final saved = await showAppPanel<bool>(
+      context: context,
+      builder: (_) => EmpleadoForm(empleado: empleado),
+    );
+    if (saved == true) {
+      ref.invalidate(empleadoDetailProvider(empleadoId));
+      ref.invalidate(empleadosPageProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final empleado = ref.watch(empleadoDetailProvider(empleadoId));
+    final canManage = ref.watch(canManageHrProvider);
     final title = switch (empleado) {
       AsyncData(:final value) => value.workNumber ?? 'Empleado',
       _ => 'Empleado',
@@ -37,6 +57,12 @@ class EmpleadoDetailPage extends ConsumerWidget {
       title: title,
       description: 'Contrato vigente y posición actual de este empleado.',
       actions: [
+        if (canManage && empleado.hasValue)
+          AppButton(
+            label: 'Editar',
+            icon: Icons.edit_outlined,
+            onPressed: () => _edit(context, ref, empleado.requireValue),
+          ),
         AppButton(
           label: 'Actualizar',
           icon: Icons.refresh,
@@ -71,10 +97,15 @@ Widget _field(String label, String? value) => Padding(
     children: [
       SizedBox(
         width: 160,
-        child: Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+        child: Text(
+          label,
+          style: const TextStyle(color: AppColors.textSecondary),
+        ),
       ),
       Expanded(
-        child: Text(value == null || value.trim().isEmpty ? _noCapturado : value),
+        child: Text(
+          value == null || value.trim().isEmpty ? _noCapturado : value,
+        ),
       ),
     ],
   ),
@@ -138,7 +169,8 @@ class _ContratoCard extends ConsumerWidget {
           loading: () => const FeatureLoading(),
           error: (error, _) => FeatureError(
             error: error,
-            onRetry: () => ref.invalidate(contratoVigenteDeProvider(empleadoId)),
+            onRetry: () =>
+                ref.invalidate(contratoVigenteDeProvider(empleadoId)),
           ),
           data: (contrato) => contrato == null
               ? const EmptyState(
@@ -158,19 +190,25 @@ class _ContratoCard extends ConsumerWidget {
                       'Fecha de ingreso',
                       contrato.fechaIngreso == null
                           ? null
-                          : _displayDate.format(DateTime.parse(contrato.fechaIngreso!)),
+                          : _displayDate.format(
+                              DateTime.parse(contrato.fechaIngreso!),
+                            ),
                     ),
                     _field(
                       'Fecha de alta',
                       contrato.fechaAlta == null
                           ? null
-                          : _displayDate.format(DateTime.parse(contrato.fechaAlta!)),
+                          : _displayDate.format(
+                              DateTime.parse(contrato.fechaAlta!),
+                            ),
                     ),
                     _field(
                       'Fecha de reingreso',
                       contrato.fechaReingreso == null
                           ? null
-                          : _displayDate.format(DateTime.parse(contrato.fechaReingreso!)),
+                          : _displayDate.format(
+                              DateTime.parse(contrato.fechaReingreso!),
+                            ),
                     ),
                     const Divider(height: AppSpacing.xl),
                     Text(
@@ -216,8 +254,9 @@ class _PuestoField extends ConsumerWidget {
   const _PuestoField({required this.puestoId});
   final int puestoId;
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(puestoRefProvider(puestoId)).when(
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(puestoRefProvider(puestoId))
+      .when(
         data: (value) => _field('Puesto', value.name),
         loading: () => _field('Puesto', 'Cargando…'),
         error: (_, _) => _field('Puesto', null),
@@ -228,8 +267,9 @@ class _EstatusField extends ConsumerWidget {
   const _EstatusField({required this.estatusId});
   final int estatusId;
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(estatusRefProvider(estatusId)).when(
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(estatusRefProvider(estatusId))
+      .when(
         data: (value) => _field('Estatus', value.name),
         loading: () => _field('Estatus', 'Cargando…'),
         error: (_, _) => _field('Estatus', null),

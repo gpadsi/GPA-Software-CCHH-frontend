@@ -1,13 +1,23 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import 'location_models.dart';
 
 class LocationsRepository {
   LocationsRepository(this.api);
   final Dio api;
-  Future<ApiPage<LocationRecord>> list(LocationKind kind, int page) =>
-      fetchPage(api, kind.path, LocationRecord.fromJson, page: page);
+  Future<ApiPage<LocationRecord>> list(
+    LocationKind kind,
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) => fetchPage(
+    api,
+    kind.path,
+    LocationRecord.fromJson,
+    page: page,
+    query: query,
+  );
 
   Future<LocationCatalog> catalog() async {
     final results = await Future.wait([

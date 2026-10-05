@@ -108,7 +108,7 @@ final class PersonsPageProvider
     with $FutureModifier<ApiPage<Persona>>, $FutureProvider<ApiPage<Persona>> {
   PersonsPageProvider._({
     required PersonsPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'personsPageProvider',
@@ -124,7 +124,7 @@ final class PersonsPageProvider
   String toString() {
     return r'personsPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -135,8 +135,8 @@ final class PersonsPageProvider
 
   @override
   FutureOr<ApiPage<Persona>> create(Ref ref) {
-    final argument = this.argument as int;
-    return personsPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return personsPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -150,10 +150,14 @@ final class PersonsPageProvider
   }
 }
 
-String _$personsPageHash() => r'2ed1e14bcaaeb435f94311c883e501000f91c5e0';
+String _$personsPageHash() => r'caf2b6323f97ca2c7e520562a7d66378ab924ebb';
 
 final class PersonsPageFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ApiPage<Persona>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<Persona>>,
+          (int, {TableQuery query})
+        > {
   PersonsPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -163,8 +167,10 @@ final class PersonsPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  PersonsPageProvider call(int pageIndex) =>
-      PersonsPageProvider._(argument: pageIndex, from: this);
+  PersonsPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) => PersonsPageProvider._(argument: (pageIndex, query: query), from: this);
 
   @override
   String toString() => r'personsPageProvider';

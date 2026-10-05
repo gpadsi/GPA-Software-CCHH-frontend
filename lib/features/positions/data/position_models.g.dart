@@ -13,6 +13,7 @@ _PositionCatalogEntry _$PositionCatalogEntryFromJson(
   code: json['code'] as String,
   name: json['name'] as String,
   isActive: json['is_active'] as bool,
+  esGerenciaDeUnidad: json['es_gerencia_de_unidad'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$PositionCatalogEntryToJson(
@@ -22,6 +23,7 @@ Map<String, dynamic> _$PositionCatalogEntryToJson(
   'code': instance.code,
   'name': instance.name,
   'is_active': instance.isActive,
+  'es_gerencia_de_unidad': instance.esGerenciaDeUnidad,
 };
 
 _RefEntry _$RefEntryFromJson(Map<String, dynamic> json) => _RefEntry(

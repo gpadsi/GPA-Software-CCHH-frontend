@@ -208,6 +208,7 @@ void main() {
         width: width,
         scale: 1.5,
       );
+      await tester.ensureVisible(find.byTooltip('Expandir Empresa de prueba'));
       await tester.tap(find.byTooltip('Expandir Empresa de prueba'));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byTooltip('Expandir Unidad de negocio'));

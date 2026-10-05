@@ -23,6 +23,12 @@ _RefreshResponse _$RefreshResponseFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$RefreshResponseToJson(_RefreshResponse instance) =>
     <String, dynamic>{'access': instance.access, 'refresh': instance.refresh};
 
+_SessionRole _$SessionRoleFromJson(Map<String, dynamic> json) =>
+    _SessionRole(code: json['code'] as String, name: json['name'] as String);
+
+Map<String, dynamic> _$SessionRoleToJson(_SessionRole instance) =>
+    <String, dynamic>{'code': instance.code, 'name': instance.name};
+
 _SessionUser _$SessionUserFromJson(Map<String, dynamic> json) => _SessionUser(
   id: json['id'] as String,
   username: json['username'] as String,
@@ -30,6 +36,10 @@ _SessionUser _$SessionUserFromJson(Map<String, dynamic> json) => _SessionUser(
   firstName: json['first_name'] as String,
   lastName: json['last_name'] as String,
   isActive: json['is_active'] as bool,
+  role: json['role'] == null
+      ? null
+      : SessionRole.fromJson(json['role'] as Map<String, dynamic>),
+  canManageHr: json['can_manage_hr'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$SessionUserToJson(_SessionUser instance) =>
@@ -40,4 +50,6 @@ Map<String, dynamic> _$SessionUserToJson(_SessionUser instance) =>
       'first_name': instance.firstName,
       'last_name': instance.lastName,
       'is_active': instance.isActive,
+      'role': instance.role,
+      'can_manage_hr': instance.canManageHr,
     };

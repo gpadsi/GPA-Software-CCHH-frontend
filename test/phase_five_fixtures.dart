@@ -1,3 +1,4 @@
+import 'package:capital_humano_front/core/network/table_query.dart';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/features/schedules/data/schedule_models.dart';
 import 'package:capital_humano_front/features/schedules/data/schedules_repository.dart';
@@ -38,6 +39,9 @@ const asignacionUbicacionA = AsignacionUbicacion(
 );
 
 class FakeSchedulesRepository extends SchedulesRepository {
+  TableQuery lastCatorcenasQuery = const TableQuery();
+  TableQuery lastAsignacionesHorarioQuery = const TableQuery();
+  TableQuery lastAsignacionesUbicacionQuery = const TableQuery();
   FakeSchedulesRepository() : super(Dio());
   Object? failure;
 
@@ -59,7 +63,11 @@ class FakeSchedulesRepository extends SchedulesRepository {
   final empleados = [empleadoRefA];
 
   @override
-  Future<ApiPage<Catorcena>> catorcenasPage(int page) async {
+  Future<ApiPage<Catorcena>> catorcenasPage(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastCatorcenasQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(count: catorcenas.length, results: [...catorcenas]);
   }
@@ -95,6 +103,20 @@ class FakeSchedulesRepository extends SchedulesRepository {
     catorcenas.removeWhere((item) => item.id == id);
   }
 
+  TipoHorarioRef? savedTipo;
+  bool? tipoCreated;
+
+  @override
+  Future<TipoHorarioRef> saveTipoHorario(
+    TipoHorarioRef tipo, {
+    required bool creating,
+  }) async {
+    if (failure != null) throw failure!;
+    savedTipo = tipo;
+    tipoCreated = creating;
+    return tipo;
+  }
+
   @override
   Future<List<TipoHorarioRef>> tiposHorario() async {
     if (failure != null) throw failure!;
@@ -120,7 +142,11 @@ class FakeSchedulesRepository extends SchedulesRepository {
   }
 
   @override
-  Future<ApiPage<AsignacionHorario>> asignacionesHorarioPage(int page) async {
+  Future<ApiPage<AsignacionHorario>> asignacionesHorarioPage(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastAsignacionesHorarioQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(
       count: asignacionesHorario.length,
@@ -141,8 +167,9 @@ class FakeSchedulesRepository extends SchedulesRepository {
       asignacionesHorario.add(result);
     } else {
       asignacionesHorario[asignacionesHorario.indexWhere(
-        (item) => item.id == asignacion.id,
-      )] = result;
+            (item) => item.id == asignacion.id,
+          )] =
+          result;
     }
     return result;
   }
@@ -156,8 +183,10 @@ class FakeSchedulesRepository extends SchedulesRepository {
 
   @override
   Future<ApiPage<AsignacionUbicacion>> asignacionesUbicacionPage(
-    int page,
-  ) async {
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastAsignacionesUbicacionQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(
       count: asignacionesUbicacion.length,
@@ -178,8 +207,9 @@ class FakeSchedulesRepository extends SchedulesRepository {
       asignacionesUbicacion.add(result);
     } else {
       asignacionesUbicacion[asignacionesUbicacion.indexWhere(
-        (item) => item.id == asignacion.id,
-      )] = result;
+            (item) => item.id == asignacion.id,
+          )] =
+          result;
     }
     return result;
   }

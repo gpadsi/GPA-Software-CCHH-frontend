@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/employment_models.dart';
 import '../data/employment_repository.dart';
 
@@ -15,8 +16,11 @@ EmploymentRepository employmentRepository(Ref ref) {
 }
 
 @Riverpod(retry: manualRetryOnly)
-Future<ApiPage<Empleado>> empleadosPage(Ref ref, int pageIndex) =>
-    ref.watch(employmentRepositoryProvider).list(pageIndex + 1);
+Future<ApiPage<Empleado>> empleadosPage(
+  Ref ref,
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref.watch(employmentRepositoryProvider).list(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<Empleado> empleadoDetail(Ref ref, String id) =>

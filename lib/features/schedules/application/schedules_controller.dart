@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/schedule_models.dart';
 import '../data/schedules_repository.dart';
 
@@ -15,8 +16,13 @@ SchedulesRepository schedulesRepository(Ref ref) {
 }
 
 @Riverpod(retry: manualRetryOnly)
-Future<ApiPage<Catorcena>> catorcenasPage(Ref ref, int pageIndex) =>
-    ref.watch(schedulesRepositoryProvider).catorcenasPage(pageIndex + 1);
+Future<ApiPage<Catorcena>> catorcenasPage(
+  Ref ref,
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref
+    .watch(schedulesRepositoryProvider)
+    .catorcenasPage(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<List<Catorcena>> allCatorcenas(Ref ref) =>
@@ -41,13 +47,17 @@ Future<EmpleadoRef> empleadoRef(Ref ref, String id) =>
 @Riverpod(retry: manualRetryOnly)
 Future<ApiPage<AsignacionHorario>> asignacionesHorarioPage(
   Ref ref,
-  int pageIndex,
-) => ref.watch(schedulesRepositoryProvider).asignacionesHorarioPage(pageIndex + 1);
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref
+    .watch(schedulesRepositoryProvider)
+    .asignacionesHorarioPage(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<ApiPage<AsignacionUbicacion>> asignacionesUbicacionPage(
   Ref ref,
-  int pageIndex,
-) => ref
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref
     .watch(schedulesRepositoryProvider)
-    .asignacionesUbicacionPage(pageIndex + 1);
+    .asignacionesUbicacionPage(pageIndex + 1, query: query);

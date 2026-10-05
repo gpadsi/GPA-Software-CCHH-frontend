@@ -49,8 +49,13 @@ abstract class PersonSummary with _$PersonSummary {
   factory PersonSummary.fromJson(Map<String, dynamic> json) =>
       _$PersonSummaryFromJson(json);
 
-  String get fullName =>
-      '$lastNamePaternal $lastNameMaternal $firstName'.trim();
+  // Sin el apellido materno (hay personas que no lo tienen) no queda un
+  // espacio doble entre los demás.
+  String get fullName => [
+    lastNamePaternal,
+    lastNameMaternal,
+    firstName,
+  ].where((part) => part.trim().isNotEmpty).join(' ');
 }
 
 @freezed

@@ -20,6 +20,14 @@ abstract class RefreshResponse with _$RefreshResponse {
 }
 
 @freezed
+abstract class SessionRole with _$SessionRole {
+  const factory SessionRole({required String code, required String name}) =
+      _SessionRole;
+  factory SessionRole.fromJson(Map<String, dynamic> json) =>
+      _$SessionRoleFromJson(json);
+}
+
+@freezed
 abstract class SessionUser with _$SessionUser {
   const SessionUser._();
   const factory SessionUser({
@@ -29,6 +37,12 @@ abstract class SessionUser with _$SessionUser {
     @JsonKey(name: 'first_name') required String firstName,
     @JsonKey(name: 'last_name') required String lastName,
     @JsonKey(name: 'is_active') required bool isActive,
+    // null mientras la cuenta no tenga rol asignado.
+    SessionRole? role,
+    // El servidor decide (Capital Humano o Admin); el front no repite la regla.
+    // Si el servidor no lo manda, se asume que NO puede: lo seguro es no
+    // ofrecer botones de escritura que la API rechazaría.
+    @JsonKey(name: 'can_manage_hr') @Default(false) bool canManageHr,
   }) = _SessionUser;
   factory SessionUser.fromJson(Map<String, dynamic> json) =>
       _$SessionUserFromJson(json);

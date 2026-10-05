@@ -72,7 +72,7 @@ final class CatorcenasPageProvider
         $FutureProvider<ApiPage<Catorcena>> {
   CatorcenasPageProvider._({
     required CatorcenasPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'catorcenasPageProvider',
@@ -88,7 +88,7 @@ final class CatorcenasPageProvider
   String toString() {
     return r'catorcenasPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -99,8 +99,8 @@ final class CatorcenasPageProvider
 
   @override
   FutureOr<ApiPage<Catorcena>> create(Ref ref) {
-    final argument = this.argument as int;
-    return catorcenasPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return catorcenasPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -114,10 +114,14 @@ final class CatorcenasPageProvider
   }
 }
 
-String _$catorcenasPageHash() => r'0591ac063a6c7cb530d4082a7e63454e83f7582d';
+String _$catorcenasPageHash() => r'411a00f75b842cdef26bd425f65b7d4303be3959';
 
 final class CatorcenasPageFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ApiPage<Catorcena>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<Catorcena>>,
+          (int, {TableQuery query})
+        > {
   CatorcenasPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -127,8 +131,11 @@ final class CatorcenasPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  CatorcenasPageProvider call(int pageIndex) =>
-      CatorcenasPageProvider._(argument: pageIndex, from: this);
+  CatorcenasPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) =>
+      CatorcenasPageProvider._(argument: (pageIndex, query: query), from: this);
 
   @override
   String toString() => r'catorcenasPageProvider';
@@ -386,7 +393,7 @@ final class AsignacionesHorarioPageProvider
         $FutureProvider<ApiPage<AsignacionHorario>> {
   AsignacionesHorarioPageProvider._({
     required AsignacionesHorarioPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'asignacionesHorarioPageProvider',
@@ -402,7 +409,7 @@ final class AsignacionesHorarioPageProvider
   String toString() {
     return r'asignacionesHorarioPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -413,8 +420,8 @@ final class AsignacionesHorarioPageProvider
 
   @override
   FutureOr<ApiPage<AsignacionHorario>> create(Ref ref) {
-    final argument = this.argument as int;
-    return asignacionesHorarioPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return asignacionesHorarioPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -430,10 +437,14 @@ final class AsignacionesHorarioPageProvider
 }
 
 String _$asignacionesHorarioPageHash() =>
-    r'f99d329a1c4784b6914fcfaf43f00c5d7b890869';
+    r'2f22c664bb9e4e4ca9e58f2dcb790a97a32f0b83';
 
 final class AsignacionesHorarioPageFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ApiPage<AsignacionHorario>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<AsignacionHorario>>,
+          (int, {TableQuery query})
+        > {
   AsignacionesHorarioPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -443,8 +454,13 @@ final class AsignacionesHorarioPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  AsignacionesHorarioPageProvider call(int pageIndex) =>
-      AsignacionesHorarioPageProvider._(argument: pageIndex, from: this);
+  AsignacionesHorarioPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) => AsignacionesHorarioPageProvider._(
+    argument: (pageIndex, query: query),
+    from: this,
+  );
 
   @override
   String toString() => r'asignacionesHorarioPageProvider';
@@ -465,7 +481,7 @@ final class AsignacionesUbicacionPageProvider
         $FutureProvider<ApiPage<AsignacionUbicacion>> {
   AsignacionesUbicacionPageProvider._({
     required AsignacionesUbicacionPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'asignacionesUbicacionPageProvider',
@@ -481,7 +497,7 @@ final class AsignacionesUbicacionPageProvider
   String toString() {
     return r'asignacionesUbicacionPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -492,8 +508,8 @@ final class AsignacionesUbicacionPageProvider
 
   @override
   FutureOr<ApiPage<AsignacionUbicacion>> create(Ref ref) {
-    final argument = this.argument as int;
-    return asignacionesUbicacionPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return asignacionesUbicacionPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -509,11 +525,14 @@ final class AsignacionesUbicacionPageProvider
 }
 
 String _$asignacionesUbicacionPageHash() =>
-    r'3fe1ea92b7cd83bdcd7312ef6466feb31d491a59';
+    r'3235e9b69407f9f6a7a3478a8d8b0230a47eb52c';
 
 final class AsignacionesUbicacionPageFamily extends $Family
     with
-        $FunctionalFamilyOverride<FutureOr<ApiPage<AsignacionUbicacion>>, int> {
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<AsignacionUbicacion>>,
+          (int, {TableQuery query})
+        > {
   AsignacionesUbicacionPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -523,8 +542,13 @@ final class AsignacionesUbicacionPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  AsignacionesUbicacionPageProvider call(int pageIndex) =>
-      AsignacionesUbicacionPageProvider._(argument: pageIndex, from: this);
+  AsignacionesUbicacionPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) => AsignacionesUbicacionPageProvider._(
+    argument: (pageIndex, query: query),
+    from: this,
+  );
 
   @override
   String toString() => r'asignacionesUbicacionPageProvider';

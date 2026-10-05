@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PositionCatalogEntry {
 
- int get id; String get code; String get name;@JsonKey(name: 'is_active') bool get isActive;
+ int get id; String get code; String get name;@JsonKey(name: 'is_active') bool get isActive;@JsonKey(name: 'es_gerencia_de_unidad') bool get esGerenciaDeUnidad;
 /// Create a copy of PositionCatalogEntry
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $PositionCatalogEntryCopyWith<PositionCatalogEntry> get copyWith => _$PositionCa
 @override
 bool operator ==(Object other) {
   final _this = this as PositionCatalogEntry;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PositionCatalogEntry&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PositionCatalogEntry&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive)&&(identical(other.esGerenciaDeUnidad, _this.esGerenciaDeUnidad) || other.esGerenciaDeUnidad == _this.esGerenciaDeUnidad));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PositionCatalogEntry;
-  return Object.hash(runtimeType,_this.id,_this.code,_this.name,_this.isActive);
+  return Object.hash(runtimeType,_this.id,_this.code,_this.name,_this.isActive,_this.esGerenciaDeUnidad);
 }
 
 @override
 String toString() {
   final _this = this as PositionCatalogEntry;
-  return 'PositionCatalogEntry(id: ${_this.id}, code: ${_this.code}, name: ${_this.name}, isActive: ${_this.isActive})';
+  return 'PositionCatalogEntry(id: ${_this.id}, code: ${_this.code}, name: ${_this.name}, isActive: ${_this.isActive}, esGerenciaDeUnidad: ${_this.esGerenciaDeUnidad})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $PositionCatalogEntryCopyWith<$Res>  {
   factory $PositionCatalogEntryCopyWith(PositionCatalogEntry value, $Res Function(PositionCatalogEntry) _then) = _$PositionCatalogEntryCopyWithImpl;
 @useResult
 $Res call({
- int id, String code, String name,@JsonKey(name: 'is_active') bool isActive
+ int id, String code, String name,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'es_gerencia_de_unidad') bool esGerenciaDeUnidad
 });
 
 
@@ -71,12 +71,13 @@ class _$PositionCatalogEntryCopyWithImpl<$Res>
 
 /// Create a copy of PositionCatalogEntry
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? code = null,Object? name = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? code = null,Object? name = null,Object? isActive = null,Object? esGerenciaDeUnidad = null,}) {
   return _then(PositionCatalogEntry(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,esGerenciaDeUnidad: null == esGerenciaDeUnidad ? _self.esGerenciaDeUnidad : esGerenciaDeUnidad // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -162,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'es_gerencia_de_unidad')  bool esGerenciaDeUnidad)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PositionCatalogEntry() when $default != null:
-return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.code,_that.name,_that.isActive,_that.esGerenciaDeUnidad);case _:
   return orElse();
 
 }
@@ -183,10 +184,10 @@ return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'es_gerencia_de_unidad')  bool esGerenciaDeUnidad)  $default,) {final _that = this;
 switch (_that) {
 case _PositionCatalogEntry():
-return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.code,_that.name,_that.isActive,_that.esGerenciaDeUnidad);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +204,10 @@ return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String code,  String name, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'es_gerencia_de_unidad')  bool esGerenciaDeUnidad)?  $default,) {final _that = this;
 switch (_that) {
 case _PositionCatalogEntry() when $default != null:
-return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.code,_that.name,_that.isActive,_that.esGerenciaDeUnidad);case _:
   return null;
 
 }
@@ -218,13 +219,14 @@ return $default(_that.id,_that.code,_that.name,_that.isActive);case _:
 @JsonSerializable()
 
 class _PositionCatalogEntry implements PositionCatalogEntry {
-  const _PositionCatalogEntry({required this.id, required this.code, required this.name, @JsonKey(name: 'is_active') required this.isActive});
+  const _PositionCatalogEntry({required this.id, required this.code, required this.name, @JsonKey(name: 'is_active') required this.isActive, @JsonKey(name: 'es_gerencia_de_unidad') this.esGerenciaDeUnidad = false});
   factory _PositionCatalogEntry.fromJson(Map<String, dynamic> json) => _$PositionCatalogEntryFromJson(json);
 
 @override final  int id;
 @override final  String code;
 @override final  String name;
 @override@JsonKey(name: 'is_active') final  bool isActive;
+@override@JsonKey(name: 'es_gerencia_de_unidad') final  bool esGerenciaDeUnidad;
 
 /// Create a copy of PositionCatalogEntry
 /// with the given fields replaced by the non-null parameter values.
@@ -239,18 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PositionCatalogEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PositionCatalogEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.esGerenciaDeUnidad, esGerenciaDeUnidad) || other.esGerenciaDeUnidad == esGerenciaDeUnidad));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,code,name,isActive);
+    return Object.hash(runtimeType,id,code,name,isActive,esGerenciaDeUnidad);
 }
 
 @override
 String toString() {
-    return 'PositionCatalogEntry(id: $id, code: $code, name: $name, isActive: $isActive)';
+    return 'PositionCatalogEntry(id: $id, code: $code, name: $name, isActive: $isActive, esGerenciaDeUnidad: $esGerenciaDeUnidad)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$PositionCatalogEntryCopyWith<$Res> implements $PositionCa
   factory _$PositionCatalogEntryCopyWith(_PositionCatalogEntry value, $Res Function(_PositionCatalogEntry) _then) = __$PositionCatalogEntryCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String code, String name,@JsonKey(name: 'is_active') bool isActive
+ int id, String code, String name,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'es_gerencia_de_unidad') bool esGerenciaDeUnidad
 });
 
 
@@ -278,12 +280,13 @@ class __$PositionCatalogEntryCopyWithImpl<$Res>
 
 /// Create a copy of PositionCatalogEntry
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? code = null,Object? name = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? code = null,Object? name = null,Object? isActive = null,Object? esGerenciaDeUnidad = null,}) {
   return _then(_PositionCatalogEntry(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,esGerenciaDeUnidad: null == esGerenciaDeUnidad ? _self.esGerenciaDeUnidad : esGerenciaDeUnidad // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

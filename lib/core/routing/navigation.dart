@@ -99,7 +99,7 @@ const appDestinations = <AppDestination>[
     path: '/reclutamiento',
     label: 'Reclutamiento',
     group: 'Personal',
-    description: 'Vacantes y proceso de selección de nuevo personal.',
+    description: 'Requisiciones de personal y descriptivos de puesto.',
     icon: Icons.person_search_outlined,
   ),
   AppDestination(

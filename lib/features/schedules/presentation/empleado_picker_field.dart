@@ -22,8 +22,9 @@ class EmpleadoPickerField extends ConsumerWidget {
   final ValueChanged<String?> onChanged;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(allEmpleadosForPickerProvider).when(
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(allEmpleadosForPickerProvider)
+      .when(
         data: (empleados) => FormField<String>(
           initialValue: selected,
           validator: (value) => value == null ? 'Elige un empleado.' : null,
@@ -55,9 +56,8 @@ class EmpleadoPickerField extends ConsumerWidget {
                   padding: const EdgeInsets.only(top: 4, left: 12),
                   child: Text(
                     field.errorText!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.error,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: AppColors.error),
                   ),
                 ),
             ],

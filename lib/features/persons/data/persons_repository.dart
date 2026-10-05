@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import 'person_models.dart';
 
 class PersonsRepository {
@@ -26,8 +27,16 @@ class PersonsRepository {
     );
   }
 
-  Future<ApiPage<Persona>> list(int page) =>
-      fetchPage(api, 'persons/personas/', Persona.fromJson, page: page);
+  Future<ApiPage<Persona>> list(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) => fetchPage(
+    api,
+    'persons/personas/',
+    Persona.fromJson,
+    page: page,
+    query: query,
+  );
 
   Future<Persona> get(String id) async {
     final response = await api.get<Map<String, dynamic>>(

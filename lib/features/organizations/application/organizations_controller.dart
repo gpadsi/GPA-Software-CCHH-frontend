@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/organization_models.dart';
 import '../data/organizations_repository.dart';
 part 'organizations_controller.g.dart';
@@ -18,8 +19,13 @@ Future<OrganizationTree> organizationTree(Ref ref) =>
     ref.watch(organizationsRepositoryProvider).tree();
 
 @Riverpod(retry: manualRetryOnly)
-Future<ApiPage<Company>> companiesPage(Ref ref, int pageIndex) =>
-    ref.watch(organizationsRepositoryProvider).companies(pageIndex + 1);
+Future<ApiPage<Company>> companiesPage(
+  Ref ref,
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref
+    .watch(organizationsRepositoryProvider)
+    .companies(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<OrganizationNode> companyNode(Ref ref, String id) =>

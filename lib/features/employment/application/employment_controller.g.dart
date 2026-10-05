@@ -72,7 +72,7 @@ final class EmpleadosPageProvider
         $FutureProvider<ApiPage<Empleado>> {
   EmpleadosPageProvider._({
     required EmpleadosPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'empleadosPageProvider',
@@ -88,7 +88,7 @@ final class EmpleadosPageProvider
   String toString() {
     return r'empleadosPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -99,8 +99,8 @@ final class EmpleadosPageProvider
 
   @override
   FutureOr<ApiPage<Empleado>> create(Ref ref) {
-    final argument = this.argument as int;
-    return empleadosPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return empleadosPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -114,10 +114,14 @@ final class EmpleadosPageProvider
   }
 }
 
-String _$empleadosPageHash() => r'6e4ffbec34c8124b225638554af35b8a0f8bfe65';
+String _$empleadosPageHash() => r'547720ffa1c3d1061cfa1a38155bce66a964bada';
 
 final class EmpleadosPageFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ApiPage<Empleado>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<Empleado>>,
+          (int, {TableQuery query})
+        > {
   EmpleadosPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -127,8 +131,11 @@ final class EmpleadosPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  EmpleadosPageProvider call(int pageIndex) =>
-      EmpleadosPageProvider._(argument: pageIndex, from: this);
+  EmpleadosPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) =>
+      EmpleadosPageProvider._(argument: (pageIndex, query: query), from: this);
 
   @override
   String toString() => r'empleadosPageProvider';

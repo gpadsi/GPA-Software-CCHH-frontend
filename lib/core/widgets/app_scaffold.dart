@@ -86,14 +86,19 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
                         right: BorderSide(color: AppColors.border),
                       ),
                     ),
-                    child: _Sidebar(
-                      collapsed: collapsed,
-                      drawer: false,
-                      currentPath: destination.path,
-                      scrollController: _sidebarScroll,
-                      onNavigate: _navigate,
-                      onToggle: () =>
-                          ref.read(sidebarControllerProvider.notifier).toggle(),
+                    // RepaintBoundary: al animar el ancho, el contenido de la barra
+                    // se repinta en su propia capa y no arrastra a la página.
+                    child: RepaintBoundary(
+                      child: _Sidebar(
+                        collapsed: collapsed,
+                        drawer: false,
+                        currentPath: destination.path,
+                        scrollController: _sidebarScroll,
+                        onNavigate: _navigate,
+                        onToggle: () => ref
+                            .read(sidebarControllerProvider.notifier)
+                            .toggle(),
+                      ),
                     ),
                   ),
                 Expanded(
@@ -110,7 +115,9 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
                         onOpenMenu: () =>
                             _scaffoldKey.currentState?.openDrawer(),
                       ),
-                      Expanded(child: widget.child),
+                      // La página en su propia capa: sus animaciones (carga,
+                      // fundidos) no repintan la barra lateral ni el encabezado.
+                      Expanded(child: RepaintBoundary(child: widget.child)),
                     ],
                   ),
                 ),

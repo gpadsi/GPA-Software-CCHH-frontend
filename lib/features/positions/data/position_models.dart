@@ -12,6 +12,10 @@ abstract class PositionCatalogEntry with _$PositionCatalogEntry {
     required String code,
     required String name,
     @JsonKey(name: 'is_active') required bool isActive,
+    // Solo lo manda el catálogo de puestos; en los demás queda en false.
+    @JsonKey(name: 'es_gerencia_de_unidad')
+    @Default(false)
+    bool esGerenciaDeUnidad,
   }) = _PositionCatalogEntry;
   factory PositionCatalogEntry.fromJson(Map<String, dynamic> json) =>
       _$PositionCatalogEntryFromJson(json);
@@ -49,7 +53,9 @@ abstract class Posicion with _$Posicion {
     @JsonKey(name: 'fecha_autorizacion_vacante')
     String? fechaAutorizacionVacante,
     @Default('') String headhunter,
-    @JsonKey(name: 'solicitante_vacante') @Default('') String solicitanteVacante,
+    @JsonKey(name: 'solicitante_vacante')
+    @Default('')
+    String solicitanteVacante,
     @JsonKey(name: 'proyecto_eventual') @Default('') String proyectoEventual,
     @JsonKey(name: 'fecha_esperada_termino') String? fechaEsperadaTermino,
   }) = _Posicion;

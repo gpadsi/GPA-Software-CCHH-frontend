@@ -92,7 +92,7 @@ void main() {
     expect(find.text('ADV0001'), findsOneWidget);
     expect(find.text('Pérez López Juan'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Ver empleado'));
+    await tester.tap(find.byTooltip('Ver empleado ADV0001'));
     await tester.pumpAndSettle();
     expect(router.routeInformationProvider.value.uri.path, '/empleados/e1');
     expect(find.text('Contrato vigente'), findsOneWidget);

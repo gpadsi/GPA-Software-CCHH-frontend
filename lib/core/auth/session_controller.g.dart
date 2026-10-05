@@ -91,6 +91,54 @@ final class SessionServiceProvider
 
 String _$sessionServiceHash() => r'6a81f80770c886d40f2eb6c598e86074bbb8a882';
 
+/// Si la cuenta en sesión puede crear, editar y borrar datos de Capital Humano.
+/// Las pantallas lo usan para no mostrar botones que la API rechazaría.
+
+@ProviderFor(canManageHr)
+final canManageHrProvider = CanManageHrProvider._();
+
+/// Si la cuenta en sesión puede crear, editar y borrar datos de Capital Humano.
+/// Las pantallas lo usan para no mostrar botones que la API rechazaría.
+
+final class CanManageHrProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// Si la cuenta en sesión puede crear, editar y borrar datos de Capital Humano.
+  /// Las pantallas lo usan para no mostrar botones que la API rechazaría.
+  CanManageHrProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'canManageHrProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$canManageHrHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return canManageHr(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$canManageHrHash() => r'ea0f029b10c9f41fe1a093ee340ff3887ce60485';
+
 @ProviderFor(SessionController)
 final sessionControllerProvider = SessionControllerProvider._();
 

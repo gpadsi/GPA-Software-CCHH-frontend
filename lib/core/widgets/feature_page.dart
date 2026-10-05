@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../design_system/spacing.dart';
 import '../network/api_failure.dart';
 import 'app_button.dart';
+import 'app_fade_switcher.dart';
+import 'app_shimmer.dart';
 import 'empty_state.dart';
 import 'loading_skeleton.dart';
 
@@ -46,7 +48,8 @@ class FeaturePage extends StatelessWidget {
               ),
             ],
             const SizedBox(height: AppSpacing.lg),
-            child,
+            // Fundido entre cargando / error / datos (ver AppFadeSwitcher).
+            AppFadeSwitcher(child: child),
           ],
         ),
       ),
@@ -57,14 +60,16 @@ class FeaturePage extends StatelessWidget {
 class FeatureLoading extends StatelessWidget {
   const FeatureLoading({super.key});
   @override
-  Widget build(BuildContext context) => const Column(
-    children: [
-      LoadingSkeleton(height: 64),
-      SizedBox(height: AppSpacing.md),
-      LoadingSkeleton(height: 64),
-      SizedBox(height: AppSpacing.md),
-      LoadingSkeleton(height: 64),
-    ],
+  Widget build(BuildContext context) => const AppShimmer(
+    child: Column(
+      children: [
+        LoadingSkeleton(height: 64),
+        SizedBox(height: AppSpacing.md),
+        LoadingSkeleton(height: 64),
+        SizedBox(height: AppSpacing.md),
+        LoadingSkeleton(height: 64),
+      ],
+    ),
   );
 }
 

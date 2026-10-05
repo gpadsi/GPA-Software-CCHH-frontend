@@ -43,8 +43,13 @@ abstract class Persona with _$Persona {
   factory Persona.fromJson(Map<String, dynamic> json) =>
       _$PersonaFromJson(json);
 
-  String get fullName =>
-      '$lastNamePaternal $lastNameMaternal $firstName'.trim();
+  // Sin el apellido materno (hay personas que no lo tienen) no queda un
+  // espacio doble entre los demás.
+  String get fullName => [
+    lastNamePaternal,
+    lastNameMaternal,
+    firstName,
+  ].where((part) => part.trim().isNotEmpty).join(' ');
 }
 
 @freezed

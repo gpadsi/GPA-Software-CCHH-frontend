@@ -72,7 +72,7 @@ final class LocationPageProvider
         $FutureProvider<ApiPage<LocationRecord>> {
   LocationPageProvider._({
     required LocationPageFamily super.from,
-    required (LocationKind, int) super.argument,
+    required (LocationKind, int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'locationPageProvider',
@@ -99,8 +99,8 @@ final class LocationPageProvider
 
   @override
   FutureOr<ApiPage<LocationRecord>> create(Ref ref) {
-    final argument = this.argument as (LocationKind, int);
-    return locationPage(ref, argument.$1, argument.$2);
+    final argument = this.argument as (LocationKind, int, {TableQuery query});
+    return locationPage(ref, argument.$1, argument.$2, query: argument.query);
   }
 
   @override
@@ -114,13 +114,13 @@ final class LocationPageProvider
   }
 }
 
-String _$locationPageHash() => r'6a450a1ba1383a4e8f37886fa7d94b5b24c864c7';
+String _$locationPageHash() => r'a0c7ea78d9cf8d81602b391d6c16a02fa038e647';
 
 final class LocationPageFamily extends $Family
     with
         $FunctionalFamilyOverride<
           FutureOr<ApiPage<LocationRecord>>,
-          (LocationKind, int)
+          (LocationKind, int, {TableQuery query})
         > {
   LocationPageFamily._()
     : super(
@@ -131,8 +131,14 @@ final class LocationPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  LocationPageProvider call(LocationKind kind, int pageIndex) =>
-      LocationPageProvider._(argument: (kind, pageIndex), from: this);
+  LocationPageProvider call(
+    LocationKind kind,
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) => LocationPageProvider._(
+    argument: (kind, pageIndex, query: query),
+    from: this,
+  );
 
   @override
   String toString() => r'locationPageProvider';

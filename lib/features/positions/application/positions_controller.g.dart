@@ -111,7 +111,7 @@ final class PosicionesPageProvider
         $FutureProvider<ApiPage<Posicion>> {
   PosicionesPageProvider._({
     required PosicionesPageFamily super.from,
-    required int super.argument,
+    required (int, {TableQuery query}) super.argument,
   }) : super(
          retry: manualRetryOnly,
          name: r'posicionesPageProvider',
@@ -127,7 +127,7 @@ final class PosicionesPageProvider
   String toString() {
     return r'posicionesPageProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -138,8 +138,8 @@ final class PosicionesPageProvider
 
   @override
   FutureOr<ApiPage<Posicion>> create(Ref ref) {
-    final argument = this.argument as int;
-    return posicionesPage(ref, argument);
+    final argument = this.argument as (int, {TableQuery query});
+    return posicionesPage(ref, argument.$1, query: argument.query);
   }
 
   @override
@@ -153,10 +153,14 @@ final class PosicionesPageProvider
   }
 }
 
-String _$posicionesPageHash() => r'777ed11206e71df3954bb61ef1459b17f560e02a';
+String _$posicionesPageHash() => r'861ba43603ed0c324d90921b7534f768b40df6ef';
 
 final class PosicionesPageFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ApiPage<Posicion>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<ApiPage<Posicion>>,
+          (int, {TableQuery query})
+        > {
   PosicionesPageFamily._()
     : super(
         retry: manualRetryOnly,
@@ -166,8 +170,11 @@ final class PosicionesPageFamily extends $Family
         isAutoDispose: true,
       );
 
-  PosicionesPageProvider call(int pageIndex) =>
-      PosicionesPageProvider._(argument: pageIndex, from: this);
+  PosicionesPageProvider call(
+    int pageIndex, {
+    TableQuery query = const TableQuery(),
+  }) =>
+      PosicionesPageProvider._(argument: (pageIndex, query: query), from: this);
 
   @override
   String toString() => r'posicionesPageProvider';

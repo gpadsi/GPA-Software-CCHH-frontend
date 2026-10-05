@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'table_query.dart';
+
 part 'api_page.freezed.dart';
 part 'api_page.g.dart';
 
@@ -26,6 +28,7 @@ Future<ApiPage<T>> fetchPage<T>(
   T Function(Map<String, dynamic>) decode, {
   int page = 1,
   int pageSize = 25,
+  TableQuery query = const TableQuery(),
   Map<String, dynamic> queryParameters = const {},
 }) async {
   final response = await api.get<Map<String, dynamic>>(
@@ -33,6 +36,7 @@ Future<ApiPage<T>> fetchPage<T>(
     queryParameters: {
       'page': page,
       'page_size': pageSize,
+      ...query.params,
       ...queryParameters,
     },
   );

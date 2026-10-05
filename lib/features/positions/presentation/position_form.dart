@@ -6,9 +6,9 @@ import 'package:intl/intl.dart';
 import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
+import '../../../core/widgets/form_panel.dart';
 import '../application/positions_controller.dart';
 import '../data/position_models.dart';
 
@@ -135,81 +135,18 @@ class _PositionFormState extends ConsumerState<PositionForm> {
   @override
   Widget build(BuildContext context) {
     final catalogs = ref.watch(positionCatalogsProvider);
-    return PopScope(
-      canPop: !_busy,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(AppSpacing.md),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640, maxHeight: 720),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  0,
-                ),
-                child: Text(
-                  widget.posicion == null
-                      ? 'Agregar posición'
-                      : 'Editar posición',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: catalogs.when(
-                    data: _fields,
-                    loading: () => const FeatureLoading(),
-                    error: (error, _) => FeatureError(
-                      error: error,
-                      onRetry: () => ref.invalidate(positionCatalogsProvider),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (_error != null) ...[
-                      Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                    Wrap(
-                      alignment: WrapAlignment.end,
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        AppButton(
-                          label: 'Cancelar',
-                          variant: AppButtonVariant.secondary,
-                          onPressed: _busy
-                              ? null
-                              : () => Navigator.of(context).pop(),
-                        ),
-                        AppButton(
-                          label: 'Guardar',
-                          isLoading: _busy,
-                          onPressed: catalogs.hasValue ? _save : null,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+    return AppFormPanel(
+      title: widget.posicion == null ? 'Agregar posición' : 'Editar posición',
+      busy: _busy,
+      error: _error,
+      canSave: catalogs.hasValue,
+      onSave: _save,
+      child: catalogs.when(
+        data: _fields,
+        loading: () => const FeatureLoading(),
+        error: (error, _) => FeatureError(
+          error: error,
+          onRetry: () => ref.invalidate(positionCatalogsProvider),
         ),
       ),
     );
@@ -220,8 +157,14 @@ class _PositionFormState extends ConsumerState<PositionForm> {
     child: Text(text, style: Theme.of(context).textTheme.titleSmall),
   );
 
-  String _dateLabel(String label, DateTime? value, ValueChanged<DateTime?> onPicked) {
-    return value == null ? '$label: sin capturar' : '$label: ${_displayDate.format(value)}';
+  String _dateLabel(
+    String label,
+    DateTime? value,
+    ValueChanged<DateTime?> onPicked,
+  ) {
+    return value == null
+        ? '$label: sin capturar'
+        : '$label: ${_displayDate.format(value)}';
   }
 
   Widget _dateField(
@@ -317,9 +260,7 @@ class _PositionFormState extends ConsumerState<PositionForm> {
               DropdownMenuItem(value: item.id, child: Text(item.name)),
           ],
           validator: (value) => value == null ? 'Elige un estatus.' : null,
-          onChanged: _busy
-              ? null
-              : (value) => setState(() => _estatus = value),
+          onChanged: _busy ? null : (value) => setState(() => _estatus = value),
         ),
         const SizedBox(height: AppSpacing.md),
         _selectInt(
@@ -425,8 +366,9 @@ class _ReportsToField extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(allPosicionesForPickerProvider).when(
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(allPosicionesForPickerProvider)
+      .when(
         data: (posiciones) {
           final options = posiciones.where((item) => item.id != excludeId);
           return DropdownMenu<String?>(

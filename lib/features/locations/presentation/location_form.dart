@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
+import '../../../core/widgets/form_panel.dart';
 import '../application/locations_controller.dart';
 import '../data/location_models.dart';
 import '../data/locations_repository.dart';
@@ -88,63 +87,19 @@ class _LocationFormState extends ConsumerState<LocationForm> {
     final catalog = widget.kind == LocationKind.ubicaciones
         ? const AsyncData(LocationCatalog(ubicaciones: [], naves: []))
         : ref.watch(locationCatalogProvider);
-    return PopScope(
-      canPop: !_busy,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(AppSpacing.md),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '${widget.record == null ? 'Agregar' : 'Editar'} ${widget.kind.singular}',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                catalog.when(
-                  data: (data) => _fields(data),
-                  loading: () => const FeatureLoading(),
-                  error: (error, _) => FeatureError(
-                    error: error,
-                    onRetry: () => ref.invalidate(locationCatalogProvider),
-                  ),
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(color: AppColors.error),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.lg),
-                Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  children: [
-                    AppButton(
-                      label: 'Cancelar',
-                      variant: AppButtonVariant.secondary,
-                      onPressed: _busy
-                          ? null
-                          : () => Navigator.of(context).pop(),
-                    ),
-                    AppButton(
-                      label: 'Guardar',
-                      isLoading: _busy,
-                      onPressed: catalog.hasValue ? _save : null,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    return AppFormPanel(
+      title:
+          '${widget.record == null ? 'Agregar' : 'Editar'} ${widget.kind.singular}',
+      busy: _busy,
+      error: _error,
+      canSave: catalog.hasValue,
+      onSave: _save,
+      child: catalog.when(
+        data: (data) => _fields(data),
+        loading: () => const FeatureLoading(),
+        error: (error, _) => FeatureError(
+          error: error,
+          onRetry: () => ref.invalidate(locationCatalogProvider),
         ),
       ),
     );
@@ -281,88 +236,4 @@ class _LocationFormState extends ConsumerState<LocationForm> {
           : null,
     );
   }
-}
-
-class LocationDeleteDialog extends ConsumerStatefulWidget {
-  const LocationDeleteDialog({
-    super.key,
-    required this.kind,
-    required this.record,
-  });
-  final LocationKind kind;
-  final LocationRecord record;
-  @override
-  ConsumerState<LocationDeleteDialog> createState() =>
-      _LocationDeleteDialogState();
-}
-
-class _LocationDeleteDialogState extends ConsumerState<LocationDeleteDialog> {
-  bool _busy = false;
-  String? _error;
-
-  Future<void> _delete() async {
-    if (_busy) return;
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      await ref
-          .read(locationsRepositoryProvider)
-          .delete(widget.kind, widget.record.id);
-      if (mounted) Navigator.of(context).pop(true);
-    } on Object catch (error) {
-      if (mounted) {
-        setState(() {
-          _busy = false;
-          _error = locationMutationError(error, deleting: true);
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: !_busy,
-    child: AlertDialog(
-      title: Text('Eliminar ${widget.kind.singular}'),
-      scrollable: true,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '¿Eliminar «${widget.record.displayName}»? Esta acción no se puede deshacer.',
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const Text(
-            'Si tiene registros vinculados, el sistema puede impedir su eliminación.',
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            Semantics(
-              liveRegion: true,
-              child: Text(
-                _error!,
-                style: const TextStyle(color: AppColors.error),
-              ),
-            ),
-          ],
-        ],
-      ),
-      actions: [
-        AppButton(
-          label: 'Cancelar',
-          variant: AppButtonVariant.secondary,
-          onPressed: _busy ? null : () => Navigator.of(context).pop(),
-        ),
-        AppButton(
-          label: 'Eliminar',
-          variant: AppButtonVariant.danger,
-          isLoading: _busy,
-          onPressed: _delete,
-        ),
-      ],
-    ),
-  );
 }

@@ -4,12 +4,26 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import 'colors.dart';
 
+/// Lenguaje de movimiento de la app (2026-10-02: unificado, antes cada pieza
+/// usaba su propia duración y casi nada animaba fuera del Inicio). Una sola
+/// curva y cuatro duraciones, cada una para UNA clase de cambio:
+///
+/// - [interaction] (140 ms): respuesta a un toque o foco — botón, campo.
+/// - [content] (160 ms): el contenido ya cargado aparece con fundido, en
+///   lugar de reemplazar de golpe al esqueleto (ver AppFadeSwitcher).
+/// - [dialog] (180 ms): diálogos de confirmación — fundido con escala leve.
+/// - [page] (240 ms): cambio de sección y paneles laterales de formulario.
+///
+/// El esqueleto de carga respira con [shimmer]. Todo se omite con movimiento
+/// reducido (ver [duration]).
 abstract final class AppMotion {
   static const curve = Curves.easeOutCubic;
-  static const page = Duration(milliseconds: 300);
+  static const page = Duration(milliseconds: 240);
+  static const dialog = Duration(milliseconds: 180);
   static const interaction = Duration(milliseconds: 140);
   static const content = Duration(milliseconds: 160);
   static const stagger = Duration(milliseconds: 30);
+  static const shimmer = Duration(milliseconds: 1400);
   static Duration duration(BuildContext context, Duration value) =>
       MediaQuery.disableAnimationsOf(context) ? Duration.zero : value;
 }

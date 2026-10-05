@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/person_models.dart';
 import '../data/persons_repository.dart';
 
@@ -19,8 +20,11 @@ Future<PersonCatalogs> personCatalogs(Ref ref) =>
     ref.watch(personsRepositoryProvider).catalogs();
 
 @Riverpod(retry: manualRetryOnly)
-Future<ApiPage<Persona>> personsPage(Ref ref, int pageIndex) =>
-    ref.watch(personsRepositoryProvider).list(pageIndex + 1);
+Future<ApiPage<Persona>> personsPage(
+  Ref ref,
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref.watch(personsRepositoryProvider).list(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<Persona> personDetail(Ref ref, String id) =>

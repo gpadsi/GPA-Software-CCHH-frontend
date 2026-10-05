@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../design_system/colors.dart';
 import '../design_system/spacing.dart';
+import 'app_button.dart';
 import 'app_card.dart';
 import 'empty_state.dart';
 import 'loading_skeleton.dart';
@@ -19,6 +20,13 @@ class AppDataTable extends StatelessWidget {
     required this.onPageChanged,
     this.sortColumnIndex,
     this.sortAscending = true,
+    this.sortFields = const [],
+    this.ordering = '',
+    this.onOrderingChanged,
+    this.searchTerm = '',
+    this.onClearSearch,
+    this.emptyTitle = 'Sin resultados',
+    this.emptyMessage = 'No hay registros para mostrar en este momento.',
     this.isLoading = false,
   }) : assert(columns.length > 0),
        assert(totalCount >= 0),
@@ -36,7 +44,37 @@ class AppDataTable extends StatelessWidget {
   final ValueChanged<int>? onPageChanged;
   final int? sortColumnIndex;
   final bool sortAscending;
+
+  /// Orden declarativo del lado del servidor: un campo de la API por columna
+  /// (mismo largo y orden que [columns]; `null` = no ordenable, como
+  /// "Acciones"). Un campo puede ser varios separados por coma
+  /// (`apellido,nombre`) para ordenar por más de uno. Al tocar un encabezado
+  /// se avisa con [onOrderingChanged] en el formato de la API (`-campo` para
+  /// descendente) y la flecha se calcula sola a partir de [ordering]. Si se
+  /// pasa [sortColumnIndex] a mano, este mecanismo no interviene.
+  final List<String?> sortFields;
+  final String ordering;
+  final ValueChanged<String>? onOrderingChanged;
+
+  /// Búsqueda aplicada: si no hay filas, el mensaje habla de la búsqueda (y
+  /// ofrece limpiarla) en vez de decir que no hay registros.
+  final String searchTerm;
+  final VoidCallback? onClearSearch;
+
+  /// Lo que dice la tabla cuando no hay filas y NO hay una búsqueda aplicada
+  /// (ej. "Todavía no has levantado ninguna requisición"): cada pantalla sabe
+  /// mejor que un texto genérico por qué está vacía.
+  final String emptyTitle;
+  final String emptyMessage;
   final bool isLoading;
+
+  static String _descending(String spec) => spec
+      .split(',')
+      .map((field) => field.startsWith('-') ? field.substring(1) : '-$field')
+      .join(',');
+
+  String? _labelOf(DataColumn column) =>
+      column.label is Text ? (column.label as Text).data : null;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +83,41 @@ class AppDataTable extends StatelessWidget {
     final last = rows.isEmpty
         ? 0
         : math.min(totalCount, pageIndex * pageSize + rows.length);
+    final sortable = onOrderingChanged != null && sortFields.isNotEmpty;
+    var sortIndex = sortColumnIndex;
+    var sortAsc = sortAscending;
+    final effectiveColumns = !sortable
+        ? columns
+        : [
+            for (final (index, column) in columns.indexed)
+              if (index < sortFields.length && sortFields[index] != null)
+                DataColumn(
+                  label: column.label,
+                  numeric: column.numeric,
+                  tooltip: _labelOf(column) == null
+                      ? column.tooltip
+                      : 'Ordenar por ${_labelOf(column)!.toLowerCase()}',
+                  onSort: (_, ascending) => onOrderingChanged!(
+                    ascending
+                        ? sortFields[index]!
+                        : _descending(sortFields[index]!),
+                  ),
+                )
+              else
+                column,
+          ];
+    if (sortable && sortColumnIndex == null) {
+      for (final (index, field) in sortFields.indexed) {
+        if (field == null) continue;
+        if (ordering == field) {
+          sortIndex = index;
+          sortAsc = true;
+        } else if (ordering == _descending(field)) {
+          sortIndex = index;
+          sortAsc = false;
+        }
+      }
+    }
     final canGoBack = !isLoading && pageIndex > 0 && onPageChanged != null;
     final canGoForward =
         !isLoading && pageIndex + 1 < pageCount && onPageChanged != null;
@@ -53,7 +126,7 @@ class AppDataTable extends StatelessWidget {
         ? List<DataRow>.generate(
             math.min(pageSize, 3),
             (_) => DataRow(
-              cells: columns
+              cells: effectiveColumns
                   .map((_) => const DataCell(LoadingSkeleton(width: 96)))
                   .toList(),
             ),
@@ -74,10 +147,18 @@ class AppDataTable extends StatelessWidget {
                 child: IgnorePointer(
                   ignoring: isLoading,
                   child: DataTable(
-                    columns: columns,
+                    columns: effectiveColumns,
                     rows: visibleRows,
-                    sortColumnIndex: sortColumnIndex,
-                    sortAscending: sortAscending,
+                    sortColumnIndex: sortIndex,
+                    sortAscending: sortAsc,
+                    // Sin columna de casillas: `onSelectChanged` de cada fila se
+                    // usa solo como "clic en la fila".
+                    showCheckboxColumn: false,
+                    dataRowColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.hovered)
+                          ? AppColors.primarySurface.withValues(alpha: 0.55)
+                          : null,
+                    ),
                     headingRowHeight: 52,
                     dataRowMinHeight: 56,
                     dataRowMaxHeight: 88,
@@ -95,11 +176,25 @@ class AppDataTable extends StatelessWidget {
             ),
           ),
           if (!isLoading && rows.isEmpty)
-            const EmptyState(
-              icon: Icons.inbox_outlined,
-              title: 'Sin resultados',
-              message: 'No hay registros para mostrar en este momento.',
-            ),
+            searchTerm.isEmpty
+                ? EmptyState(
+                    icon: Icons.inbox_outlined,
+                    title: emptyTitle,
+                    message: emptyMessage,
+                  )
+                : EmptyState(
+                    icon: Icons.search_off_rounded,
+                    title: 'Sin resultados',
+                    message:
+                        'No encontramos nada para «$searchTerm». Revisa la ortografía o prueba con menos palabras.',
+                    action: onClearSearch == null
+                        ? null
+                        : AppButton(
+                            label: 'Limpiar búsqueda',
+                            variant: AppButtonVariant.secondary,
+                            onPressed: onClearSearch,
+                          ),
+                  ),
           const Divider(height: 1, color: AppColors.border),
           Padding(
             padding: const EdgeInsets.symmetric(

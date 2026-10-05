@@ -1,3 +1,4 @@
+import 'package:capital_humano_front/core/network/table_query.dart';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/features/employment/data/employment_models.dart';
 import 'package:capital_humano_front/features/employment/data/employment_repository.dart';
@@ -5,10 +6,30 @@ import 'package:capital_humano_front/features/persons/data/person_models.dart';
 import 'package:capital_humano_front/features/persons/data/persons_repository.dart';
 import 'package:dio/dio.dart';
 
-const generoM = PersonCatalogEntry(id: 1, code: 'm', name: 'Masculino', isActive: true);
-const civilS = PersonCatalogEntry(id: 1, code: 's', name: 'Soltero', isActive: true);
-const escolaridadA = PersonCatalogEntry(id: 1, code: 'p', name: 'Primaria', isActive: true);
-const sangreA = PersonCatalogEntry(id: 1, code: 'op', name: 'O+', isActive: true);
+const generoM = PersonCatalogEntry(
+  id: 1,
+  code: 'm',
+  name: 'Masculino',
+  isActive: true,
+);
+const civilS = PersonCatalogEntry(
+  id: 1,
+  code: 's',
+  name: 'Soltero',
+  isActive: true,
+);
+const escolaridadA = PersonCatalogEntry(
+  id: 1,
+  code: 'p',
+  name: 'Primaria',
+  isActive: true,
+);
+const sangreA = PersonCatalogEntry(
+  id: 1,
+  code: 'op',
+  name: 'O+',
+  isActive: true,
+);
 const personCatalogsFixture = PersonCatalogs(
   generos: [generoM],
   estadosCiviles: [civilS],
@@ -33,6 +54,7 @@ const contactoA = ContactoUrgencia(
 const perfilA = PerfilMedico(id: 'm1', persona: 'p1', allergies: 'Ninguna');
 
 class FakePersonsRepository extends PersonsRepository {
+  TableQuery lastQuery = const TableQuery();
   FakePersonsRepository() : super(Dio());
   Object? failure;
   Persona? saved;
@@ -54,7 +76,11 @@ class FakePersonsRepository extends PersonsRepository {
   }
 
   @override
-  Future<ApiPage<Persona>> list(int page) async {
+  Future<ApiPage<Persona>> list(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(count: personas.length, results: [...personas]);
   }
@@ -93,14 +119,18 @@ class FakePersonsRepository extends PersonsRepository {
   }
 
   @override
-  Future<void> saveContacto(ContactoUrgencia contacto, {required bool creating}) async {
+  Future<void> saveContacto(
+    ContactoUrgencia contacto, {
+    required bool creating,
+  }) async {
     if (failure != null) throw failure!;
     savedContacto = contacto;
     createdContacto = creating;
     if (creating) {
       contactos.add(contacto.copyWith(id: 'new'));
     } else {
-      contactos[contactos.indexWhere((item) => item.id == contacto.id)] = contacto;
+      contactos[contactos.indexWhere((item) => item.id == contacto.id)] =
+          contacto;
     }
   }
 
@@ -140,18 +170,47 @@ const personSummaryA = PersonSummary(
   lastNameMaternal: 'López',
   personalEmail: 'juan@example.test',
 );
+const personSummaryB = PersonSummary(
+  id: 'p2',
+  firstName: 'Ana',
+  lastNamePaternal: 'Ruiz',
+  personalEmail: 'ana@example.test',
+);
 const posicionSummaryA = PosicionSummary(id: 'pos1', puesto: 10, estatus: 20);
 const puestoRefA = NamedRef(id: 10, name: 'Auxiliar de Producción');
 const estatusRefA = NamedRef(id: 20, name: 'Colaborador Activo');
 
 class FakeEmploymentRepository extends EmploymentRepository {
+  TableQuery lastQuery = const TableQuery();
   FakeEmploymentRepository() : super(Dio());
   Object? failure;
   Contrato? contratoVigenteValue = contratoA;
   final empleados = [empleadoA];
+  Empleado? saved;
+  bool? created;
+  final searches = <String>[];
 
   @override
-  Future<ApiPage<Empleado>> list(int page) async {
+  Future<Empleado> save(Empleado empleado, {required bool creating}) async {
+    if (failure != null) throw failure!;
+    saved = empleado;
+    created = creating;
+    return empleado;
+  }
+
+  @override
+  Future<List<PersonSummary>> searchPersonas(String text) async {
+    searches.add(text);
+    if (failure != null) throw failure!;
+    return [personSummaryB];
+  }
+
+  @override
+  Future<ApiPage<Empleado>> list(
+    int page, {
+    TableQuery query = const TableQuery(),
+  }) async {
+    lastQuery = query;
     if (failure != null) throw failure!;
     return ApiPage(count: empleados.length, results: [...empleados]);
   }

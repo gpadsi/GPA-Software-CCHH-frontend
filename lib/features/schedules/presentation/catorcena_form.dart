@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/design_system/colors.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/form_panel.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
 
@@ -45,7 +44,9 @@ class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
   }
 
   String? _requiredInt(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Este dato es obligatorio.';
+    if (value == null || value.trim().isEmpty) {
+      return 'Este dato es obligatorio.';
+    }
     return int.tryParse(value.trim()) == null ? 'Debe ser un número.' : null;
   }
 
@@ -102,136 +103,69 @@ class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
   }
 
   @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: !_busy,
-    child: Dialog(
-      insetPadding: const EdgeInsets.all(AppSpacing.md),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 560),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.lg,
-                AppSpacing.lg,
-                0,
-              ),
-              child: Text(
-                widget.catorcena == null
-                    ? 'Agregar catorcena'
-                    : 'Editar catorcena',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Form(
-                  key: _form,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppTextField(
-                        label: 'Número de catorcena',
-                        controller: _numero,
-                        enabled: !_busy,
-                        validator: _requiredInt,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      AppTextField(
-                        label: 'Año',
-                        controller: _anio,
-                        enabled: !_busy,
-                        validator: _requiredInt,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _fechaInicio == null
-                                  ? 'Fecha de inicio: sin capturar'
-                                  : 'Fecha de inicio: ${_displayDate.format(_fechaInicio!)}',
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: _busy
-                                ? null
-                                : () => _pickDate(
-                                    _fechaInicio,
-                                    (value) => _fechaInicio = value,
-                                  ),
-                            child: const Text('Elegir'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _fechaFin == null
-                                  ? 'Fecha de fin: sin capturar'
-                                  : 'Fecha de fin: ${_displayDate.format(_fechaFin!)}',
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: _busy
-                                ? null
-                                : () => _pickDate(
-                                    _fechaFin,
-                                    (value) => _fechaFin = value,
-                                  ),
-                            child: const Text('Elegir'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+  Widget build(BuildContext context) => AppFormPanel(
+    title: widget.catorcena == null ? 'Agregar catorcena' : 'Editar catorcena',
+    busy: _busy,
+    error: _error,
+    onSave: _save,
+    child: Form(
+      key: _form,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppTextField(
+            label: 'Número de catorcena',
+            controller: _numero,
+            enabled: !_busy,
+            validator: _requiredInt,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AppTextField(
+            label: 'Año',
+            controller: _anio,
+            enabled: !_busy,
+            validator: _requiredInt,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _fechaInicio == null
+                      ? 'Fecha de inicio: sin capturar'
+                      : 'Fecha de inicio: ${_displayDate.format(_fechaInicio!)}',
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (_error != null) ...[
-                    Semantics(
-                      liveRegion: true,
-                      child: Text(
-                        _error!,
-                        style: const TextStyle(color: AppColors.error),
+              TextButton(
+                onPressed: _busy
+                    ? null
+                    : () => _pickDate(
+                        _fechaInicio,
+                        (value) => _fechaInicio = value,
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                  Wrap(
-                    alignment: WrapAlignment.end,
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      AppButton(
-                        label: 'Cancelar',
-                        variant: AppButtonVariant.secondary,
-                        onPressed: _busy
-                            ? null
-                            : () => Navigator.of(context).pop(),
-                      ),
-                      AppButton(
-                        label: 'Guardar',
-                        isLoading: _busy,
-                        onPressed: _save,
-                      ),
-                    ],
-                  ),
-                ],
+                child: const Text('Elegir'),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _fechaFin == null
+                      ? 'Fecha de fin: sin capturar'
+                      : 'Fecha de fin: ${_displayDate.format(_fechaFin!)}',
+                ),
+              ),
+              TextButton(
+                onPressed: _busy
+                    ? null
+                    : () => _pickDate(_fechaFin, (value) => _fechaFin = value),
+                child: const Text('Elegir'),
+              ),
+            ],
+          ),
+        ],
       ),
     ),
   );

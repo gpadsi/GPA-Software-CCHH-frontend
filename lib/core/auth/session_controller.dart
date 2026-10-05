@@ -19,6 +19,12 @@ SessionService sessionService(Ref ref) {
   return service;
 }
 
+/// Si la cuenta en sesión puede crear, editar y borrar datos de Capital Humano.
+/// Las pantallas lo usan para no mostrar botones que la API rechazaría.
+@Riverpod(keepAlive: true)
+bool canManageHr(Ref ref) =>
+    ref.watch(sessionControllerProvider).user?.canManageHr ?? false;
+
 @Riverpod(keepAlive: true)
 class SessionController extends _$SessionController {
   int _operation = 0;

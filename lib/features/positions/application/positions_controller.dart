@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/network/api_page.dart';
+import '../../../core/network/table_query.dart';
 import '../data/position_models.dart';
 import '../data/positions_repository.dart';
 
@@ -19,8 +20,11 @@ Future<PositionCatalogs> positionCatalogs(Ref ref) =>
     ref.watch(positionsRepositoryProvider).catalogs();
 
 @Riverpod(retry: manualRetryOnly)
-Future<ApiPage<Posicion>> posicionesPage(Ref ref, int pageIndex) =>
-    ref.watch(positionsRepositoryProvider).list(pageIndex + 1);
+Future<ApiPage<Posicion>> posicionesPage(
+  Ref ref,
+  int pageIndex, {
+  TableQuery query = const TableQuery(),
+}) => ref.watch(positionsRepositoryProvider).list(pageIndex + 1, query: query);
 
 @Riverpod(retry: manualRetryOnly)
 Future<List<Posicion>> allPosicionesForPicker(Ref ref) =>
