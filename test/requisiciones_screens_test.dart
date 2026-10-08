@@ -426,20 +426,24 @@ void main() {
           tester,
           'Editar requisición de ${posicionUno.etiqueta}',
         );
-        // La posición se muestra, pero ya no hay buscador.
-        expect(find.byType(SearchPickerField<dynamic>), findsNothing);
+        // La posición no cambia; el área sigue siendo una elección opcional.
+        expect(find.byType(SearchPickerField<PosicionElegible>), findsNothing);
+        expect(find.byType(SearchPickerField<AreaSolicitante>), findsOneWidget);
         expect(find.widgetWithText(TextFormField, 'Soldadura'), findsOneWidget);
 
         await tester.enterText(
           find.widgetWithText(TextFormField, 'Soldadura'),
           'Maquinados',
         );
+        await pumpDebounce(tester);
+        await tester.tap(find.text('Maquinados').last);
+        await tester.pumpAndSettle();
         await saveForm(tester);
 
         final saved = repository.savedRequisicion!;
         expect(repository.requisicionCreated, isFalse);
         expect(saved.id, 'r1');
-        expect(saved.areaSolicitante, 'Maquinados');
+        expect(saved.areaSolicitante, areaMaquinados.id);
         expect(saved.sueldoMensualBruto, '12500.00');
         expect(find.text('Requisición guardada.'), findsOneWidget);
       },

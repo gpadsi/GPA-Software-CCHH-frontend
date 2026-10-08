@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../design_system/colors.dart';
 import 'app_badge.dart';
+import 'app_overlays.dart';
+import 'search_picker_create_dialog.dart';
 
 /// Selector que busca en el servidor, espera [debounce] al escribir y descarta
 /// respuestas superadas. [suggestOnFocus] permite consultar sin texto.
@@ -21,6 +23,11 @@ class SearchPickerField<T extends Object> extends StatefulWidget {
     this.errorText,
     this.enabled = true,
     this.initialText,
+    this.initialValue,
+    this.onCreate,
+    this.emptyText,
+    this.emptyQueryText,
+    this.helpText = 'Elige una sugerencia o escribe puesto, unidad o área',
     this.suggestOnFocus = false,
     this.attention = 0,
     this.debounce = const Duration(milliseconds: 300),
@@ -37,6 +44,11 @@ class SearchPickerField<T extends Object> extends StatefulWidget {
   final String? errorText;
   final bool enabled;
   final String? initialText;
+  final T? initialValue;
+  final Future<T> Function(String text)? onCreate;
+  final String? emptyText;
+  final String? emptyQueryText;
+  final String helpText;
   final bool suggestOnFocus;
 
   /// El formulario sube este contador cada vez que falla la validación del
@@ -64,6 +76,31 @@ class _PickerLoading<T extends Object> extends _PickerOption<T> {
   const _PickerLoading();
 }
 
+class _PickerCreate<T extends Object> extends _PickerOption<T> {
+  const _PickerCreate(this.text);
+  final String text;
+}
+
+String _nombreComparable(String text) {
+  const acentos = {
+    'a': 'áàâäãåāăą',
+    'e': 'éèêëēĕėęě',
+    'i': 'íìîïĩīĭį',
+    'o': 'óòôöõōŏő',
+    'u': 'úùûüũūŭůűų',
+    'n': 'ñńň',
+    'c': 'çćč',
+    's': 'śš',
+    'z': 'źżž',
+    'y': 'ýÿ',
+  };
+  var nombre = text.toLowerCase().replaceAll(RegExp(r'[\u0300-\u036f]'), '');
+  for (final entry in acentos.entries) {
+    nombre = nombre.replaceAll(RegExp('[${entry.value}]'), entry.key);
+  }
+  return nombre.trim().replaceAll(RegExp(r'\s+'), ' ');
+}
+
 class _PickerEmpty<T extends Object> extends _PickerOption<T> {
   const _PickerEmpty(this.text);
   final String text;
@@ -84,14 +121,21 @@ class _PickerTextController extends TextEditingController {
 
 class _SearchPickerFieldState<T extends Object>
     extends State<SearchPickerField<T>> {
-  late final _controller = _PickerTextController(text: widget.initialText);
+  late final _controller = _PickerTextController(
+    text:
+        widget.initialText ??
+        (widget.initialValue == null
+            ? null
+            : widget.labelOf(widget.initialValue!)),
+  );
   final _focusNode = FocusNode();
   final _fieldKey = GlobalKey();
   Timer? _timer;
   int _search = 0;
   int _revision = 0;
   late String _lastText = _controller.text;
-  T? _selected;
+  late T? _selected = widget.initialValue;
+  bool _creating = false;
   List<_PickerOption<T>> _options = [_PickerIdle<T>()];
 
   @override
@@ -119,7 +163,7 @@ class _SearchPickerFieldState<T extends Object>
   }
 
   void _onFocusChanged() {
-    if (_focusNode.hasFocus && _selected == null) {
+    if (_focusNode.hasFocus && _selected == null && !_creating) {
       _startSearch(immediate: true);
     }
   }
@@ -157,6 +201,7 @@ class _SearchPickerFieldState<T extends Object>
         (selected != null && text == widget.labelOf(selected)) ||
         (!force &&
             text.length < widget.minChars &&
+            !(widget.onCreate != null && text.isNotEmpty) &&
             !(text.isEmpty && widget.suggestOnFocus))) {
       _publish([_PickerIdle<T>()]);
       return;
@@ -166,14 +211,56 @@ class _SearchPickerFieldState<T extends Object>
       try {
         final result = await widget.search(text);
         if (!mounted || id != _search) return;
-        _publish(
-          result.isEmpty
-              ? [_PickerEmpty<T>(text)]
-              : [for (final item in result) _PickerItem<T>(item)],
-        );
+        final puedeAgregar =
+            widget.onCreate != null &&
+            text.isNotEmpty &&
+            !result.any(
+              (item) =>
+                  _nombreComparable(widget.labelOf(item)) ==
+                  _nombreComparable(text),
+            );
+        _publish([
+          if (result.isEmpty) _PickerEmpty<T>(text),
+          for (final item in result) _PickerItem<T>(item),
+          if (puedeAgregar) _PickerCreate<T>(text),
+        ]);
       } on Object {
         if (mounted && id == _search) _publish([_PickerError<T>()]);
       }
+    });
+  }
+
+  void _select(T item) {
+    _timer?.cancel();
+    _search++;
+    _selected = item;
+    if (_controller.text != widget.labelOf(item)) {
+      _controller.text = widget.labelOf(item);
+    }
+    _publish([_PickerIdle<T>()]);
+    widget.onChanged(item);
+  }
+
+  Future<void> _create(String text) async {
+    if (_creating || !widget.enabled || widget.onCreate == null) return;
+    _creating = true;
+    _timer?.cancel();
+    _search++;
+    _focusNode.unfocus();
+    _publish([_PickerIdle<T>()]);
+    final created = await showAppDialog<T>(
+      context: context,
+      builder: (_) => SearchPickerCreateDialog<T>(
+        label: widget.label,
+        name: text,
+        onCreate: widget.onCreate!,
+      ),
+    );
+    if (!mounted) return;
+    if (created != null) _select(created);
+    _creating = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.enabled) _focusNode.requestFocus();
     });
   }
 
@@ -199,12 +286,8 @@ class _SearchPickerFieldState<T extends Object>
               : _controller.text,
           optionsBuilder: (_) => _options,
           onSelected: (option) {
-            if (option is! _PickerItem<T>) return;
-            _timer?.cancel();
-            _search++;
-            _selected = option.item;
-            _publish([_PickerIdle<T>()]);
-            widget.onChanged(option.item);
+            if (option is _PickerItem<T>) _select(option.item);
+            if (option is _PickerCreate<T>) unawaited(_create(option.text));
           },
           fieldViewBuilder: (context, controller, focusNode, onSubmit) =>
               Actions(
@@ -232,8 +315,12 @@ class _SearchPickerFieldState<T extends Object>
                     suffixIcon: const Icon(Icons.search),
                   ),
                   onFieldSubmitted: (_) {
-                    // Los centinelas informan, pero nunca se eligen con Enter.
-                    if (_options.first is _PickerItem<T>) onSubmit();
+                    // Los estados informativos no se eligen; la acción de
+                    // alta abre su diálogo sin convertirse en un valor.
+                    if (_options.first is _PickerItem<T> ||
+                        _options.any((option) => option is _PickerCreate<T>)) {
+                      onSubmit();
+                    }
                   },
                 ),
               ),
@@ -254,6 +341,8 @@ class _SearchPickerFieldState<T extends Object>
                     labelOf: widget.labelOf,
                     detailOf: widget.detailOf,
                     badgeOf: widget.badgeOf,
+                    emptyText: widget.emptyText,
+                    emptyQueryText: widget.emptyQueryText,
                     onSelected: onSelected,
                     onRetry: () => _startSearch(immediate: true, force: true),
                   ),
@@ -264,10 +353,7 @@ class _SearchPickerFieldState<T extends Object>
         ),
         if (widget.suggestOnFocus) ...[
           const SizedBox(height: 8),
-          Text(
-            'Elige una sugerencia o escribe puesto, unidad o área',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(widget.helpText, style: Theme.of(context).textTheme.bodySmall),
         ],
       ],
     ),
@@ -280,6 +366,8 @@ class _PickerOptions<T extends Object> extends StatefulWidget {
     required this.labelOf,
     required this.detailOf,
     required this.badgeOf,
+    required this.emptyText,
+    required this.emptyQueryText,
     required this.onSelected,
     required this.onRetry,
   });
@@ -287,6 +375,8 @@ class _PickerOptions<T extends Object> extends StatefulWidget {
   final String Function(T) labelOf;
   final String? Function(T)? detailOf;
   final String? Function(T)? badgeOf;
+  final String? emptyText;
+  final String? emptyQueryText;
   final ValueChanged<_PickerOption<T>> onSelected;
   final VoidCallback onRetry;
 
@@ -337,6 +427,25 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
       itemCount: widget.options.length,
       itemBuilder: (context, index) {
         final option = widget.options[index];
+        if (option is _PickerCreate<T>) {
+          return Semantics(
+            button: true,
+            selected: index == highlighted,
+            child: InkWell(
+              onTap: () => widget.onSelected(option),
+              child: Container(
+                color: index == highlighted ? AppColors.primarySurface : null,
+                padding: const EdgeInsets.all(12),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Agregar «${option.text}»',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          );
+        }
         if (option is _PickerItem<T>) {
           final detail = widget.detailOf?.call(option.item);
           final badge = widget.badgeOf?.call(option.item);
@@ -389,7 +498,9 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
                 ],
               ),
               _PickerEmpty<T>(:final text) => Text(
-                'Sin coincidencias para «$text»',
+                (text.isEmpty ? widget.emptyQueryText : null) ??
+                    widget.emptyText ??
+                    'Sin coincidencias para «$text»',
               ),
               _PickerError<T>() => Row(
                 children: [

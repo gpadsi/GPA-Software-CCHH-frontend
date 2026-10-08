@@ -69,7 +69,12 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   late int? _contrato = _current?.tipoContratoOfrecido;
   late bool? _viajar = _current?.disposicionViajar;
 
-  late final _area = TextEditingController(text: _current?.areaSolicitante);
+  late AreaSolicitante? _area = _current?.areaSolicitante == null
+      ? null
+      : AreaSolicitante(
+          id: _current!.areaSolicitante!,
+          name: _current.areaSolicitanteNombre ?? 'Sin dato',
+        );
   late final _justificacion = TextEditingController(
     text: _current?.justificacion,
   );
@@ -94,7 +99,6 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   @override
   void dispose() {
     for (final controller in [
-      _area,
       _justificacion,
       _idiomas,
       _nivel,
@@ -157,7 +161,7 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
               fechaEntregaACapitalHumano: _fechaEntrega == null
                   ? null
                   : toIsoDate(_fechaEntrega!),
-              areaSolicitante: _area.text,
+              areaSolicitante: _area?.id,
               justificacion: _justificacion.text,
               horarioACubrir: _horario,
               idiomasRequeridos: _idiomas.text,
@@ -369,11 +373,26 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
             onChanged: (value) => _fechaEntrega = value,
           ),
           const SizedBox(height: AppSpacing.lg),
-          AppTextField(
+          SearchPickerField<AreaSolicitante>(
             label: 'Área solicitante',
-            controller: _area,
+            minChars: 1,
+            hint: 'Escribe el departamento',
+            initialValue: _area,
             enabled: !_busy,
-            validator: (value) => _limit(value, 150),
+            suggestOnFocus: true,
+            helpText: 'Elige un área de la lista o escribe su nombre.',
+            emptyText: canManage ? null : 'No está en la lista. Pídele a Capital Humano que la agregue.',
+            emptyQueryText: canManage
+                ? 'Todavía no hay áreas. Escribe un nombre para agregar la primera.'
+                : 'Todavía no hay áreas registradas. Pídele a Capital Humano que las agregue.',
+            search: (text) => ref
+                .read(recruitmentRepositoryProvider)
+                .areasSolicitantes(search: text),
+            labelOf: (area) => area.name,
+            onCreate: canManage
+                ? ref.read(recruitmentRepositoryProvider).crearAreaSolicitante
+                : null,
+            onChanged: (area) => setState(() => _area = area),
           ),
           const SectionTitle('Justificación'),
           AppTextField(

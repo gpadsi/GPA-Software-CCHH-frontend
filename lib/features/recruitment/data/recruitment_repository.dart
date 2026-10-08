@@ -56,6 +56,37 @@ class RecruitmentRepository {
   Future<List<RecruitmentCatalogEntry>> rolesConformidad() =>
       _catalog('recruitment/roles-conformidad/');
 
+  Future<List<AreaSolicitante>> areasSolicitantes({String search = ''}) async {
+    final response = await api.get<Map<String, dynamic>>(
+      'recruitment/areas-solicitantes/',
+      queryParameters: {'search': search, 'is_active': true, 'page_size': 8},
+    );
+    return [
+      for (final item in response.data!['results'] as List<dynamic>)
+        AreaSolicitante.fromJson(item as Map<String, dynamic>),
+    ];
+  }
+
+  Future<AreaSolicitante> crearAreaSolicitante(String nombre) async {
+    try {
+      final response = await api.post<Map<String, dynamic>>(
+        'recruitment/areas-solicitantes/',
+        data: {'name': nombre.trim()},
+      );
+      return AreaSolicitante.fromJson(response.data!);
+    } on DioException catch (error) {
+      final data = error.response?.data;
+      if (error.response?.statusCode == 400 &&
+          data is Map<String, dynamic> &&
+          data['existente'] is Map<String, dynamic>) {
+        return AreaSolicitante.fromJson(
+          data['existente'] as Map<String, dynamic>,
+        );
+      }
+      rethrow;
+    }
+  }
+
   /// Posiciones que coinciden con lo escrito (puesto, unidad, área...), con
   /// su nombre ya armado, para elegir a cuál se refiere una requisición o un
   /// descriptivo.
@@ -129,7 +160,7 @@ class RecruitmentRepository {
       'fecha_solicitud': r.fechaSolicitud,
       'fecha_a_cubrir_vacante': r.fechaACubrirVacante,
       'fecha_entrega_a_capital_humano': r.fechaEntregaACapitalHumano,
-      'area_solicitante': r.areaSolicitante.trim(),
+      'area_solicitante': r.areaSolicitante,
       'justificacion': r.justificacion.trim(),
       'horario_a_cubrir': r.horarioACubrir,
       'idiomas_requeridos': r.idiomasRequeridos.trim(),

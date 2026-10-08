@@ -162,7 +162,7 @@ void main() {
           expect(data['tipo'], 40);
           expect(data['estado'], 1);
           expect(data['fecha_solicitud'], '2026-10-05');
-          expect(data['area_solicitante'], 'Soldadura');
+          expect(data['area_solicitante'], 1);
           expect(data['sueldo_mensual_bruto'], '12500.5');
           expect(data['sueldo_mensual_neto'], isNull);
           expect(data['fecha_a_cubrir_vacante'], isNull);
@@ -177,7 +177,7 @@ void main() {
           tipo: 40,
           estado: 1,
           fechaSolicitud: '2026-10-05',
-          areaSolicitante: '  Soldadura ',
+          areaSolicitante: 1,
           sueldoMensualBruto: r'$12,500.5',
           sueldoMensualNeto: '   ',
         ),
@@ -786,6 +786,123 @@ void main() {
       );
       expect(found.empresa, isNull);
       expect(found.reportaA, isNull);
+    });
+  });
+
+  group('RecruitmentRepository: áreas solicitantes', () {
+    test('busca solo activas y deserializa el catálogo paginado', () async {
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.path, 'recruitment/areas-solicitantes/');
+          expect(request.queryParameters, {
+            'search': 'sold',
+            'is_active': true,
+            'page_size': 8,
+          });
+          return response({
+            'count': 1,
+            'results': [areaSoldadura.toJson()],
+          });
+        }),
+      );
+      expect(await repository.areasSolicitantes(search: 'sold'), [
+        areaSoldadura,
+      ]);
+    });
+
+    test('crea con nombre y devuelve el id del servidor', () async {
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.method, 'POST');
+          expect(request.path, 'recruitment/areas-solicitantes/');
+          expect(request.data, {'name': 'Soldadura'});
+          return response(areaSoldadura.toJson(), status: 201);
+        }),
+      );
+      expect(
+        await repository.crearAreaSolicitante(' Soldadura '),
+        areaSoldadura,
+      );
+    });
+
+    test('400 existente selecciona la referencia sin mostrar error', () async {
+      final repository = RecruitmentRepository(
+        client(
+          (_) => response({
+            'existente': {'id': 1, 'name': 'Soldadura'},
+          }, status: 400),
+        ),
+      );
+      final found = await repository.crearAreaSolicitante('SOLDADURA');
+      expect(found.id, 1);
+      expect(found.name, 'Soldadura');
+    });
+
+    test('otros errores no se disfrazan de duplicado', () async {
+      for (final code in [400, 403, 500]) {
+        final repository = RecruitmentRepository(
+          client(
+            (_) => response({
+              'name': ['Error'],
+            }, status: code),
+          ),
+        );
+        await expectLater(
+          repository.crearAreaSolicitante('X'),
+          throwsA(isA<DioException>()),
+        );
+      }
+    });
+
+    test('requisición lee id y nombre y permite ambos nulos', () {
+      final json = {
+        ...requisicionPropia.toJson(),
+        'aprobaciones': [
+          for (final aprobacion in requisicionPropia.aprobaciones)
+            aprobacion.toJson(),
+        ],
+      };
+      expect(Requisicion.fromJson(json).areaSolicitante, 1);
+      expect(Requisicion.fromJson(json).areaSolicitanteNombre, 'Soldadura');
+      final sinArea = Requisicion.fromJson({
+        ...json,
+        'area_solicitante': null,
+        'area_solicitante_nombre': null,
+      });
+      expect(sinArea.areaSolicitante, isNull);
+      expect(sinArea.areaSolicitanteNombre, isNull);
+    });
+
+    test(
+      'área opcional viaja nula, el nombre de lectura no se manda',
+      () async {
+        final repository = RecruitmentRepository(
+          client((request) {
+            final payload = request.data as Map<String, dynamic>;
+            expect(payload['area_solicitante'], isNull);
+            expect(payload.containsKey('area_solicitante_nombre'), isFalse);
+            return response(requisicionImportada.toJson(), status: 201);
+          }),
+        );
+        await repository.saveRequisicion(requisicionImportada, creating: true);
+      },
+    );
+
+    test('búsqueda y orden por nombre de área se envían al servidor', () async {
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.queryParameters['search'], 'Producción');
+          expect(request.queryParameters['ordering'], 'area_solicitante__name');
+          return response({'count': 0, 'results': []});
+        }),
+      );
+      await repository.requisiciones(
+        1,
+        query: const TableQuery(
+          search: 'Producción',
+          ordering: 'area_solicitante__name',
+        ),
+      );
     });
   });
 

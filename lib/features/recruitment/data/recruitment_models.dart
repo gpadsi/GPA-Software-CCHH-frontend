@@ -40,6 +40,18 @@ abstract class PosicionRef with _$PosicionRef {
 }
 
 @freezed
+abstract class AreaSolicitante with _$AreaSolicitante {
+  const factory AreaSolicitante({
+    required int id,
+    required String name,
+    @Default('') String code,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+  }) = _AreaSolicitante;
+  factory AreaSolicitante.fromJson(Map<String, dynamic> json) =>
+      _$AreaSolicitanteFromJson(json);
+}
+
+@freezed
 abstract class TramiteAbierto with _$TramiteAbierto {
   const factory TramiteAbierto({
     required String tipo,
@@ -128,7 +140,8 @@ abstract class Requisicion with _$Requisicion {
     @JsonKey(name: 'fecha_a_cubrir_vacante') String? fechaACubrirVacante,
     @JsonKey(name: 'fecha_entrega_a_capital_humano')
     String? fechaEntregaACapitalHumano,
-    @JsonKey(name: 'area_solicitante') @Default('') String areaSolicitante,
+    @JsonKey(name: 'area_solicitante') int? areaSolicitante,
+    @JsonKey(name: 'area_solicitante_nombre') String? areaSolicitanteNombre,
     @Default('') String justificacion,
     @JsonKey(name: 'horario_a_cubrir') int? horarioACubrir,
     @JsonKey(name: 'idiomas_requeridos') @Default('') String idiomasRequeridos,

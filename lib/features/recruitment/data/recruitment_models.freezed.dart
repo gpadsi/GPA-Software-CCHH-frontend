@@ -575,6 +575,285 @@ as String,
 
 
 /// @nodoc
+mixin _$AreaSolicitante {
+
+ int get id; String get name; String get code;@JsonKey(name: 'is_active') bool get isActive;
+/// Create a copy of AreaSolicitante
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AreaSolicitanteCopyWith<AreaSolicitante> get copyWith => _$AreaSolicitanteCopyWithImpl<AreaSolicitante>(this as AreaSolicitante, _$identity);
+
+  /// Serializes this AreaSolicitante to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as AreaSolicitante;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AreaSolicitante&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as AreaSolicitante;
+  return Object.hash(runtimeType,_this.id,_this.name,_this.code,_this.isActive);
+}
+
+@override
+String toString() {
+  final _this = this as AreaSolicitante;
+  return 'AreaSolicitante(id: ${_this.id}, name: ${_this.name}, code: ${_this.code}, isActive: ${_this.isActive})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AreaSolicitanteCopyWith<$Res>  {
+  factory $AreaSolicitanteCopyWith(AreaSolicitante value, $Res Function(AreaSolicitante) _then) = _$AreaSolicitanteCopyWithImpl;
+@useResult
+$Res call({
+ int id, String name, String code,@JsonKey(name: 'is_active') bool isActive
+});
+
+
+
+
+}
+/// @nodoc
+class _$AreaSolicitanteCopyWithImpl<$Res>
+    implements $AreaSolicitanteCopyWith<$Res> {
+  _$AreaSolicitanteCopyWithImpl(this._self, this._then);
+
+  final AreaSolicitante _self;
+  final $Res Function(AreaSolicitante) _then;
+
+/// Create a copy of AreaSolicitante
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? code = null,Object? isActive = null,}) {
+  return _then(AreaSolicitante(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [AreaSolicitante].
+extension AreaSolicitantePatterns on AreaSolicitante {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AreaSolicitante value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AreaSolicitante() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AreaSolicitante value)  $default,){
+final _that = this;
+switch (_that) {
+case _AreaSolicitante():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AreaSolicitante value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AreaSolicitante() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String code, @JsonKey(name: 'is_active')  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AreaSolicitante() when $default != null:
+return $default(_that.id,_that.name,_that.code,_that.isActive);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String code, @JsonKey(name: 'is_active')  bool isActive)  $default,) {final _that = this;
+switch (_that) {
+case _AreaSolicitante():
+return $default(_that.id,_that.name,_that.code,_that.isActive);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String code, @JsonKey(name: 'is_active')  bool isActive)?  $default,) {final _that = this;
+switch (_that) {
+case _AreaSolicitante() when $default != null:
+return $default(_that.id,_that.name,_that.code,_that.isActive);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _AreaSolicitante implements AreaSolicitante {
+  const _AreaSolicitante({required this.id, required this.name, this.code = '', @JsonKey(name: 'is_active') this.isActive = true});
+  factory _AreaSolicitante.fromJson(Map<String, dynamic> json) => _$AreaSolicitanteFromJson(json);
+
+@override final  int id;
+@override final  String name;
+@override@JsonKey() final  String code;
+@override@JsonKey(name: 'is_active') final  bool isActive;
+
+/// Create a copy of AreaSolicitante
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AreaSolicitanteCopyWith<_AreaSolicitante> get copyWith => __$AreaSolicitanteCopyWithImpl<_AreaSolicitante>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$AreaSolicitanteToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AreaSolicitante&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.code, code) || other.code == code)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,name,code,isActive);
+}
+
+@override
+String toString() {
+    return 'AreaSolicitante(id: $id, name: $name, code: $code, isActive: $isActive)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AreaSolicitanteCopyWith<$Res> implements $AreaSolicitanteCopyWith<$Res> {
+  factory _$AreaSolicitanteCopyWith(_AreaSolicitante value, $Res Function(_AreaSolicitante) _then) = __$AreaSolicitanteCopyWithImpl;
+@override @useResult
+$Res call({
+ int id, String name, String code,@JsonKey(name: 'is_active') bool isActive
+});
+
+
+
+
+}
+/// @nodoc
+class __$AreaSolicitanteCopyWithImpl<$Res>
+    implements _$AreaSolicitanteCopyWith<$Res> {
+  __$AreaSolicitanteCopyWithImpl(this._self, this._then);
+
+  final _AreaSolicitante _self;
+  final $Res Function(_AreaSolicitante) _then;
+
+/// Create a copy of AreaSolicitante
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? code = null,Object? isActive = null,}) {
+  return _then(_AreaSolicitante(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$TramiteAbierto {
 
  String get tipo; String? get id; String? get estado;
@@ -1780,7 +2059,7 @@ as String,
 /// @nodoc
 mixin _$Requisicion {
 
- String get id; String get posicion;@JsonKey(name: 'posicion_etiqueta') String get posicionEtiqueta; int get tipo; int get estado;@JsonKey(name: 'creado_por') String? get creadoPor; String? get solicitante;@JsonKey(name: 'fecha_solicitud') String get fechaSolicitud;@JsonKey(name: 'fecha_a_cubrir_vacante') String? get fechaACubrirVacante;@JsonKey(name: 'fecha_entrega_a_capital_humano') String? get fechaEntregaACapitalHumano;@JsonKey(name: 'area_solicitante') String get areaSolicitante; String get justificacion;@JsonKey(name: 'horario_a_cubrir') int? get horarioACubrir;@JsonKey(name: 'idiomas_requeridos') String get idiomasRequeridos;@JsonKey(name: 'disposicion_viajar') bool? get disposicionViajar;@JsonKey(name: 'nivel_tabulador') String get nivelTabulador;@JsonKey(name: 'sueldo_mensual_compuesto') String? get sueldoMensualCompuesto;@JsonKey(name: 'sueldo_mensual_bruto') String? get sueldoMensualBruto;@JsonKey(name: 'sueldo_mensual_neto') String? get sueldoMensualNeto;@JsonKey(name: 'tipo_contrato_ofrecido') int? get tipoContratoOfrecido;@JsonKey(name: 'motivo_suspension') String get motivoSuspension;@JsonKey(name: 'fecha_suspension') String? get fechaSuspension;@JsonKey(name: 'autorizado_por_suspension') String get autorizadoPorSuspension; List<Aprobacion> get aprobaciones;
+ String get id; String get posicion;@JsonKey(name: 'posicion_etiqueta') String get posicionEtiqueta; int get tipo; int get estado;@JsonKey(name: 'creado_por') String? get creadoPor; String? get solicitante;@JsonKey(name: 'fecha_solicitud') String get fechaSolicitud;@JsonKey(name: 'fecha_a_cubrir_vacante') String? get fechaACubrirVacante;@JsonKey(name: 'fecha_entrega_a_capital_humano') String? get fechaEntregaACapitalHumano;@JsonKey(name: 'area_solicitante') int? get areaSolicitante;@JsonKey(name: 'area_solicitante_nombre') String? get areaSolicitanteNombre; String get justificacion;@JsonKey(name: 'horario_a_cubrir') int? get horarioACubrir;@JsonKey(name: 'idiomas_requeridos') String get idiomasRequeridos;@JsonKey(name: 'disposicion_viajar') bool? get disposicionViajar;@JsonKey(name: 'nivel_tabulador') String get nivelTabulador;@JsonKey(name: 'sueldo_mensual_compuesto') String? get sueldoMensualCompuesto;@JsonKey(name: 'sueldo_mensual_bruto') String? get sueldoMensualBruto;@JsonKey(name: 'sueldo_mensual_neto') String? get sueldoMensualNeto;@JsonKey(name: 'tipo_contrato_ofrecido') int? get tipoContratoOfrecido;@JsonKey(name: 'motivo_suspension') String get motivoSuspension;@JsonKey(name: 'fecha_suspension') String? get fechaSuspension;@JsonKey(name: 'autorizado_por_suspension') String get autorizadoPorSuspension; List<Aprobacion> get aprobaciones;
 /// Create a copy of Requisicion
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1794,20 +2073,20 @@ $RequisicionCopyWith<Requisicion> get copyWith => _$RequisicionCopyWithImpl<Requ
 @override
 bool operator ==(Object other) {
   final _this = this as Requisicion;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Requisicion&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.posicion, _this.posicion) || other.posicion == _this.posicion)&&(identical(other.posicionEtiqueta, _this.posicionEtiqueta) || other.posicionEtiqueta == _this.posicionEtiqueta)&&(identical(other.tipo, _this.tipo) || other.tipo == _this.tipo)&&(identical(other.estado, _this.estado) || other.estado == _this.estado)&&(identical(other.creadoPor, _this.creadoPor) || other.creadoPor == _this.creadoPor)&&(identical(other.solicitante, _this.solicitante) || other.solicitante == _this.solicitante)&&(identical(other.fechaSolicitud, _this.fechaSolicitud) || other.fechaSolicitud == _this.fechaSolicitud)&&(identical(other.fechaACubrirVacante, _this.fechaACubrirVacante) || other.fechaACubrirVacante == _this.fechaACubrirVacante)&&(identical(other.fechaEntregaACapitalHumano, _this.fechaEntregaACapitalHumano) || other.fechaEntregaACapitalHumano == _this.fechaEntregaACapitalHumano)&&(identical(other.areaSolicitante, _this.areaSolicitante) || other.areaSolicitante == _this.areaSolicitante)&&(identical(other.justificacion, _this.justificacion) || other.justificacion == _this.justificacion)&&(identical(other.horarioACubrir, _this.horarioACubrir) || other.horarioACubrir == _this.horarioACubrir)&&(identical(other.idiomasRequeridos, _this.idiomasRequeridos) || other.idiomasRequeridos == _this.idiomasRequeridos)&&(identical(other.disposicionViajar, _this.disposicionViajar) || other.disposicionViajar == _this.disposicionViajar)&&(identical(other.nivelTabulador, _this.nivelTabulador) || other.nivelTabulador == _this.nivelTabulador)&&(identical(other.sueldoMensualCompuesto, _this.sueldoMensualCompuesto) || other.sueldoMensualCompuesto == _this.sueldoMensualCompuesto)&&(identical(other.sueldoMensualBruto, _this.sueldoMensualBruto) || other.sueldoMensualBruto == _this.sueldoMensualBruto)&&(identical(other.sueldoMensualNeto, _this.sueldoMensualNeto) || other.sueldoMensualNeto == _this.sueldoMensualNeto)&&(identical(other.tipoContratoOfrecido, _this.tipoContratoOfrecido) || other.tipoContratoOfrecido == _this.tipoContratoOfrecido)&&(identical(other.motivoSuspension, _this.motivoSuspension) || other.motivoSuspension == _this.motivoSuspension)&&(identical(other.fechaSuspension, _this.fechaSuspension) || other.fechaSuspension == _this.fechaSuspension)&&(identical(other.autorizadoPorSuspension, _this.autorizadoPorSuspension) || other.autorizadoPorSuspension == _this.autorizadoPorSuspension)&&const DeepCollectionEquality().equals(other.aprobaciones, _this.aprobaciones));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Requisicion&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.posicion, _this.posicion) || other.posicion == _this.posicion)&&(identical(other.posicionEtiqueta, _this.posicionEtiqueta) || other.posicionEtiqueta == _this.posicionEtiqueta)&&(identical(other.tipo, _this.tipo) || other.tipo == _this.tipo)&&(identical(other.estado, _this.estado) || other.estado == _this.estado)&&(identical(other.creadoPor, _this.creadoPor) || other.creadoPor == _this.creadoPor)&&(identical(other.solicitante, _this.solicitante) || other.solicitante == _this.solicitante)&&(identical(other.fechaSolicitud, _this.fechaSolicitud) || other.fechaSolicitud == _this.fechaSolicitud)&&(identical(other.fechaACubrirVacante, _this.fechaACubrirVacante) || other.fechaACubrirVacante == _this.fechaACubrirVacante)&&(identical(other.fechaEntregaACapitalHumano, _this.fechaEntregaACapitalHumano) || other.fechaEntregaACapitalHumano == _this.fechaEntregaACapitalHumano)&&(identical(other.areaSolicitante, _this.areaSolicitante) || other.areaSolicitante == _this.areaSolicitante)&&(identical(other.areaSolicitanteNombre, _this.areaSolicitanteNombre) || other.areaSolicitanteNombre == _this.areaSolicitanteNombre)&&(identical(other.justificacion, _this.justificacion) || other.justificacion == _this.justificacion)&&(identical(other.horarioACubrir, _this.horarioACubrir) || other.horarioACubrir == _this.horarioACubrir)&&(identical(other.idiomasRequeridos, _this.idiomasRequeridos) || other.idiomasRequeridos == _this.idiomasRequeridos)&&(identical(other.disposicionViajar, _this.disposicionViajar) || other.disposicionViajar == _this.disposicionViajar)&&(identical(other.nivelTabulador, _this.nivelTabulador) || other.nivelTabulador == _this.nivelTabulador)&&(identical(other.sueldoMensualCompuesto, _this.sueldoMensualCompuesto) || other.sueldoMensualCompuesto == _this.sueldoMensualCompuesto)&&(identical(other.sueldoMensualBruto, _this.sueldoMensualBruto) || other.sueldoMensualBruto == _this.sueldoMensualBruto)&&(identical(other.sueldoMensualNeto, _this.sueldoMensualNeto) || other.sueldoMensualNeto == _this.sueldoMensualNeto)&&(identical(other.tipoContratoOfrecido, _this.tipoContratoOfrecido) || other.tipoContratoOfrecido == _this.tipoContratoOfrecido)&&(identical(other.motivoSuspension, _this.motivoSuspension) || other.motivoSuspension == _this.motivoSuspension)&&(identical(other.fechaSuspension, _this.fechaSuspension) || other.fechaSuspension == _this.fechaSuspension)&&(identical(other.autorizadoPorSuspension, _this.autorizadoPorSuspension) || other.autorizadoPorSuspension == _this.autorizadoPorSuspension)&&const DeepCollectionEquality().equals(other.aprobaciones, _this.aprobaciones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Requisicion;
-  return Object.hashAll([runtimeType,_this.id,_this.posicion,_this.posicionEtiqueta,_this.tipo,_this.estado,_this.creadoPor,_this.solicitante,_this.fechaSolicitud,_this.fechaACubrirVacante,_this.fechaEntregaACapitalHumano,_this.areaSolicitante,_this.justificacion,_this.horarioACubrir,_this.idiomasRequeridos,_this.disposicionViajar,_this.nivelTabulador,_this.sueldoMensualCompuesto,_this.sueldoMensualBruto,_this.sueldoMensualNeto,_this.tipoContratoOfrecido,_this.motivoSuspension,_this.fechaSuspension,_this.autorizadoPorSuspension,const DeepCollectionEquality().hash(_this.aprobaciones)]);
+  return Object.hashAll([runtimeType,_this.id,_this.posicion,_this.posicionEtiqueta,_this.tipo,_this.estado,_this.creadoPor,_this.solicitante,_this.fechaSolicitud,_this.fechaACubrirVacante,_this.fechaEntregaACapitalHumano,_this.areaSolicitante,_this.areaSolicitanteNombre,_this.justificacion,_this.horarioACubrir,_this.idiomasRequeridos,_this.disposicionViajar,_this.nivelTabulador,_this.sueldoMensualCompuesto,_this.sueldoMensualBruto,_this.sueldoMensualNeto,_this.tipoContratoOfrecido,_this.motivoSuspension,_this.fechaSuspension,_this.autorizadoPorSuspension,const DeepCollectionEquality().hash(_this.aprobaciones)]);
 }
 
 @override
 String toString() {
   final _this = this as Requisicion;
-  return 'Requisicion(id: ${_this.id}, posicion: ${_this.posicion}, posicionEtiqueta: ${_this.posicionEtiqueta}, tipo: ${_this.tipo}, estado: ${_this.estado}, creadoPor: ${_this.creadoPor}, solicitante: ${_this.solicitante}, fechaSolicitud: ${_this.fechaSolicitud}, fechaACubrirVacante: ${_this.fechaACubrirVacante}, fechaEntregaACapitalHumano: ${_this.fechaEntregaACapitalHumano}, areaSolicitante: ${_this.areaSolicitante}, justificacion: ${_this.justificacion}, horarioACubrir: ${_this.horarioACubrir}, idiomasRequeridos: ${_this.idiomasRequeridos}, disposicionViajar: ${_this.disposicionViajar}, nivelTabulador: ${_this.nivelTabulador}, sueldoMensualCompuesto: ${_this.sueldoMensualCompuesto}, sueldoMensualBruto: ${_this.sueldoMensualBruto}, sueldoMensualNeto: ${_this.sueldoMensualNeto}, tipoContratoOfrecido: ${_this.tipoContratoOfrecido}, motivoSuspension: ${_this.motivoSuspension}, fechaSuspension: ${_this.fechaSuspension}, autorizadoPorSuspension: ${_this.autorizadoPorSuspension}, aprobaciones: ${_this.aprobaciones})';
+  return 'Requisicion(id: ${_this.id}, posicion: ${_this.posicion}, posicionEtiqueta: ${_this.posicionEtiqueta}, tipo: ${_this.tipo}, estado: ${_this.estado}, creadoPor: ${_this.creadoPor}, solicitante: ${_this.solicitante}, fechaSolicitud: ${_this.fechaSolicitud}, fechaACubrirVacante: ${_this.fechaACubrirVacante}, fechaEntregaACapitalHumano: ${_this.fechaEntregaACapitalHumano}, areaSolicitante: ${_this.areaSolicitante}, areaSolicitanteNombre: ${_this.areaSolicitanteNombre}, justificacion: ${_this.justificacion}, horarioACubrir: ${_this.horarioACubrir}, idiomasRequeridos: ${_this.idiomasRequeridos}, disposicionViajar: ${_this.disposicionViajar}, nivelTabulador: ${_this.nivelTabulador}, sueldoMensualCompuesto: ${_this.sueldoMensualCompuesto}, sueldoMensualBruto: ${_this.sueldoMensualBruto}, sueldoMensualNeto: ${_this.sueldoMensualNeto}, tipoContratoOfrecido: ${_this.tipoContratoOfrecido}, motivoSuspension: ${_this.motivoSuspension}, fechaSuspension: ${_this.fechaSuspension}, autorizadoPorSuspension: ${_this.autorizadoPorSuspension}, aprobaciones: ${_this.aprobaciones})';
 }
 
 
@@ -1818,7 +2097,7 @@ abstract mixin class $RequisicionCopyWith<$Res>  {
   factory $RequisicionCopyWith(Requisicion value, $Res Function(Requisicion) _then) = _$RequisicionCopyWithImpl;
 @useResult
 $Res call({
- String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int tipo, int estado,@JsonKey(name: 'creado_por') String? creadoPor, String? solicitante,@JsonKey(name: 'fecha_solicitud') String fechaSolicitud,@JsonKey(name: 'fecha_a_cubrir_vacante') String? fechaACubrirVacante,@JsonKey(name: 'fecha_entrega_a_capital_humano') String? fechaEntregaACapitalHumano,@JsonKey(name: 'area_solicitante') String areaSolicitante, String justificacion,@JsonKey(name: 'horario_a_cubrir') int? horarioACubrir,@JsonKey(name: 'idiomas_requeridos') String idiomasRequeridos,@JsonKey(name: 'disposicion_viajar') bool? disposicionViajar,@JsonKey(name: 'nivel_tabulador') String nivelTabulador,@JsonKey(name: 'sueldo_mensual_compuesto') String? sueldoMensualCompuesto,@JsonKey(name: 'sueldo_mensual_bruto') String? sueldoMensualBruto,@JsonKey(name: 'sueldo_mensual_neto') String? sueldoMensualNeto,@JsonKey(name: 'tipo_contrato_ofrecido') int? tipoContratoOfrecido,@JsonKey(name: 'motivo_suspension') String motivoSuspension,@JsonKey(name: 'fecha_suspension') String? fechaSuspension,@JsonKey(name: 'autorizado_por_suspension') String autorizadoPorSuspension, List<Aprobacion> aprobaciones
+ String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int tipo, int estado,@JsonKey(name: 'creado_por') String? creadoPor, String? solicitante,@JsonKey(name: 'fecha_solicitud') String fechaSolicitud,@JsonKey(name: 'fecha_a_cubrir_vacante') String? fechaACubrirVacante,@JsonKey(name: 'fecha_entrega_a_capital_humano') String? fechaEntregaACapitalHumano,@JsonKey(name: 'area_solicitante') int? areaSolicitante,@JsonKey(name: 'area_solicitante_nombre') String? areaSolicitanteNombre, String justificacion,@JsonKey(name: 'horario_a_cubrir') int? horarioACubrir,@JsonKey(name: 'idiomas_requeridos') String idiomasRequeridos,@JsonKey(name: 'disposicion_viajar') bool? disposicionViajar,@JsonKey(name: 'nivel_tabulador') String nivelTabulador,@JsonKey(name: 'sueldo_mensual_compuesto') String? sueldoMensualCompuesto,@JsonKey(name: 'sueldo_mensual_bruto') String? sueldoMensualBruto,@JsonKey(name: 'sueldo_mensual_neto') String? sueldoMensualNeto,@JsonKey(name: 'tipo_contrato_ofrecido') int? tipoContratoOfrecido,@JsonKey(name: 'motivo_suspension') String motivoSuspension,@JsonKey(name: 'fecha_suspension') String? fechaSuspension,@JsonKey(name: 'autorizado_por_suspension') String autorizadoPorSuspension, List<Aprobacion> aprobaciones
 });
 
 
@@ -1835,7 +2114,7 @@ class _$RequisicionCopyWithImpl<$Res>
 
 /// Create a copy of Requisicion
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? tipo = null,Object? estado = null,Object? creadoPor = freezed,Object? solicitante = freezed,Object? fechaSolicitud = null,Object? fechaACubrirVacante = freezed,Object? fechaEntregaACapitalHumano = freezed,Object? areaSolicitante = null,Object? justificacion = null,Object? horarioACubrir = freezed,Object? idiomasRequeridos = null,Object? disposicionViajar = freezed,Object? nivelTabulador = null,Object? sueldoMensualCompuesto = freezed,Object? sueldoMensualBruto = freezed,Object? sueldoMensualNeto = freezed,Object? tipoContratoOfrecido = freezed,Object? motivoSuspension = null,Object? fechaSuspension = freezed,Object? autorizadoPorSuspension = null,Object? aprobaciones = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? tipo = null,Object? estado = null,Object? creadoPor = freezed,Object? solicitante = freezed,Object? fechaSolicitud = null,Object? fechaACubrirVacante = freezed,Object? fechaEntregaACapitalHumano = freezed,Object? areaSolicitante = freezed,Object? areaSolicitanteNombre = freezed,Object? justificacion = null,Object? horarioACubrir = freezed,Object? idiomasRequeridos = null,Object? disposicionViajar = freezed,Object? nivelTabulador = null,Object? sueldoMensualCompuesto = freezed,Object? sueldoMensualBruto = freezed,Object? sueldoMensualNeto = freezed,Object? tipoContratoOfrecido = freezed,Object? motivoSuspension = null,Object? fechaSuspension = freezed,Object? autorizadoPorSuspension = null,Object? aprobaciones = null,}) {
   return _then(Requisicion(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,posicion: null == posicion ? _self.posicion : posicion // ignore: cast_nullable_to_non_nullable
@@ -1847,8 +2126,9 @@ as String?,solicitante: freezed == solicitante ? _self.solicitante : solicitante
 as String?,fechaSolicitud: null == fechaSolicitud ? _self.fechaSolicitud : fechaSolicitud // ignore: cast_nullable_to_non_nullable
 as String,fechaACubrirVacante: freezed == fechaACubrirVacante ? _self.fechaACubrirVacante : fechaACubrirVacante // ignore: cast_nullable_to_non_nullable
 as String?,fechaEntregaACapitalHumano: freezed == fechaEntregaACapitalHumano ? _self.fechaEntregaACapitalHumano : fechaEntregaACapitalHumano // ignore: cast_nullable_to_non_nullable
-as String?,areaSolicitante: null == areaSolicitante ? _self.areaSolicitante : areaSolicitante // ignore: cast_nullable_to_non_nullable
-as String,justificacion: null == justificacion ? _self.justificacion : justificacion // ignore: cast_nullable_to_non_nullable
+as String?,areaSolicitante: freezed == areaSolicitante ? _self.areaSolicitante : areaSolicitante // ignore: cast_nullable_to_non_nullable
+as int?,areaSolicitanteNombre: freezed == areaSolicitanteNombre ? _self.areaSolicitanteNombre : areaSolicitanteNombre // ignore: cast_nullable_to_non_nullable
+as String?,justificacion: null == justificacion ? _self.justificacion : justificacion // ignore: cast_nullable_to_non_nullable
 as String,horarioACubrir: freezed == horarioACubrir ? _self.horarioACubrir : horarioACubrir // ignore: cast_nullable_to_non_nullable
 as int?,idiomasRequeridos: null == idiomasRequeridos ? _self.idiomasRequeridos : idiomasRequeridos // ignore: cast_nullable_to_non_nullable
 as String,disposicionViajar: freezed == disposicionViajar ? _self.disposicionViajar : disposicionViajar // ignore: cast_nullable_to_non_nullable
@@ -1946,10 +2226,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  String areaSolicitante,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  int? areaSolicitante, @JsonKey(name: 'area_solicitante_nombre')  String? areaSolicitanteNombre,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Requisicion() when $default != null:
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.areaSolicitanteNombre,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
   return orElse();
 
 }
@@ -1967,10 +2247,10 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  String areaSolicitante,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  int? areaSolicitante, @JsonKey(name: 'area_solicitante_nombre')  String? areaSolicitanteNombre,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)  $default,) {final _that = this;
 switch (_that) {
 case _Requisicion():
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.areaSolicitanteNombre,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1987,10 +2267,10 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  String areaSolicitante,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int tipo,  int estado, @JsonKey(name: 'creado_por')  String? creadoPor,  String? solicitante, @JsonKey(name: 'fecha_solicitud')  String fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante')  String? fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano')  String? fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante')  int? areaSolicitante, @JsonKey(name: 'area_solicitante_nombre')  String? areaSolicitanteNombre,  String justificacion, @JsonKey(name: 'horario_a_cubrir')  int? horarioACubrir, @JsonKey(name: 'idiomas_requeridos')  String idiomasRequeridos, @JsonKey(name: 'disposicion_viajar')  bool? disposicionViajar, @JsonKey(name: 'nivel_tabulador')  String nivelTabulador, @JsonKey(name: 'sueldo_mensual_compuesto')  String? sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto')  String? sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto')  String? sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido')  int? tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension')  String motivoSuspension, @JsonKey(name: 'fecha_suspension')  String? fechaSuspension, @JsonKey(name: 'autorizado_por_suspension')  String autorizadoPorSuspension,  List<Aprobacion> aprobaciones)?  $default,) {final _that = this;
 switch (_that) {
 case _Requisicion() when $default != null:
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.estado,_that.creadoPor,_that.solicitante,_that.fechaSolicitud,_that.fechaACubrirVacante,_that.fechaEntregaACapitalHumano,_that.areaSolicitante,_that.areaSolicitanteNombre,_that.justificacion,_that.horarioACubrir,_that.idiomasRequeridos,_that.disposicionViajar,_that.nivelTabulador,_that.sueldoMensualCompuesto,_that.sueldoMensualBruto,_that.sueldoMensualNeto,_that.tipoContratoOfrecido,_that.motivoSuspension,_that.fechaSuspension,_that.autorizadoPorSuspension,_that.aprobaciones);case _:
   return null;
 
 }
@@ -2002,7 +2282,7 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.tipo,_that.
 @JsonSerializable()
 
 class _Requisicion extends Requisicion {
-  const _Requisicion({required this.id, required this.posicion, @JsonKey(name: 'posicion_etiqueta') this.posicionEtiqueta = '', required this.tipo, required this.estado, @JsonKey(name: 'creado_por') this.creadoPor, this.solicitante, @JsonKey(name: 'fecha_solicitud') required this.fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante') this.fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano') this.fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante') this.areaSolicitante = '', this.justificacion = '', @JsonKey(name: 'horario_a_cubrir') this.horarioACubrir, @JsonKey(name: 'idiomas_requeridos') this.idiomasRequeridos = '', @JsonKey(name: 'disposicion_viajar') this.disposicionViajar, @JsonKey(name: 'nivel_tabulador') this.nivelTabulador = '', @JsonKey(name: 'sueldo_mensual_compuesto') this.sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto') this.sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto') this.sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido') this.tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension') this.motivoSuspension = '', @JsonKey(name: 'fecha_suspension') this.fechaSuspension, @JsonKey(name: 'autorizado_por_suspension') this.autorizadoPorSuspension = '',  List<Aprobacion> aprobaciones = const <Aprobacion>[]}): _aprobaciones = aprobaciones,super._();
+  const _Requisicion({required this.id, required this.posicion, @JsonKey(name: 'posicion_etiqueta') this.posicionEtiqueta = '', required this.tipo, required this.estado, @JsonKey(name: 'creado_por') this.creadoPor, this.solicitante, @JsonKey(name: 'fecha_solicitud') required this.fechaSolicitud, @JsonKey(name: 'fecha_a_cubrir_vacante') this.fechaACubrirVacante, @JsonKey(name: 'fecha_entrega_a_capital_humano') this.fechaEntregaACapitalHumano, @JsonKey(name: 'area_solicitante') this.areaSolicitante, @JsonKey(name: 'area_solicitante_nombre') this.areaSolicitanteNombre, this.justificacion = '', @JsonKey(name: 'horario_a_cubrir') this.horarioACubrir, @JsonKey(name: 'idiomas_requeridos') this.idiomasRequeridos = '', @JsonKey(name: 'disposicion_viajar') this.disposicionViajar, @JsonKey(name: 'nivel_tabulador') this.nivelTabulador = '', @JsonKey(name: 'sueldo_mensual_compuesto') this.sueldoMensualCompuesto, @JsonKey(name: 'sueldo_mensual_bruto') this.sueldoMensualBruto, @JsonKey(name: 'sueldo_mensual_neto') this.sueldoMensualNeto, @JsonKey(name: 'tipo_contrato_ofrecido') this.tipoContratoOfrecido, @JsonKey(name: 'motivo_suspension') this.motivoSuspension = '', @JsonKey(name: 'fecha_suspension') this.fechaSuspension, @JsonKey(name: 'autorizado_por_suspension') this.autorizadoPorSuspension = '',  List<Aprobacion> aprobaciones = const <Aprobacion>[]}): _aprobaciones = aprobaciones,super._();
   factory _Requisicion.fromJson(Map<String, dynamic> json) => _$RequisicionFromJson(json);
 
 @override final  String id;
@@ -2015,7 +2295,8 @@ class _Requisicion extends Requisicion {
 @override@JsonKey(name: 'fecha_solicitud') final  String fechaSolicitud;
 @override@JsonKey(name: 'fecha_a_cubrir_vacante') final  String? fechaACubrirVacante;
 @override@JsonKey(name: 'fecha_entrega_a_capital_humano') final  String? fechaEntregaACapitalHumano;
-@override@JsonKey(name: 'area_solicitante') final  String areaSolicitante;
+@override@JsonKey(name: 'area_solicitante') final  int? areaSolicitante;
+@override@JsonKey(name: 'area_solicitante_nombre') final  String? areaSolicitanteNombre;
 @override@JsonKey() final  String justificacion;
 @override@JsonKey(name: 'horario_a_cubrir') final  int? horarioACubrir;
 @override@JsonKey(name: 'idiomas_requeridos') final  String idiomasRequeridos;
@@ -2049,18 +2330,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Requisicion&&(identical(other.id, id) || other.id == id)&&(identical(other.posicion, posicion) || other.posicion == posicion)&&(identical(other.posicionEtiqueta, posicionEtiqueta) || other.posicionEtiqueta == posicionEtiqueta)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.estado, estado) || other.estado == estado)&&(identical(other.creadoPor, creadoPor) || other.creadoPor == creadoPor)&&(identical(other.solicitante, solicitante) || other.solicitante == solicitante)&&(identical(other.fechaSolicitud, fechaSolicitud) || other.fechaSolicitud == fechaSolicitud)&&(identical(other.fechaACubrirVacante, fechaACubrirVacante) || other.fechaACubrirVacante == fechaACubrirVacante)&&(identical(other.fechaEntregaACapitalHumano, fechaEntregaACapitalHumano) || other.fechaEntregaACapitalHumano == fechaEntregaACapitalHumano)&&(identical(other.areaSolicitante, areaSolicitante) || other.areaSolicitante == areaSolicitante)&&(identical(other.justificacion, justificacion) || other.justificacion == justificacion)&&(identical(other.horarioACubrir, horarioACubrir) || other.horarioACubrir == horarioACubrir)&&(identical(other.idiomasRequeridos, idiomasRequeridos) || other.idiomasRequeridos == idiomasRequeridos)&&(identical(other.disposicionViajar, disposicionViajar) || other.disposicionViajar == disposicionViajar)&&(identical(other.nivelTabulador, nivelTabulador) || other.nivelTabulador == nivelTabulador)&&(identical(other.sueldoMensualCompuesto, sueldoMensualCompuesto) || other.sueldoMensualCompuesto == sueldoMensualCompuesto)&&(identical(other.sueldoMensualBruto, sueldoMensualBruto) || other.sueldoMensualBruto == sueldoMensualBruto)&&(identical(other.sueldoMensualNeto, sueldoMensualNeto) || other.sueldoMensualNeto == sueldoMensualNeto)&&(identical(other.tipoContratoOfrecido, tipoContratoOfrecido) || other.tipoContratoOfrecido == tipoContratoOfrecido)&&(identical(other.motivoSuspension, motivoSuspension) || other.motivoSuspension == motivoSuspension)&&(identical(other.fechaSuspension, fechaSuspension) || other.fechaSuspension == fechaSuspension)&&(identical(other.autorizadoPorSuspension, autorizadoPorSuspension) || other.autorizadoPorSuspension == autorizadoPorSuspension)&&const DeepCollectionEquality().equals(other.aprobaciones, _aprobaciones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Requisicion&&(identical(other.id, id) || other.id == id)&&(identical(other.posicion, posicion) || other.posicion == posicion)&&(identical(other.posicionEtiqueta, posicionEtiqueta) || other.posicionEtiqueta == posicionEtiqueta)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.estado, estado) || other.estado == estado)&&(identical(other.creadoPor, creadoPor) || other.creadoPor == creadoPor)&&(identical(other.solicitante, solicitante) || other.solicitante == solicitante)&&(identical(other.fechaSolicitud, fechaSolicitud) || other.fechaSolicitud == fechaSolicitud)&&(identical(other.fechaACubrirVacante, fechaACubrirVacante) || other.fechaACubrirVacante == fechaACubrirVacante)&&(identical(other.fechaEntregaACapitalHumano, fechaEntregaACapitalHumano) || other.fechaEntregaACapitalHumano == fechaEntregaACapitalHumano)&&(identical(other.areaSolicitante, areaSolicitante) || other.areaSolicitante == areaSolicitante)&&(identical(other.areaSolicitanteNombre, areaSolicitanteNombre) || other.areaSolicitanteNombre == areaSolicitanteNombre)&&(identical(other.justificacion, justificacion) || other.justificacion == justificacion)&&(identical(other.horarioACubrir, horarioACubrir) || other.horarioACubrir == horarioACubrir)&&(identical(other.idiomasRequeridos, idiomasRequeridos) || other.idiomasRequeridos == idiomasRequeridos)&&(identical(other.disposicionViajar, disposicionViajar) || other.disposicionViajar == disposicionViajar)&&(identical(other.nivelTabulador, nivelTabulador) || other.nivelTabulador == nivelTabulador)&&(identical(other.sueldoMensualCompuesto, sueldoMensualCompuesto) || other.sueldoMensualCompuesto == sueldoMensualCompuesto)&&(identical(other.sueldoMensualBruto, sueldoMensualBruto) || other.sueldoMensualBruto == sueldoMensualBruto)&&(identical(other.sueldoMensualNeto, sueldoMensualNeto) || other.sueldoMensualNeto == sueldoMensualNeto)&&(identical(other.tipoContratoOfrecido, tipoContratoOfrecido) || other.tipoContratoOfrecido == tipoContratoOfrecido)&&(identical(other.motivoSuspension, motivoSuspension) || other.motivoSuspension == motivoSuspension)&&(identical(other.fechaSuspension, fechaSuspension) || other.fechaSuspension == fechaSuspension)&&(identical(other.autorizadoPorSuspension, autorizadoPorSuspension) || other.autorizadoPorSuspension == autorizadoPorSuspension)&&const DeepCollectionEquality().equals(other.aprobaciones, _aprobaciones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hashAll([runtimeType,id,posicion,posicionEtiqueta,tipo,estado,creadoPor,solicitante,fechaSolicitud,fechaACubrirVacante,fechaEntregaACapitalHumano,areaSolicitante,justificacion,horarioACubrir,idiomasRequeridos,disposicionViajar,nivelTabulador,sueldoMensualCompuesto,sueldoMensualBruto,sueldoMensualNeto,tipoContratoOfrecido,motivoSuspension,fechaSuspension,autorizadoPorSuspension,const DeepCollectionEquality().hash(_aprobaciones)]);
+    return Object.hashAll([runtimeType,id,posicion,posicionEtiqueta,tipo,estado,creadoPor,solicitante,fechaSolicitud,fechaACubrirVacante,fechaEntregaACapitalHumano,areaSolicitante,areaSolicitanteNombre,justificacion,horarioACubrir,idiomasRequeridos,disposicionViajar,nivelTabulador,sueldoMensualCompuesto,sueldoMensualBruto,sueldoMensualNeto,tipoContratoOfrecido,motivoSuspension,fechaSuspension,autorizadoPorSuspension,const DeepCollectionEquality().hash(_aprobaciones)]);
 }
 
 @override
 String toString() {
-    return 'Requisicion(id: $id, posicion: $posicion, posicionEtiqueta: $posicionEtiqueta, tipo: $tipo, estado: $estado, creadoPor: $creadoPor, solicitante: $solicitante, fechaSolicitud: $fechaSolicitud, fechaACubrirVacante: $fechaACubrirVacante, fechaEntregaACapitalHumano: $fechaEntregaACapitalHumano, areaSolicitante: $areaSolicitante, justificacion: $justificacion, horarioACubrir: $horarioACubrir, idiomasRequeridos: $idiomasRequeridos, disposicionViajar: $disposicionViajar, nivelTabulador: $nivelTabulador, sueldoMensualCompuesto: $sueldoMensualCompuesto, sueldoMensualBruto: $sueldoMensualBruto, sueldoMensualNeto: $sueldoMensualNeto, tipoContratoOfrecido: $tipoContratoOfrecido, motivoSuspension: $motivoSuspension, fechaSuspension: $fechaSuspension, autorizadoPorSuspension: $autorizadoPorSuspension, aprobaciones: $aprobaciones)';
+    return 'Requisicion(id: $id, posicion: $posicion, posicionEtiqueta: $posicionEtiqueta, tipo: $tipo, estado: $estado, creadoPor: $creadoPor, solicitante: $solicitante, fechaSolicitud: $fechaSolicitud, fechaACubrirVacante: $fechaACubrirVacante, fechaEntregaACapitalHumano: $fechaEntregaACapitalHumano, areaSolicitante: $areaSolicitante, areaSolicitanteNombre: $areaSolicitanteNombre, justificacion: $justificacion, horarioACubrir: $horarioACubrir, idiomasRequeridos: $idiomasRequeridos, disposicionViajar: $disposicionViajar, nivelTabulador: $nivelTabulador, sueldoMensualCompuesto: $sueldoMensualCompuesto, sueldoMensualBruto: $sueldoMensualBruto, sueldoMensualNeto: $sueldoMensualNeto, tipoContratoOfrecido: $tipoContratoOfrecido, motivoSuspension: $motivoSuspension, fechaSuspension: $fechaSuspension, autorizadoPorSuspension: $autorizadoPorSuspension, aprobaciones: $aprobaciones)';
 }
 
 
@@ -2071,7 +2352,7 @@ abstract mixin class _$RequisicionCopyWith<$Res> implements $RequisicionCopyWith
   factory _$RequisicionCopyWith(_Requisicion value, $Res Function(_Requisicion) _then) = __$RequisicionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int tipo, int estado,@JsonKey(name: 'creado_por') String? creadoPor, String? solicitante,@JsonKey(name: 'fecha_solicitud') String fechaSolicitud,@JsonKey(name: 'fecha_a_cubrir_vacante') String? fechaACubrirVacante,@JsonKey(name: 'fecha_entrega_a_capital_humano') String? fechaEntregaACapitalHumano,@JsonKey(name: 'area_solicitante') String areaSolicitante, String justificacion,@JsonKey(name: 'horario_a_cubrir') int? horarioACubrir,@JsonKey(name: 'idiomas_requeridos') String idiomasRequeridos,@JsonKey(name: 'disposicion_viajar') bool? disposicionViajar,@JsonKey(name: 'nivel_tabulador') String nivelTabulador,@JsonKey(name: 'sueldo_mensual_compuesto') String? sueldoMensualCompuesto,@JsonKey(name: 'sueldo_mensual_bruto') String? sueldoMensualBruto,@JsonKey(name: 'sueldo_mensual_neto') String? sueldoMensualNeto,@JsonKey(name: 'tipo_contrato_ofrecido') int? tipoContratoOfrecido,@JsonKey(name: 'motivo_suspension') String motivoSuspension,@JsonKey(name: 'fecha_suspension') String? fechaSuspension,@JsonKey(name: 'autorizado_por_suspension') String autorizadoPorSuspension, List<Aprobacion> aprobaciones
+ String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int tipo, int estado,@JsonKey(name: 'creado_por') String? creadoPor, String? solicitante,@JsonKey(name: 'fecha_solicitud') String fechaSolicitud,@JsonKey(name: 'fecha_a_cubrir_vacante') String? fechaACubrirVacante,@JsonKey(name: 'fecha_entrega_a_capital_humano') String? fechaEntregaACapitalHumano,@JsonKey(name: 'area_solicitante') int? areaSolicitante,@JsonKey(name: 'area_solicitante_nombre') String? areaSolicitanteNombre, String justificacion,@JsonKey(name: 'horario_a_cubrir') int? horarioACubrir,@JsonKey(name: 'idiomas_requeridos') String idiomasRequeridos,@JsonKey(name: 'disposicion_viajar') bool? disposicionViajar,@JsonKey(name: 'nivel_tabulador') String nivelTabulador,@JsonKey(name: 'sueldo_mensual_compuesto') String? sueldoMensualCompuesto,@JsonKey(name: 'sueldo_mensual_bruto') String? sueldoMensualBruto,@JsonKey(name: 'sueldo_mensual_neto') String? sueldoMensualNeto,@JsonKey(name: 'tipo_contrato_ofrecido') int? tipoContratoOfrecido,@JsonKey(name: 'motivo_suspension') String motivoSuspension,@JsonKey(name: 'fecha_suspension') String? fechaSuspension,@JsonKey(name: 'autorizado_por_suspension') String autorizadoPorSuspension, List<Aprobacion> aprobaciones
 });
 
 
@@ -2088,7 +2369,7 @@ class __$RequisicionCopyWithImpl<$Res>
 
 /// Create a copy of Requisicion
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? tipo = null,Object? estado = null,Object? creadoPor = freezed,Object? solicitante = freezed,Object? fechaSolicitud = null,Object? fechaACubrirVacante = freezed,Object? fechaEntregaACapitalHumano = freezed,Object? areaSolicitante = null,Object? justificacion = null,Object? horarioACubrir = freezed,Object? idiomasRequeridos = null,Object? disposicionViajar = freezed,Object? nivelTabulador = null,Object? sueldoMensualCompuesto = freezed,Object? sueldoMensualBruto = freezed,Object? sueldoMensualNeto = freezed,Object? tipoContratoOfrecido = freezed,Object? motivoSuspension = null,Object? fechaSuspension = freezed,Object? autorizadoPorSuspension = null,Object? aprobaciones = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? tipo = null,Object? estado = null,Object? creadoPor = freezed,Object? solicitante = freezed,Object? fechaSolicitud = null,Object? fechaACubrirVacante = freezed,Object? fechaEntregaACapitalHumano = freezed,Object? areaSolicitante = freezed,Object? areaSolicitanteNombre = freezed,Object? justificacion = null,Object? horarioACubrir = freezed,Object? idiomasRequeridos = null,Object? disposicionViajar = freezed,Object? nivelTabulador = null,Object? sueldoMensualCompuesto = freezed,Object? sueldoMensualBruto = freezed,Object? sueldoMensualNeto = freezed,Object? tipoContratoOfrecido = freezed,Object? motivoSuspension = null,Object? fechaSuspension = freezed,Object? autorizadoPorSuspension = null,Object? aprobaciones = null,}) {
   return _then(_Requisicion(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,posicion: null == posicion ? _self.posicion : posicion // ignore: cast_nullable_to_non_nullable
@@ -2100,8 +2381,9 @@ as String?,solicitante: freezed == solicitante ? _self.solicitante : solicitante
 as String?,fechaSolicitud: null == fechaSolicitud ? _self.fechaSolicitud : fechaSolicitud // ignore: cast_nullable_to_non_nullable
 as String,fechaACubrirVacante: freezed == fechaACubrirVacante ? _self.fechaACubrirVacante : fechaACubrirVacante // ignore: cast_nullable_to_non_nullable
 as String?,fechaEntregaACapitalHumano: freezed == fechaEntregaACapitalHumano ? _self.fechaEntregaACapitalHumano : fechaEntregaACapitalHumano // ignore: cast_nullable_to_non_nullable
-as String?,areaSolicitante: null == areaSolicitante ? _self.areaSolicitante : areaSolicitante // ignore: cast_nullable_to_non_nullable
-as String,justificacion: null == justificacion ? _self.justificacion : justificacion // ignore: cast_nullable_to_non_nullable
+as String?,areaSolicitante: freezed == areaSolicitante ? _self.areaSolicitante : areaSolicitante // ignore: cast_nullable_to_non_nullable
+as int?,areaSolicitanteNombre: freezed == areaSolicitanteNombre ? _self.areaSolicitanteNombre : areaSolicitanteNombre // ignore: cast_nullable_to_non_nullable
+as String?,justificacion: null == justificacion ? _self.justificacion : justificacion // ignore: cast_nullable_to_non_nullable
 as String,horarioACubrir: freezed == horarioACubrir ? _self.horarioACubrir : horarioACubrir // ignore: cast_nullable_to_non_nullable
 as int?,idiomasRequeridos: null == idiomasRequeridos ? _self.idiomasRequeridos : idiomasRequeridos // ignore: cast_nullable_to_non_nullable
 as String,disposicionViajar: freezed == disposicionViajar ? _self.disposicionViajar : disposicionViajar // ignore: cast_nullable_to_non_nullable

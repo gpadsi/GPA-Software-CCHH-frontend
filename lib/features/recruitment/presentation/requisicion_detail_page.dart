@@ -208,7 +208,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
                   'Entrega a Capital Humano',
                   shownDate(r.fechaEntregaACapitalHumano),
                 ),
-                DetailField('Área solicitante', r.areaSolicitante),
+                DetailField('Área solicitante', r.areaSolicitanteNombre ?? ''),
                 DetailField(
                   'Solicitante',
                   r.solicitante ?? 'Importada de los datos de GPA',

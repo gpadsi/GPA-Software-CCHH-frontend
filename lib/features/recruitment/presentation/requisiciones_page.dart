@@ -210,7 +210,8 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
                   // cabe sin desplazarse y las acciones siempre se ven.
                   detalle: [
                     nameIn(catalogs.tipos, r.tipo),
-                    if (r.areaSolicitante.trim().isNotEmpty) r.areaSolicitante,
+                    if (r.areaSolicitanteNombre?.trim().isNotEmpty ?? false)
+                      r.areaSolicitanteNombre!,
                   ].whereType<String>().join(' · '),
                 ),
               ),

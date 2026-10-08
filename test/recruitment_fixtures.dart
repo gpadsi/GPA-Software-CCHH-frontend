@@ -25,6 +25,17 @@ RecruitmentCatalogEntry entry(
   requierePersona: requierePersona,
 );
 
+const areaSoldadura = AreaSolicitante(
+  id: 1,
+  name: 'Soldadura',
+  code: 'soldadura',
+);
+const areaMaquinados = AreaSolicitante(
+  id: 2,
+  name: 'Maquinados',
+  code: 'maquinados',
+);
+
 final estadoBorrador = entry(1, 'borrador', 'Borrador');
 final estadoPendiente = entry(
   2,
@@ -112,7 +123,8 @@ final requisicionPropia = Requisicion(
   solicitante: 'Cuenta de prueba',
   fechaSolicitud: '2026-09-10',
   fechaACubrirVacante: '2026-10-01',
-  areaSolicitante: 'Soldadura',
+  areaSolicitante: 1,
+  areaSolicitanteNombre: 'Soldadura',
   horarioACubrir: horario8.id,
   idiomasRequeridos: 'Inglés básico',
   disposicionViajar: true,
@@ -226,6 +238,10 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   TableQuery lastDescriptivosQuery = const TableQuery();
   final searches = <String>[];
   final selectorPurposes = <String>[];
+  final areaSearches = <String>[];
+  List<AreaSolicitante> areasSolicitantesData = [areaSoldadura, areaMaquinados];
+  String? createdAreaName;
+  AreaSolicitante? areaExistente;
   final contextoRequests = <(String, String)>[];
   final contextos = <(String, String), PosicionContexto>{};
   Future<PosicionContexto> Function(String, String)? contextoLoader;
@@ -337,6 +353,33 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   }
 
   @override
+  Future<List<AreaSolicitante>> areasSolicitantes({String search = ''}) async {
+    areaSearches.add(search);
+    _check();
+    return areasSolicitantesData
+        .where(
+          (area) =>
+              area.isActive &&
+              area.name.toLowerCase().contains(search.toLowerCase()),
+        )
+        .toList();
+  }
+
+  @override
+  Future<AreaSolicitante> crearAreaSolicitante(String nombre) async {
+    _check();
+    createdAreaName = nombre;
+    if (areaExistente != null) return areaExistente!;
+    final area = AreaSolicitante(
+      id: 99,
+      name: nombre.trim(),
+      code: 'nueva-area',
+    );
+    areasSolicitantesData = [...areasSolicitantesData, area];
+    return area;
+  }
+
+  @override
   Future<PosicionContexto> posicionContexto(
     String id, {
     required String para,
@@ -391,7 +434,20 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     _check();
     savedRequisicion = r;
     requisicionCreated = creating;
-    final result = creating ? r.copyWith(id: 'nueva') : r;
+    final areaNombre = areasSolicitantesData
+        .where((area) => area.id == r.areaSolicitante)
+        .firstOrNull
+        ?.name;
+    final result = r.copyWith(
+      id: creating ? 'nueva' : r.id,
+      posicionEtiqueta:
+          requisicionesData
+              .where((item) => item.id == r.id)
+              .firstOrNull
+              ?.posicionEtiqueta ??
+          r.posicionEtiqueta,
+      areaSolicitanteNombre: areaNombre,
+    );
     if (creating) {
       requisicionesData = [...requisicionesData, result];
     } else {

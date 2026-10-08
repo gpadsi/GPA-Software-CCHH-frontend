@@ -38,6 +38,22 @@ _PosicionRef _$PosicionRefFromJson(Map<String, dynamic> json) => _PosicionRef(
 Map<String, dynamic> _$PosicionRefToJson(_PosicionRef instance) =>
     <String, dynamic>{'id': instance.id, 'etiqueta': instance.etiqueta};
 
+_AreaSolicitante _$AreaSolicitanteFromJson(Map<String, dynamic> json) =>
+    _AreaSolicitante(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      code: json['code'] as String? ?? '',
+      isActive: json['is_active'] as bool? ?? true,
+    );
+
+Map<String, dynamic> _$AreaSolicitanteToJson(_AreaSolicitante instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'code': instance.code,
+      'is_active': instance.isActive,
+    };
+
 _TramiteAbierto _$TramiteAbiertoFromJson(Map<String, dynamic> json) =>
     _TramiteAbierto(
       tipo: json['tipo'] as String,
@@ -146,7 +162,8 @@ _Requisicion _$RequisicionFromJson(Map<String, dynamic> json) => _Requisicion(
   fechaSolicitud: json['fecha_solicitud'] as String,
   fechaACubrirVacante: json['fecha_a_cubrir_vacante'] as String?,
   fechaEntregaACapitalHumano: json['fecha_entrega_a_capital_humano'] as String?,
-  areaSolicitante: json['area_solicitante'] as String? ?? '',
+  areaSolicitante: (json['area_solicitante'] as num?)?.toInt(),
+  areaSolicitanteNombre: json['area_solicitante_nombre'] as String?,
   justificacion: json['justificacion'] as String? ?? '',
   horarioACubrir: (json['horario_a_cubrir'] as num?)?.toInt(),
   idiomasRequeridos: json['idiomas_requeridos'] as String? ?? '',
@@ -179,6 +196,7 @@ Map<String, dynamic> _$RequisicionToJson(_Requisicion instance) =>
       'fecha_a_cubrir_vacante': instance.fechaACubrirVacante,
       'fecha_entrega_a_capital_humano': instance.fechaEntregaACapitalHumano,
       'area_solicitante': instance.areaSolicitante,
+      'area_solicitante_nombre': instance.areaSolicitanteNombre,
       'justificacion': instance.justificacion,
       'horario_a_cubrir': instance.horarioACubrir,
       'idiomas_requeridos': instance.idiomasRequeridos,
