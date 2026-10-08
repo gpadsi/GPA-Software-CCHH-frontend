@@ -68,6 +68,38 @@ abstract class PosicionElegible with _$PosicionElegible {
 }
 
 @freezed
+abstract class PosicionContexto with _$PosicionContexto {
+  const PosicionContexto._();
+  const factory PosicionContexto({
+    required String id,
+    required String etiqueta,
+    String? puesto,
+    required String unidad,
+    String? area,
+    required String estatus,
+    @JsonKey(name: 'estatus_code') required String estatusCode,
+    required bool ocupada,
+    @JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto,
+    String? empresa,
+    @JsonKey(name: 'reporta_a') String? reportaA,
+  }) = _PosicionContexto;
+  factory PosicionContexto.fromJson(Map<String, dynamic> json) =>
+      _$PosicionContextoFromJson(json);
+
+  PosicionElegible get elegible => PosicionElegible(
+    id: id,
+    etiqueta: etiqueta,
+    puesto: puesto,
+    unidad: unidad,
+    area: area,
+    estatus: estatus,
+    estatusCode: estatusCode,
+    ocupada: ocupada,
+    tramiteAbierto: tramiteAbierto,
+  );
+}
+
+@freezed
 abstract class Aprobacion with _$Aprobacion {
   const factory Aprobacion({
     required String id,

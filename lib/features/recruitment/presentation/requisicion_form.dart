@@ -14,6 +14,7 @@ import '../application/recruitment_controller.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
+import 'posicion_contexto_card.dart';
 import 'recruitment_ui.dart';
 
 /// Alta de una requisición (sin [requisicion]: se elige la posición) o su
@@ -23,8 +24,9 @@ import 'recruitment_ui.dart';
 /// mandarla a autorización; del resto de los estados se encarga Capital
 /// Humano (el servidor lo exige; aquí no se ofrecen las demás opciones).
 class RequisicionForm extends ConsumerStatefulWidget {
-  const RequisicionForm({super.key, this.requisicion});
+  const RequisicionForm({super.key, this.requisicion, this.posicionId});
   final Requisicion? requisicion;
+  final String? posicionId;
 
   @override
   ConsumerState<RequisicionForm> createState() => _RequisicionFormState();
@@ -34,7 +36,24 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   final _form = GlobalKey<FormState>();
   late final Requisicion? _current = widget.requisicion;
 
-  PosicionElegible? _posicion;
+  PosicionElegible? _posicionElegida;
+  late String? _posicionContextoId = _current == null
+      ? widget.posicionId
+      : null;
+  late bool _selectorVisible = widget.posicionId == null;
+  PosicionElegible? get _posicion =>
+      _posicionElegida ??
+      (_posicionContextoId == null
+          ? null
+          : ref
+                .read(
+                  posicionContextoProvider((
+                    _posicionContextoId!,
+                    'requisicion',
+                  )),
+                )
+                .value
+                ?.elegible);
   String? _posicionError;
   int _posicionAttention = 0;
   late int? _tipo = _current?.tipo;
@@ -108,6 +127,7 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
       return;
     }
     final creating = _current == null;
+    if (creating && _posicionContextoId != null && _posicion == null) return;
     final valid = _form.currentState!.validate();
     if (creating && _posicion == null) {
       setState(() {
@@ -169,6 +189,11 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   @override
   Widget build(BuildContext context) {
     final catalogs = ref.watch(requisicionCatalogsProvider);
+    if (_posicionContextoId != null) {
+      ref.watch(
+        posicionContextoProvider((_posicionContextoId!, 'requisicion')),
+      );
+    }
     return AppFormPanel(
       title: _current == null ? 'Nueva requisición' : 'Editar requisición',
       subtitle: _current?.posicionEtiqueta,
@@ -177,6 +202,7 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
       error: _error,
       canSave:
           catalogs.hasValue &&
+          (_posicionContextoId == null || _posicion != null) &&
           (_current != null || _posicion?.tramiteAbierto == null),
       onSave: () => _save(catalogs.requireValue),
       child: catalogs.when(
@@ -217,7 +243,7 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SectionTitle('Solicitud', padTop: false),
-          if (creating)
+          if (creating && _selectorVisible)
             SearchPickerField<PosicionElegible>(
               label: 'Posición',
               hint: 'Escribe puesto, unidad o área',
@@ -237,15 +263,41 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
                   ? null
                   : 'Requisición abierta',
               onChanged: (posicion) => setState(() {
-                _posicion = posicion;
+                _posicionElegida = posicion;
+                _posicionContextoId = posicion?.id;
+                if (posicion != null && widget.posicionId != null) {
+                  _selectorVisible = false;
+                }
                 _posicionError = null;
               }),
             )
-          else
+          else if (!creating)
             InputDecorator(
               decoration: const InputDecoration(labelText: 'Posición'),
               child: Text(_current.posicionEtiqueta),
             ),
+          if (creating && _posicionContextoId != null) ...[
+            if (_selectorVisible) const SizedBox(height: AppSpacing.md),
+            PosicionContextoCard(
+              posicionId: _posicionContextoId!,
+              para: 'requisicion',
+            ),
+            if (widget.posicionId != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: _busy
+                      ? null
+                      : () => setState(() {
+                          _posicionElegida = null;
+                          _posicionContextoId = null;
+                          _posicionError = null;
+                          _selectorVisible = true;
+                        }),
+                  child: const Text('Cambiar posición'),
+                ),
+              ),
+          ],
           if (creating && _posicion?.tramiteAbierto != null) ...[
             const SizedBox(height: AppSpacing.sm),
             const Text('Esta posición ya tiene una requisición abierta'),

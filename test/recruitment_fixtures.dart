@@ -77,6 +77,30 @@ const posicionDos = PosicionRef(
   etiqueta: 'Ingeniero de Servicio — SERVICIO TECNICO',
 );
 
+const contextoUno = PosicionContexto(
+  id: 'pos1',
+  etiqueta: 'Operador de Soldadura — PAILERIA',
+  puesto: 'Operador de Soldadura',
+  unidad: 'PAILERIA',
+  area: 'Producción',
+  estatus: 'Colaborador Activo',
+  estatusCode: 'colaborador-activo',
+  ocupada: true,
+  empresa: 'GPA Azimatronics',
+  reportaA: 'Supervisor de Soldadura',
+);
+const contextoDos = PosicionContexto(
+  id: 'pos2',
+  etiqueta: 'Ingeniero de Servicio — SERVICIO TECNICO',
+  puesto: 'Ingeniero de Servicio',
+  unidad: 'SERVICIO TECNICO',
+  estatus: 'Vacante Activa',
+  estatusCode: 'vacante-activa',
+  ocupada: false,
+  empresa: 'GPA Advanced Manufacturing',
+  reportaA: 'Gerencia de Servicio',
+);
+
 /// Una requisición levantada por la cuenta de prueba (Capital Humano).
 final requisicionPropia = Requisicion(
   id: 'r1',
@@ -202,6 +226,9 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   TableQuery lastDescriptivosQuery = const TableQuery();
   final searches = <String>[];
   final selectorPurposes = <String>[];
+  final contextoRequests = <(String, String)>[];
+  final contextos = <(String, String), PosicionContexto>{};
+  Future<PosicionContexto> Function(String, String)? contextoLoader;
   List<PosicionElegible> posicionesElegiblesData = [
     PosicionElegible(
       id: posicionDos.id,
@@ -307,6 +334,34 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     selectorPurposes.add(para);
     _check();
     return posicionesElegiblesData;
+  }
+
+  @override
+  Future<PosicionContexto> posicionContexto(
+    String id, {
+    required String para,
+  }) async {
+    contextoRequests.add((id, para));
+    if (contextoLoader != null) return contextoLoader!(id, para);
+    _check();
+    if (contextos.containsKey((id, para))) return contextos[(id, para)]!;
+    final base = id == contextoUno.id ? contextoUno : contextoDos;
+    final elegible = posicionesElegiblesData
+        .where((item) => item.id == id)
+        .firstOrNull;
+    return elegible == null
+        ? base
+        : base.copyWith(
+            id: elegible.id,
+            etiqueta: elegible.etiqueta,
+            puesto: elegible.puesto,
+            unidad: elegible.unidad,
+            area: elegible.area,
+            estatus: elegible.estatus,
+            estatusCode: elegible.estatusCode,
+            ocupada: elegible.ocupada,
+            tramiteAbierto: elegible.tramiteAbierto,
+          );
   }
 
   @override

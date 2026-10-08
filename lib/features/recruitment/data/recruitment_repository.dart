@@ -87,6 +87,17 @@ class RecruitmentRepository {
     ];
   }
 
+  Future<PosicionContexto> posicionContexto(
+    String id, {
+    required String para,
+  }) async {
+    final response = await api.get<Map<String, dynamic>>(
+      'recruitment/posiciones-elegibles/$id/',
+      queryParameters: {'para': para},
+    );
+    return PosicionContexto.fromJson(response.data!);
+  }
+
   Future<ApiPage<Requisicion>> requisiciones(
     int page, {
     TableQuery query = const TableQuery(),

@@ -10,6 +10,14 @@ import '../data/recruitment_repository.dart';
 
 part 'recruitment_controller.g.dart';
 
+final posicionContextoProvider = FutureProvider.autoDispose
+    .family<PosicionContexto, (String, String)>(
+      (ref, key) => ref
+          .watch(recruitmentRepositoryProvider)
+          .posicionContexto(key.$1, para: key.$2),
+      retry: manualRetryOnly,
+    );
+
 @riverpod
 RecruitmentRepository recruitmentRepository(Ref ref) {
   ref.watch(sessionControllerProvider.select((session) => session.user?.id));

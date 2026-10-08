@@ -1169,6 +1169,330 @@ $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
 
 
 /// @nodoc
+mixin _$PosicionContexto {
+
+ String get id; String get etiqueta; String? get puesto; String get unidad; String? get area; String get estatus;@JsonKey(name: 'estatus_code') String get estatusCode; bool get ocupada;@JsonKey(name: 'tramite_abierto') TramiteAbierto? get tramiteAbierto; String? get empresa;@JsonKey(name: 'reporta_a') String? get reportaA;
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PosicionContextoCopyWith<PosicionContexto> get copyWith => _$PosicionContextoCopyWithImpl<PosicionContexto>(this as PosicionContexto, _$identity);
+
+  /// Serializes this PosicionContexto to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PosicionContexto;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PosicionContexto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.etiqueta, _this.etiqueta) || other.etiqueta == _this.etiqueta)&&(identical(other.puesto, _this.puesto) || other.puesto == _this.puesto)&&(identical(other.unidad, _this.unidad) || other.unidad == _this.unidad)&&(identical(other.area, _this.area) || other.area == _this.area)&&(identical(other.estatus, _this.estatus) || other.estatus == _this.estatus)&&(identical(other.estatusCode, _this.estatusCode) || other.estatusCode == _this.estatusCode)&&(identical(other.ocupada, _this.ocupada) || other.ocupada == _this.ocupada)&&(identical(other.tramiteAbierto, _this.tramiteAbierto) || other.tramiteAbierto == _this.tramiteAbierto)&&(identical(other.empresa, _this.empresa) || other.empresa == _this.empresa)&&(identical(other.reportaA, _this.reportaA) || other.reportaA == _this.reportaA));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PosicionContexto;
+  return Object.hash(runtimeType,_this.id,_this.etiqueta,_this.puesto,_this.unidad,_this.area,_this.estatus,_this.estatusCode,_this.ocupada,_this.tramiteAbierto,_this.empresa,_this.reportaA);
+}
+
+@override
+String toString() {
+  final _this = this as PosicionContexto;
+  return 'PosicionContexto(id: ${_this.id}, etiqueta: ${_this.etiqueta}, puesto: ${_this.puesto}, unidad: ${_this.unidad}, area: ${_this.area}, estatus: ${_this.estatus}, estatusCode: ${_this.estatusCode}, ocupada: ${_this.ocupada}, tramiteAbierto: ${_this.tramiteAbierto}, empresa: ${_this.empresa}, reportaA: ${_this.reportaA})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PosicionContextoCopyWith<$Res>  {
+  factory $PosicionContextoCopyWith(PosicionContexto value, $Res Function(PosicionContexto) _then) = _$PosicionContextoCopyWithImpl;
+@useResult
+$Res call({
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA
+});
+
+
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+
+}
+/// @nodoc
+class _$PosicionContextoCopyWithImpl<$Res>
+    implements $PosicionContextoCopyWith<$Res> {
+  _$PosicionContextoCopyWithImpl(this._self, this._then);
+
+  final PosicionContexto _self;
+  final $Res Function(PosicionContexto) _then;
+
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,}) {
+  return _then(PosicionContexto(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,puesto: freezed == puesto ? _self.puesto : puesto // ignore: cast_nullable_to_non_nullable
+as String?,unidad: null == unidad ? _self.unidad : unidad // ignore: cast_nullable_to_non_nullable
+as String,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,estatus: null == estatus ? _self.estatus : estatus // ignore: cast_nullable_to_non_nullable
+as String,estatusCode: null == estatusCode ? _self.estatusCode : estatusCode // ignore: cast_nullable_to_non_nullable
+as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nullable_to_non_nullable
+as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
+as TramiteAbierto?,empresa: freezed == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
+as String?,reportaA: freezed == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
+    if (_self.tramiteAbierto == null) {
+    return null;
+  }
+
+  return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
+    return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [PosicionContexto].
+extension PosicionContextoPatterns on PosicionContexto {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PosicionContexto value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PosicionContexto() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PosicionContexto value)  $default,){
+final _that = this;
+switch (_that) {
+case _PosicionContexto():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PosicionContexto value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PosicionContexto() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PosicionContexto() when $default != null:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)  $default,) {final _that = this;
+switch (_that) {
+case _PosicionContexto():
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)?  $default,) {final _that = this;
+switch (_that) {
+case _PosicionContexto() when $default != null:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PosicionContexto extends PosicionContexto {
+  const _PosicionContexto({required this.id, required this.etiqueta, this.puesto, required this.unidad, this.area, required this.estatus, @JsonKey(name: 'estatus_code') required this.estatusCode, required this.ocupada, @JsonKey(name: 'tramite_abierto') this.tramiteAbierto, this.empresa, @JsonKey(name: 'reporta_a') this.reportaA}): super._();
+  factory _PosicionContexto.fromJson(Map<String, dynamic> json) => _$PosicionContextoFromJson(json);
+
+@override final  String id;
+@override final  String etiqueta;
+@override final  String? puesto;
+@override final  String unidad;
+@override final  String? area;
+@override final  String estatus;
+@override@JsonKey(name: 'estatus_code') final  String estatusCode;
+@override final  bool ocupada;
+@override@JsonKey(name: 'tramite_abierto') final  TramiteAbierto? tramiteAbierto;
+@override final  String? empresa;
+@override@JsonKey(name: 'reporta_a') final  String? reportaA;
+
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PosicionContextoCopyWith<_PosicionContexto> get copyWith => __$PosicionContextoCopyWithImpl<_PosicionContexto>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PosicionContextoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PosicionContexto&&(identical(other.id, id) || other.id == id)&&(identical(other.etiqueta, etiqueta) || other.etiqueta == etiqueta)&&(identical(other.puesto, puesto) || other.puesto == puesto)&&(identical(other.unidad, unidad) || other.unidad == unidad)&&(identical(other.area, area) || other.area == area)&&(identical(other.estatus, estatus) || other.estatus == estatus)&&(identical(other.estatusCode, estatusCode) || other.estatusCode == estatusCode)&&(identical(other.ocupada, ocupada) || other.ocupada == ocupada)&&(identical(other.tramiteAbierto, tramiteAbierto) || other.tramiteAbierto == tramiteAbierto)&&(identical(other.empresa, empresa) || other.empresa == empresa)&&(identical(other.reportaA, reportaA) || other.reportaA == reportaA));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,etiqueta,puesto,unidad,area,estatus,estatusCode,ocupada,tramiteAbierto,empresa,reportaA);
+}
+
+@override
+String toString() {
+    return 'PosicionContexto(id: $id, etiqueta: $etiqueta, puesto: $puesto, unidad: $unidad, area: $area, estatus: $estatus, estatusCode: $estatusCode, ocupada: $ocupada, tramiteAbierto: $tramiteAbierto, empresa: $empresa, reportaA: $reportaA)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PosicionContextoCopyWith<$Res> implements $PosicionContextoCopyWith<$Res> {
+  factory _$PosicionContextoCopyWith(_PosicionContexto value, $Res Function(_PosicionContexto) _then) = __$PosicionContextoCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA
+});
+
+
+@override $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+
+}
+/// @nodoc
+class __$PosicionContextoCopyWithImpl<$Res>
+    implements _$PosicionContextoCopyWith<$Res> {
+  __$PosicionContextoCopyWithImpl(this._self, this._then);
+
+  final _PosicionContexto _self;
+  final $Res Function(_PosicionContexto) _then;
+
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,}) {
+  return _then(_PosicionContexto(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,puesto: freezed == puesto ? _self.puesto : puesto // ignore: cast_nullable_to_non_nullable
+as String?,unidad: null == unidad ? _self.unidad : unidad // ignore: cast_nullable_to_non_nullable
+as String,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,estatus: null == estatus ? _self.estatus : estatus // ignore: cast_nullable_to_non_nullable
+as String,estatusCode: null == estatusCode ? _self.estatusCode : estatusCode // ignore: cast_nullable_to_non_nullable
+as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nullable_to_non_nullable
+as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
+as TramiteAbierto?,empresa: freezed == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
+as String?,reportaA: freezed == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
+    if (_self.tramiteAbierto == null) {
+    return null;
+  }
+
+  return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
+    return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$Aprobacion {
 
  String get id; String get requisicion; int get etapa; String? get fecha; String? get usuario;@JsonKey(name: 'nombre_manual') String get nombreManual;

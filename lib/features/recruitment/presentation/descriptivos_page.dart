@@ -9,7 +9,6 @@ import '../../../core/widgets/app_badge.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/app_fade_switcher.dart';
-import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -17,7 +16,7 @@ import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
-import 'nuevo_descriptivo_form.dart';
+import 'recruitment_creation.dart';
 import 'recruitment_ui.dart';
 
 /// Lo más reciente primero: por fecha de elaboración y, a igual fecha, la
@@ -43,16 +42,7 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
 
   void _refresh() => ref.invalidate(descriptivosPageProvider);
 
-  Future<void> _create() async {
-    final creado = await showAppPanel<Descriptivo>(
-      context: context,
-      builder: (_) => const NuevoDescriptivoForm(),
-    );
-    if (creado != null && mounted) {
-      _refresh();
-      context.go('/reclutamiento/descriptivos/${creado.id}');
-    }
-  }
+  Future<void> _create() => abrirNuevoDescriptivo(context, ref);
 
   Future<void> _delete(Descriptivo descriptivo, int pageLength) async {
     final deleted = await showConfirmDialog(

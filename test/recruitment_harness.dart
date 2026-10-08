@@ -3,6 +3,7 @@ import 'package:capital_humano_front/core/auth/session_controller.dart';
 import 'package:capital_humano_front/core/files/file_saver.dart';
 import 'package:capital_humano_front/core/routing/app_router.dart';
 import 'package:capital_humano_front/features/employment/application/employment_controller.dart';
+import 'package:capital_humano_front/features/positions/application/positions_controller.dart';
 import 'package:capital_humano_front/features/recruitment/application/recruitment_controller.dart';
 import 'package:capital_humano_front/main.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import 'phase_three_fixtures.dart';
+import 'phase_four_fixtures.dart';
 import 'recruitment_fixtures.dart';
 import 'test_session.dart';
 
@@ -22,6 +24,7 @@ Future<GoRouter> pumpRecruitment(
   required FakeRecruitmentRepository repository,
   FakeFileSaver? saver,
   FakeEmploymentRepository? employment,
+  FakePositionsRepository? positions,
   SessionUser user = testUser,
   double width = 1440,
   double height = 1000,
@@ -49,6 +52,8 @@ Future<GoRouter> pumpRecruitment(
           () => TestSessionController(user: user),
         ),
         recruitmentRepositoryProvider.overrideWithValue(repository),
+        if (positions != null)
+          positionsRepositoryProvider.overrideWithValue(positions),
         fileSaverProvider.overrideWithValue(saver ?? FakeFileSaver()),
         employmentRepositoryProvider.overrideWithValue(
           employment ?? FakeEmploymentRepository(),

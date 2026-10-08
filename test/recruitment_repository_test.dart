@@ -732,6 +732,63 @@ void main() {
     });
   });
 
+  group('RecruitmentRepository: contexto de posición', () {
+    test(
+      'detalle usa id y para, lee relaciones y conserva la privacidad',
+      () async {
+        for (final para in ['requisicion', 'descriptivo']) {
+          final repository = RecruitmentRepository(
+            client((request) {
+              expect(request.path, 'recruitment/posiciones-elegibles/pos1/');
+              expect(request.queryParameters, {'para': para});
+              return response({
+                'id': 'pos1',
+                'etiqueta': 'Operador — GPA',
+                'puesto': 'Operador',
+                'unidad': 'GPA',
+                'area': null,
+                'estatus': 'Colaborador Activo',
+                'estatus_code': 'colaborador-activo',
+                'ocupada': true,
+                'empresa': 'Empresa de prueba',
+                'reporta_a': 'Supervisión',
+                'tramite_abierto': {
+                  'tipo': para,
+                  'id': para == 'requisicion' ? null : 'd1',
+                  'estado': para == 'requisicion' ? null : 'Borrador',
+                },
+              });
+            }),
+          );
+          final found = await repository.posicionContexto('pos1', para: para);
+          expect(found.empresa, 'Empresa de prueba');
+          expect(found.reportaA, 'Supervisión');
+          expect(found.area, isNull);
+          expect(found.elegible.ocupada, isTrue);
+          expect(found.tramiteAbierto!.id, para == 'requisicion' ? null : 'd1');
+        }
+      },
+    );
+
+    test('detalle admite empresa y reporte nulos', () async {
+      final repository = RecruitmentRepository(
+        client(
+          (_) => response({
+            ...contextoUno.toJson(),
+            'empresa': null,
+            'reporta_a': null,
+          }),
+        ),
+      );
+      final found = await repository.posicionContexto(
+        'pos1',
+        para: 'descriptivo',
+      );
+      expect(found.empresa, isNull);
+      expect(found.reportaA, isNull);
+    });
+  });
+
   group('recruitmentMutationError', () {
     test('explica el motivo del servidor con el nombre del campo', () {
       expect(

@@ -14,6 +14,7 @@ import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/network/table_query.dart';
 import '../../../core/widgets/app_fade_switcher.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
+import '../../recruitment/presentation/recruitment_creation.dart';
 import '../application/positions_controller.dart';
 import '../data/position_models.dart';
 import 'position_form.dart';
@@ -183,6 +184,26 @@ class _PositionsPageState extends ConsumerState<PositionsPage> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    IconButton(
+                      tooltip: 'Crear requisición',
+                      onPressed: () => abrirNuevaRequisicion(
+                        context,
+                        ref,
+                        posicionId: posicion.id,
+                      ),
+                      icon: const Icon(Icons.post_add_outlined),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    IconButton(
+                      tooltip: 'Crear descriptivo',
+                      onPressed: () => abrirNuevoDescriptivo(
+                        context,
+                        ref,
+                        posicionId: posicion.id,
+                      ),
+                      icon: const Icon(Icons.description_outlined),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
                     IconButton(
                       tooltip: 'Editar posición',
                       onPressed: () => _addOrEdit(posicion),

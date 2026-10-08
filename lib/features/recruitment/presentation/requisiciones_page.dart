@@ -22,6 +22,7 @@ import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_creation.dart';
 import 'requisicion_form.dart';
 
 /// Quién puede editar una requisición: Capital Humano y Admin las de todos, y
@@ -50,18 +51,7 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
 
   void _refresh() => ref.invalidate(requisicionesPageProvider);
 
-  Future<void> _create() async {
-    final saved = await showAppPanel<Requisicion>(
-      context: context,
-      builder: (_) => const RequisicionForm(),
-    );
-    if (saved != null && mounted) {
-      _refresh();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Requisición creada.')));
-      context.go('/reclutamiento/requisiciones/${saved.id}');
-    }
-  }
+  Future<void> _create() => abrirNuevaRequisicion(context, ref);
 
   Future<void> _edit(Requisicion requisicion) async {
     final saved = await showAppPanel<Requisicion>(
