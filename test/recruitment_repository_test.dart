@@ -645,6 +645,93 @@ void main() {
     );
   });
 
+  group('posiciones elegibles', () {
+    test(
+      'manda para search y page_size y conserva el trámite privado',
+      () async {
+        for (final para in ['requisicion', 'descriptivo']) {
+          final repository = RecruitmentRepository(
+            client((request) {
+              expect(request.path, 'recruitment/posiciones-elegibles/');
+              expect(request.queryParameters, {
+                'para': para,
+                'search': 'sold',
+                'page_size': 12,
+              });
+              return response({
+                'results': [
+                  {
+                    'id': 'pos1',
+                    'etiqueta': 'Operador — GPA',
+                    'puesto': 'Operador',
+                    'unidad': 'GPA',
+                    'area': 'Producción',
+                    'estatus': 'Colaborador Activo',
+                    'estatus_code': 'colaborador-activo',
+                    'ocupada': true,
+                    'tramite_abierto': {
+                      'tipo': para,
+                      'id': para == 'requisicion' ? null : 'd1',
+                      'estado': para == 'requisicion' ? null : 'Borrador',
+                    },
+                  },
+                ],
+              });
+            }),
+          );
+          final found = (await repository.posicionesElegibles(
+            para: para,
+            search: 'sold',
+            pageSize: 12,
+          )).single;
+          expect(found.id, 'pos1');
+          expect(found.puesto, 'Operador');
+          expect(found.area, 'Producción');
+          expect(found.estatusCode, 'colaborador-activo');
+          expect(found.ocupada, isTrue);
+          expect(found.tramiteAbierto!.tipo, para);
+          expect(found.tramiteAbierto!.id, para == 'requisicion' ? null : 'd1');
+          expect(
+            found.tramiteAbierto!.estado,
+            para == 'requisicion' ? null : 'Borrador',
+          );
+        }
+      },
+    );
+
+    test('sugerencias usan search vacío y leen valores nulos', () async {
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.queryParameters, {
+            'para': 'descriptivo',
+            'search': '',
+            'page_size': 8,
+          });
+          return response({
+            'results': [
+              {
+                'id': 'pos1',
+                'etiqueta': 'Sin puesto — GPA',
+                'puesto': null,
+                'unidad': 'GPA',
+                'area': null,
+                'estatus': 'Vacante Activa',
+                'estatus_code': 'vacante-activa',
+                'ocupada': false,
+                'tramite_abierto': null,
+              },
+            ],
+          });
+        }),
+      );
+      final found = (await repository.posicionesElegibles(para: 'descriptivo'))
+          .single;
+      expect(found.puesto, isNull);
+      expect(found.area, isNull);
+      expect(found.tramiteAbierto, isNull);
+    });
+  });
+
   group('recruitmentMutationError', () {
     test('explica el motivo del servidor con el nombre del campo', () {
       expect(

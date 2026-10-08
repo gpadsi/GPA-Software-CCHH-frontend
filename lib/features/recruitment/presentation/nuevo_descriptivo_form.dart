@@ -20,8 +20,9 @@ class NuevoDescriptivoForm extends ConsumerStatefulWidget {
 }
 
 class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
-  PosicionRef? _posicion;
+  PosicionElegible? _posicion;
   String? _posicionError;
+  int _posicionAttention = 0;
   bool _busy = false;
   String? _error;
 
@@ -29,7 +30,10 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
     if (_busy) return;
     final posicion = _posicion;
     if (posicion == null) {
-      setState(() => _posicionError = 'Elige la posición de la lista.');
+      setState(() {
+        _posicionError = 'Elige la posición de la lista.';
+        _posicionAttention++;
+      });
       return;
     }
     setState(() {
@@ -37,9 +41,11 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
       _error = null;
     });
     try {
-      final creado = await ref
-          .read(recruitmentRepositoryProvider)
-          .crearBorrador(posicion.id);
+      final repository = ref.read(recruitmentRepositoryProvider);
+      final borradorId = posicion.tramiteAbierto?.id;
+      final creado = borradorId == null
+          ? await repository.crearBorrador(posicion.id)
+          : await repository.descriptivo(borradorId);
       if (mounted) Navigator.of(context).pop(creado);
     } on Object catch (error) {
       if (mounted) {
@@ -54,7 +60,9 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
   @override
   Widget build(BuildContext context) => AppFormPanel(
     title: 'Nuevo descriptivo de puesto',
-    saveLabel: 'Crear borrador',
+    saveLabel: _posicion?.tramiteAbierto == null
+        ? 'Crear borrador'
+        : 'Continuar borrador',
     busy: _busy,
     error: _error,
     onSave: _save,
@@ -66,14 +74,23 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: AppSpacing.lg),
-        SearchPickerField<PosicionRef>(
+        SearchPickerField<PosicionElegible>(
           label: 'Posición',
           hint: 'Escribe puesto, unidad o área',
           enabled: !_busy,
+          suggestOnFocus: true,
           errorText: _posicionError,
-          search: (text) =>
-              ref.read(recruitmentRepositoryProvider).searchPosiciones(text),
+          attention: _posicionAttention,
+          search: (text) => ref
+              .read(recruitmentRepositoryProvider)
+              .posicionesElegibles(para: 'descriptivo', search: text),
           labelOf: (posicion) => posicion.etiqueta,
+          detailOf: (posicion) => [
+            posicion.estatus,
+            if (posicion.area != null) posicion.area!,
+          ].join(' · '),
+          badgeOf: (posicion) =>
+              posicion.tramiteAbierto == null ? null : 'Borrador abierto',
           onChanged: (posicion) => setState(() {
             _posicion = posicion;
             _posicionError = null;

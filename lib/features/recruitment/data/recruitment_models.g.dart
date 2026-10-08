@@ -38,6 +38,50 @@ _PosicionRef _$PosicionRefFromJson(Map<String, dynamic> json) => _PosicionRef(
 Map<String, dynamic> _$PosicionRefToJson(_PosicionRef instance) =>
     <String, dynamic>{'id': instance.id, 'etiqueta': instance.etiqueta};
 
+_TramiteAbierto _$TramiteAbiertoFromJson(Map<String, dynamic> json) =>
+    _TramiteAbierto(
+      tipo: json['tipo'] as String,
+      id: json['id'] as String?,
+      estado: json['estado'] as String?,
+    );
+
+Map<String, dynamic> _$TramiteAbiertoToJson(_TramiteAbierto instance) =>
+    <String, dynamic>{
+      'tipo': instance.tipo,
+      'id': instance.id,
+      'estado': instance.estado,
+    };
+
+_PosicionElegible _$PosicionElegibleFromJson(Map<String, dynamic> json) =>
+    _PosicionElegible(
+      id: json['id'] as String,
+      etiqueta: json['etiqueta'] as String,
+      puesto: json['puesto'] as String?,
+      unidad: json['unidad'] as String,
+      area: json['area'] as String?,
+      estatus: json['estatus'] as String,
+      estatusCode: json['estatus_code'] as String,
+      ocupada: json['ocupada'] as bool,
+      tramiteAbierto: json['tramite_abierto'] == null
+          ? null
+          : TramiteAbierto.fromJson(
+              json['tramite_abierto'] as Map<String, dynamic>,
+            ),
+    );
+
+Map<String, dynamic> _$PosicionElegibleToJson(_PosicionElegible instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'etiqueta': instance.etiqueta,
+      'puesto': instance.puesto,
+      'unidad': instance.unidad,
+      'area': instance.area,
+      'estatus': instance.estatus,
+      'estatus_code': instance.estatusCode,
+      'ocupada': instance.ocupada,
+      'tramite_abierto': instance.tramiteAbierto,
+    };
+
 _Aprobacion _$AprobacionFromJson(Map<String, dynamic> json) => _Aprobacion(
   id: json['id'] as String,
   requisicion: json['requisicion'] as String,

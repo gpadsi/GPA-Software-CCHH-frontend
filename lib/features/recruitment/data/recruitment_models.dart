@@ -40,6 +40,34 @@ abstract class PosicionRef with _$PosicionRef {
 }
 
 @freezed
+abstract class TramiteAbierto with _$TramiteAbierto {
+  const factory TramiteAbierto({
+    required String tipo,
+    String? id,
+    String? estado,
+  }) = _TramiteAbierto;
+  factory TramiteAbierto.fromJson(Map<String, dynamic> json) =>
+      _$TramiteAbiertoFromJson(json);
+}
+
+@freezed
+abstract class PosicionElegible with _$PosicionElegible {
+  const factory PosicionElegible({
+    required String id,
+    required String etiqueta,
+    String? puesto,
+    required String unidad,
+    String? area,
+    required String estatus,
+    @JsonKey(name: 'estatus_code') required String estatusCode,
+    required bool ocupada,
+    @JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto,
+  }) = _PosicionElegible;
+  factory PosicionElegible.fromJson(Map<String, dynamic> json) =>
+      _$PosicionElegibleFromJson(json);
+}
+
+@freezed
 abstract class Aprobacion with _$Aprobacion {
   const factory Aprobacion({
     required String id,

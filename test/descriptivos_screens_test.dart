@@ -3,6 +3,7 @@
 // y conformidades.
 import 'package:capital_humano_front/core/widgets/app_button.dart';
 import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/recruitment_ui.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -180,6 +181,115 @@ void main() {
       await tester.tap(find.text('Nuevo descriptivo').first);
       await tester.pumpAndSettle();
     }
+
+    testWidgets(
+      'continúa el borrador elegido sin crear otro y abre su editor',
+      (tester) async {
+        final repository = FakeRecruitmentRepository()
+          ..posicionesElegiblesData = [
+            PosicionElegible(
+              id: posicionUno.id,
+              etiqueta: posicionUno.etiqueta,
+              unidad: 'PAILERIA',
+              estatus: 'Colaborador Activo',
+              estatusCode: 'colaborador-activo',
+              ocupada: true,
+              tramiteAbierto: const TramiteAbierto(
+                tipo: 'descriptivo',
+                id: 'd1',
+                estado: 'Borrador',
+              ),
+            ),
+          ];
+        final router = await pumpRecruitment(
+          tester,
+          path: '/reclutamiento/descriptivos',
+          repository: repository,
+        );
+        await openPanel(tester);
+        await tester.tap(find.byType(TextFormField).first);
+        await tester.pumpAndSettle();
+        expect(find.text('Borrador abierto'), findsOneWidget);
+        await tester.tap(find.text(posicionUno.etiqueta).last);
+        await tester.pumpAndSettle();
+        expect(find.text('Continuar borrador'), findsOneWidget);
+        await saveForm(tester, label: 'Continuar borrador');
+        expect(repository.createdDraftFor, isNull);
+        expect(repository.selectorPurposes, everyElement('descriptivo'));
+        expect(
+          router.routeInformationProvider.value.uri.path,
+          '/reclutamiento/descriptivos/d1',
+        );
+        expect(find.text('Guardar borrador'), findsOneWidget);
+      },
+    );
+
+    testWidgets('distingue etiquetas iguales por estatus área y trámite', (
+      tester,
+    ) async {
+      final repository = FakeRecruitmentRepository()
+        ..posicionesElegiblesData = [
+          const PosicionElegible(
+            id: 'pos1',
+            etiqueta: 'Operador — GPA',
+            unidad: 'GPA',
+            area: 'Producción',
+            estatus: 'Vacante Activa',
+            estatusCode: 'vacante-activa',
+            ocupada: false,
+          ),
+          const PosicionElegible(
+            id: 'pos2',
+            etiqueta: 'Operador — GPA',
+            unidad: 'GPA',
+            area: 'Mantenimiento',
+            estatus: 'Colaborador Activo',
+            estatusCode: 'colaborador-activo',
+            ocupada: true,
+            tramiteAbierto: TramiteAbierto(
+              tipo: 'descriptivo',
+              id: 'd1',
+              estado: 'Borrador',
+            ),
+          ),
+        ];
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/descriptivos',
+        repository: repository,
+      );
+      await openPanel(tester);
+      await tester.tap(find.byType(TextFormField).first);
+      await tester.pumpAndSettle();
+      expect(find.text('Operador — GPA'), findsNWidgets(2));
+      expect(find.text('Vacante Activa · Producción'), findsOneWidget);
+      expect(find.text('Colaborador Activo · Mantenimiento'), findsOneWidget);
+      expect(find.text('Borrador abierto'), findsOneWidget);
+      await tester.tap(find.text('Operador — GPA').first);
+      await tester.pumpAndSettle();
+      expect(find.text('Crear borrador'), findsOneWidget);
+    });
+
+    testWidgets('continuar con texto sin selección reabre la lista', (
+      tester,
+    ) async {
+      final repository = FakeRecruitmentRepository();
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/descriptivos',
+        repository: repository,
+      );
+      await openPanel(tester);
+      await tester.enterText(find.byType(TextFormField).first, 'ingen');
+      await pumpDebounce(tester);
+      await saveForm(tester, label: 'Crear borrador');
+      expect(find.text('Elige la posición de la lista.'), findsOneWidget);
+      expect(
+        find.text(posicionDos.etiqueta).last.hitTestable(),
+        findsOneWidget,
+      );
+      expect(repository.createdDraftFor, isNull);
+    });
 
     testWidgets('elige la posición, crea el borrador y abre el editor', (
       tester,

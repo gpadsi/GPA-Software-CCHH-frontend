@@ -575,6 +575,600 @@ as String,
 
 
 /// @nodoc
+mixin _$TramiteAbierto {
+
+ String get tipo; String? get id; String? get estado;
+/// Create a copy of TramiteAbierto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TramiteAbiertoCopyWith<TramiteAbierto> get copyWith => _$TramiteAbiertoCopyWithImpl<TramiteAbierto>(this as TramiteAbierto, _$identity);
+
+  /// Serializes this TramiteAbierto to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as TramiteAbierto;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TramiteAbierto&&(identical(other.tipo, _this.tipo) || other.tipo == _this.tipo)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.estado, _this.estado) || other.estado == _this.estado));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as TramiteAbierto;
+  return Object.hash(runtimeType,_this.tipo,_this.id,_this.estado);
+}
+
+@override
+String toString() {
+  final _this = this as TramiteAbierto;
+  return 'TramiteAbierto(tipo: ${_this.tipo}, id: ${_this.id}, estado: ${_this.estado})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TramiteAbiertoCopyWith<$Res>  {
+  factory $TramiteAbiertoCopyWith(TramiteAbierto value, $Res Function(TramiteAbierto) _then) = _$TramiteAbiertoCopyWithImpl;
+@useResult
+$Res call({
+ String tipo, String? id, String? estado
+});
+
+
+
+
+}
+/// @nodoc
+class _$TramiteAbiertoCopyWithImpl<$Res>
+    implements $TramiteAbiertoCopyWith<$Res> {
+  _$TramiteAbiertoCopyWithImpl(this._self, this._then);
+
+  final TramiteAbierto _self;
+  final $Res Function(TramiteAbierto) _then;
+
+/// Create a copy of TramiteAbierto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? tipo = null,Object? id = freezed,Object? estado = freezed,}) {
+  return _then(TramiteAbierto(
+tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
+as String,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,estado: freezed == estado ? _self.estado : estado // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [TramiteAbierto].
+extension TramiteAbiertoPatterns on TramiteAbierto {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TramiteAbierto value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _TramiteAbierto() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TramiteAbierto value)  $default,){
+final _that = this;
+switch (_that) {
+case _TramiteAbierto():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TramiteAbierto value)?  $default,){
+final _that = this;
+switch (_that) {
+case _TramiteAbierto() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String tipo,  String? id,  String? estado)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _TramiteAbierto() when $default != null:
+return $default(_that.tipo,_that.id,_that.estado);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String tipo,  String? id,  String? estado)  $default,) {final _that = this;
+switch (_that) {
+case _TramiteAbierto():
+return $default(_that.tipo,_that.id,_that.estado);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String tipo,  String? id,  String? estado)?  $default,) {final _that = this;
+switch (_that) {
+case _TramiteAbierto() when $default != null:
+return $default(_that.tipo,_that.id,_that.estado);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _TramiteAbierto implements TramiteAbierto {
+  const _TramiteAbierto({required this.tipo, this.id, this.estado});
+  factory _TramiteAbierto.fromJson(Map<String, dynamic> json) => _$TramiteAbiertoFromJson(json);
+
+@override final  String tipo;
+@override final  String? id;
+@override final  String? estado;
+
+/// Create a copy of TramiteAbierto
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TramiteAbiertoCopyWith<_TramiteAbierto> get copyWith => __$TramiteAbiertoCopyWithImpl<_TramiteAbierto>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$TramiteAbiertoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TramiteAbierto&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.id, id) || other.id == id)&&(identical(other.estado, estado) || other.estado == estado));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,tipo,id,estado);
+}
+
+@override
+String toString() {
+    return 'TramiteAbierto(tipo: $tipo, id: $id, estado: $estado)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TramiteAbiertoCopyWith<$Res> implements $TramiteAbiertoCopyWith<$Res> {
+  factory _$TramiteAbiertoCopyWith(_TramiteAbierto value, $Res Function(_TramiteAbierto) _then) = __$TramiteAbiertoCopyWithImpl;
+@override @useResult
+$Res call({
+ String tipo, String? id, String? estado
+});
+
+
+
+
+}
+/// @nodoc
+class __$TramiteAbiertoCopyWithImpl<$Res>
+    implements _$TramiteAbiertoCopyWith<$Res> {
+  __$TramiteAbiertoCopyWithImpl(this._self, this._then);
+
+  final _TramiteAbierto _self;
+  final $Res Function(_TramiteAbierto) _then;
+
+/// Create a copy of TramiteAbierto
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? tipo = null,Object? id = freezed,Object? estado = freezed,}) {
+  return _then(_TramiteAbierto(
+tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
+as String,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,estado: freezed == estado ? _self.estado : estado // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$PosicionElegible {
+
+ String get id; String get etiqueta; String? get puesto; String get unidad; String? get area; String get estatus;@JsonKey(name: 'estatus_code') String get estatusCode; bool get ocupada;@JsonKey(name: 'tramite_abierto') TramiteAbierto? get tramiteAbierto;
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PosicionElegibleCopyWith<PosicionElegible> get copyWith => _$PosicionElegibleCopyWithImpl<PosicionElegible>(this as PosicionElegible, _$identity);
+
+  /// Serializes this PosicionElegible to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PosicionElegible;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PosicionElegible&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.etiqueta, _this.etiqueta) || other.etiqueta == _this.etiqueta)&&(identical(other.puesto, _this.puesto) || other.puesto == _this.puesto)&&(identical(other.unidad, _this.unidad) || other.unidad == _this.unidad)&&(identical(other.area, _this.area) || other.area == _this.area)&&(identical(other.estatus, _this.estatus) || other.estatus == _this.estatus)&&(identical(other.estatusCode, _this.estatusCode) || other.estatusCode == _this.estatusCode)&&(identical(other.ocupada, _this.ocupada) || other.ocupada == _this.ocupada)&&(identical(other.tramiteAbierto, _this.tramiteAbierto) || other.tramiteAbierto == _this.tramiteAbierto));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PosicionElegible;
+  return Object.hash(runtimeType,_this.id,_this.etiqueta,_this.puesto,_this.unidad,_this.area,_this.estatus,_this.estatusCode,_this.ocupada,_this.tramiteAbierto);
+}
+
+@override
+String toString() {
+  final _this = this as PosicionElegible;
+  return 'PosicionElegible(id: ${_this.id}, etiqueta: ${_this.etiqueta}, puesto: ${_this.puesto}, unidad: ${_this.unidad}, area: ${_this.area}, estatus: ${_this.estatus}, estatusCode: ${_this.estatusCode}, ocupada: ${_this.ocupada}, tramiteAbierto: ${_this.tramiteAbierto})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PosicionElegibleCopyWith<$Res>  {
+  factory $PosicionElegibleCopyWith(PosicionElegible value, $Res Function(PosicionElegible) _then) = _$PosicionElegibleCopyWithImpl;
+@useResult
+$Res call({
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto
+});
+
+
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+
+}
+/// @nodoc
+class _$PosicionElegibleCopyWithImpl<$Res>
+    implements $PosicionElegibleCopyWith<$Res> {
+  _$PosicionElegibleCopyWithImpl(this._self, this._then);
+
+  final PosicionElegible _self;
+  final $Res Function(PosicionElegible) _then;
+
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,}) {
+  return _then(PosicionElegible(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,puesto: freezed == puesto ? _self.puesto : puesto // ignore: cast_nullable_to_non_nullable
+as String?,unidad: null == unidad ? _self.unidad : unidad // ignore: cast_nullable_to_non_nullable
+as String,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,estatus: null == estatus ? _self.estatus : estatus // ignore: cast_nullable_to_non_nullable
+as String,estatusCode: null == estatusCode ? _self.estatusCode : estatusCode // ignore: cast_nullable_to_non_nullable
+as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nullable_to_non_nullable
+as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
+as TramiteAbierto?,
+  ));
+}
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
+    if (_self.tramiteAbierto == null) {
+    return null;
+  }
+
+  return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
+    return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [PosicionElegible].
+extension PosicionElegiblePatterns on PosicionElegible {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PosicionElegible value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PosicionElegible() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PosicionElegible value)  $default,){
+final _that = this;
+switch (_that) {
+case _PosicionElegible():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PosicionElegible value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PosicionElegible() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PosicionElegible() when $default != null:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto)  $default,) {final _that = this;
+switch (_that) {
+case _PosicionElegible():
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto)?  $default,) {final _that = this;
+switch (_that) {
+case _PosicionElegible() when $default != null:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PosicionElegible implements PosicionElegible {
+  const _PosicionElegible({required this.id, required this.etiqueta, this.puesto, required this.unidad, this.area, required this.estatus, @JsonKey(name: 'estatus_code') required this.estatusCode, required this.ocupada, @JsonKey(name: 'tramite_abierto') this.tramiteAbierto});
+  factory _PosicionElegible.fromJson(Map<String, dynamic> json) => _$PosicionElegibleFromJson(json);
+
+@override final  String id;
+@override final  String etiqueta;
+@override final  String? puesto;
+@override final  String unidad;
+@override final  String? area;
+@override final  String estatus;
+@override@JsonKey(name: 'estatus_code') final  String estatusCode;
+@override final  bool ocupada;
+@override@JsonKey(name: 'tramite_abierto') final  TramiteAbierto? tramiteAbierto;
+
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PosicionElegibleCopyWith<_PosicionElegible> get copyWith => __$PosicionElegibleCopyWithImpl<_PosicionElegible>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PosicionElegibleToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PosicionElegible&&(identical(other.id, id) || other.id == id)&&(identical(other.etiqueta, etiqueta) || other.etiqueta == etiqueta)&&(identical(other.puesto, puesto) || other.puesto == puesto)&&(identical(other.unidad, unidad) || other.unidad == unidad)&&(identical(other.area, area) || other.area == area)&&(identical(other.estatus, estatus) || other.estatus == estatus)&&(identical(other.estatusCode, estatusCode) || other.estatusCode == estatusCode)&&(identical(other.ocupada, ocupada) || other.ocupada == ocupada)&&(identical(other.tramiteAbierto, tramiteAbierto) || other.tramiteAbierto == tramiteAbierto));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,etiqueta,puesto,unidad,area,estatus,estatusCode,ocupada,tramiteAbierto);
+}
+
+@override
+String toString() {
+    return 'PosicionElegible(id: $id, etiqueta: $etiqueta, puesto: $puesto, unidad: $unidad, area: $area, estatus: $estatus, estatusCode: $estatusCode, ocupada: $ocupada, tramiteAbierto: $tramiteAbierto)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PosicionElegibleCopyWith<$Res> implements $PosicionElegibleCopyWith<$Res> {
+  factory _$PosicionElegibleCopyWith(_PosicionElegible value, $Res Function(_PosicionElegible) _then) = __$PosicionElegibleCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto
+});
+
+
+@override $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+
+}
+/// @nodoc
+class __$PosicionElegibleCopyWithImpl<$Res>
+    implements _$PosicionElegibleCopyWith<$Res> {
+  __$PosicionElegibleCopyWithImpl(this._self, this._then);
+
+  final _PosicionElegible _self;
+  final $Res Function(_PosicionElegible) _then;
+
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,}) {
+  return _then(_PosicionElegible(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,puesto: freezed == puesto ? _self.puesto : puesto // ignore: cast_nullable_to_non_nullable
+as String?,unidad: null == unidad ? _self.unidad : unidad // ignore: cast_nullable_to_non_nullable
+as String,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,estatus: null == estatus ? _self.estatus : estatus // ignore: cast_nullable_to_non_nullable
+as String,estatusCode: null == estatusCode ? _self.estatusCode : estatusCode // ignore: cast_nullable_to_non_nullable
+as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nullable_to_non_nullable
+as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
+as TramiteAbierto?,
+  ));
+}
+
+/// Create a copy of PosicionElegible
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
+    if (_self.tramiteAbierto == null) {
+    return null;
+  }
+
+  return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
+    return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$Aprobacion {
 
  String get id; String get requisicion; int get etapa; String? get fecha; String? get usuario;@JsonKey(name: 'nombre_manual') String get nombreManual;

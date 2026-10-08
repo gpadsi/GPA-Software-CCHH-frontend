@@ -201,6 +201,18 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   TableQuery lastRequisicionesQuery = const TableQuery();
   TableQuery lastDescriptivosQuery = const TableQuery();
   final searches = <String>[];
+  final selectorPurposes = <String>[];
+  List<PosicionElegible> posicionesElegiblesData = [
+    PosicionElegible(
+      id: posicionDos.id,
+      etiqueta: posicionDos.etiqueta,
+      puesto: 'Ingeniero de Servicio',
+      unidad: 'SERVICIO TECNICO',
+      estatus: 'Vacante Activa',
+      estatusCode: 'vacante-activa',
+      ocupada: false,
+    ),
+  ];
   Requisicion? savedRequisicion;
   bool? requisicionCreated;
   String? deletedRequisicion;
@@ -283,6 +295,18 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     searches.add(text);
     _check();
     return [posicionDos];
+  }
+
+  @override
+  Future<List<PosicionElegible>> posicionesElegibles({
+    required String para,
+    String search = '',
+    int pageSize = 8,
+  }) async {
+    searches.add(search);
+    selectorPurposes.add(para);
+    _check();
+    return posicionesElegiblesData;
   }
 
   @override

@@ -1,6 +1,8 @@
 // Pantallas de Requisiciones (paso 3 del plan del front, 2026-10-05): lista,
 // alta y edición, detalle con aprobaciones y descarga del Excel oficial.
+import 'package:capital_humano_front/core/widgets/app_button.dart';
 import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_field.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/recruitment_ui.dart';
 import 'package:dio/dio.dart';
@@ -180,6 +182,92 @@ void main() {
   });
 
   group('alta y edición de una requisición', () {
+    testWidgets('requisición abierta ajena avisa y deshabilita guardar', (
+      tester,
+    ) async {
+      final repository = FakeRecruitmentRepository()
+        ..posicionesElegiblesData = [
+          PosicionElegible(
+            id: posicionDos.id,
+            etiqueta: posicionDos.etiqueta,
+            unidad: 'SERVICIO TECNICO',
+            estatus: 'Vacante Activa',
+            estatusCode: 'vacante-activa',
+            ocupada: false,
+            tramiteAbierto: const TramiteAbierto(tipo: 'requisicion'),
+          ),
+        ];
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento',
+        repository: repository,
+        user: testColaborador,
+      );
+      await tester.tap(find.text('Nueva requisición').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(TextFormField).first);
+      await tester.pumpAndSettle();
+      expect(find.text('Requisición abierta'), findsOneWidget);
+      await tester.tap(find.text(posicionDos.etiqueta).last);
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Esta posición ya tiene una requisición abierta'),
+        findsOneWidget,
+      );
+      expect(find.text('Pídela a Capital Humano'), findsOneWidget);
+      expect(find.text('Abrir'), findsNothing);
+      expect(
+        tester
+            .widget<AppButton>(find.widgetWithText(AppButton, 'Guardar'))
+            .onPressed,
+        isNull,
+      );
+      expect(repository.savedRequisicion, isNull);
+      expect(repository.selectorPurposes, everyElement('requisicion'));
+    });
+
+    testWidgets('requisición abierta visible permite abrir su detalle', (
+      tester,
+    ) async {
+      final repository = FakeRecruitmentRepository()
+        ..posicionesElegiblesData = [
+          PosicionElegible(
+            id: posicionUno.id,
+            etiqueta: posicionUno.etiqueta,
+            unidad: 'PAILERIA',
+            estatus: 'Vacante Activa',
+            estatusCode: 'vacante-activa',
+            ocupada: false,
+            tramiteAbierto: const TramiteAbierto(
+              tipo: 'requisicion',
+              id: 'r1',
+              estado: 'Pendiente de Autorización',
+            ),
+          ),
+        ];
+      final router = await pumpRecruitment(
+        tester,
+        path: '/reclutamiento',
+        repository: repository,
+      );
+      await tester.tap(find.text('Nueva requisición').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(TextFormField).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(posicionUno.etiqueta).last);
+      await tester.pumpAndSettle();
+      expect(find.text('Abrir'), findsOneWidget);
+      expect(find.text('Pídela a Capital Humano'), findsNothing);
+      await tester.tap(find.text('Abrir'));
+      await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/reclutamiento/requisiciones/r1',
+      );
+      expect(find.byType(AppFormPanel), findsNothing);
+      expect(repository.savedRequisicion, isNull);
+    });
+
     Future<void> pickPosicion(WidgetTester tester) async {
       await tester.enterText(find.byType(TextFormField).first, 'ingen');
       await pumpDebounce(tester);

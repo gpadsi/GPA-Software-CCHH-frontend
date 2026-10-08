@@ -72,6 +72,21 @@ class RecruitmentRepository {
 
   // --- Requisiciones ---------------------------------------------------
 
+  Future<List<PosicionElegible>> posicionesElegibles({
+    required String para,
+    String search = '',
+    int pageSize = 8,
+  }) async {
+    final response = await api.get<Map<String, dynamic>>(
+      'recruitment/posiciones-elegibles/',
+      queryParameters: {'para': para, 'search': search, 'page_size': pageSize},
+    );
+    return [
+      for (final item in response.data!['results'] as List<dynamic>)
+        PosicionElegible.fromJson(item as Map<String, dynamic>),
+    ];
+  }
+
   Future<ApiPage<Requisicion>> requisiciones(
     int page, {
     TableQuery query = const TableQuery(),

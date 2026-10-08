@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
@@ -33,8 +34,9 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   final _form = GlobalKey<FormState>();
   late final Requisicion? _current = widget.requisicion;
 
-  PosicionRef? _posicion;
+  PosicionElegible? _posicion;
   String? _posicionError;
+  int _posicionAttention = 0;
   late int? _tipo = _current?.tipo;
   late int? _estado = _current?.estado;
   late DateTime? _fechaSolicitud =
@@ -102,11 +104,16 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
   }
 
   Future<void> _save(RequisicionCatalogs catalogs) async {
-    if (_busy) return;
+    if (_busy || (_current == null && _posicion?.tramiteAbierto != null)) {
+      return;
+    }
     final creating = _current == null;
     final valid = _form.currentState!.validate();
     if (creating && _posicion == null) {
-      setState(() => _posicionError = 'Elige la posición de la lista.');
+      setState(() {
+        _posicionError = 'Elige la posición de la lista.';
+        _posicionAttention++;
+      });
       return;
     }
     if (!valid) return;
@@ -168,7 +175,9 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
       width: 680,
       busy: _busy,
       error: _error,
-      canSave: catalogs.hasValue,
+      canSave:
+          catalogs.hasValue &&
+          (_current != null || _posicion?.tramiteAbierto == null),
       onSave: () => _save(catalogs.requireValue),
       child: catalogs.when(
         data: _fields,
@@ -209,15 +218,24 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
         children: [
           const SectionTitle('Solicitud', padTop: false),
           if (creating)
-            SearchPickerField<PosicionRef>(
+            SearchPickerField<PosicionElegible>(
               label: 'Posición',
               hint: 'Escribe puesto, unidad o área',
               enabled: !_busy,
+              suggestOnFocus: true,
               errorText: _posicionError,
+              attention: _posicionAttention,
               search: (text) => ref
                   .read(recruitmentRepositoryProvider)
-                  .searchPosiciones(text),
+                  .posicionesElegibles(para: 'requisicion', search: text),
               labelOf: (posicion) => posicion.etiqueta,
+              detailOf: (posicion) => [
+                posicion.estatus,
+                if (posicion.area != null) posicion.area!,
+              ].join(' · '),
+              badgeOf: (posicion) => posicion.tramiteAbierto == null
+                  ? null
+                  : 'Requisición abierta',
               onChanged: (posicion) => setState(() {
                 _posicion = posicion;
                 _posicionError = null;
@@ -228,6 +246,24 @@ class _RequisicionFormState extends ConsumerState<RequisicionForm> {
               decoration: const InputDecoration(labelText: 'Posición'),
               child: Text(_current.posicionEtiqueta),
             ),
+          if (creating && _posicion?.tramiteAbierto != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            const Text('Esta posición ya tiene una requisición abierta'),
+            if (_posicion!.tramiteAbierto!.id == null)
+              const Text('Pídela a Capital Humano')
+            else
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {
+                    final id = _posicion!.tramiteAbierto!.id!;
+                    Navigator.of(context).pop();
+                    context.go('/reclutamiento/requisiciones/$id');
+                  },
+                  child: const Text('Abrir'),
+                ),
+              ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           DropdownButtonFormField<int>(
             initialValue: _tipo,
