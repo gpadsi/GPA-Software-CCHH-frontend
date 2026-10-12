@@ -169,6 +169,7 @@ const descriptivoBorrador = Descriptivo(
   posicion: 'pos1',
   posicionEtiqueta: 'Operador de Soldadura — PAILERIA',
   version: 1,
+  estadoVersion: 'borrador',
   nombrePuesto: 'Operador de Soldadura',
   empresa: 'GPA Azimatronics',
   areaDepartamento: 'PAILERIA',
@@ -187,6 +188,7 @@ const descriptivoCongelado = Descriptivo(
   version: 2,
   congeladoEn: '2026-09-25T10:00:00Z',
   estaCongelado: true,
+  estadoVersion: 'aprobada',
   nombrePuesto: 'Ingeniero de Servicio',
   empresa: 'GPA Azimatronics',
   areaDepartamento: 'SERVICIO TECNICO',
@@ -263,6 +265,11 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   bool? aprobacionCreated;
   String? deletedAprobacion;
   Descriptivo? savedDescriptivo;
+  // Lo que dice la posición hoy frente a lo guardado en el borrador, y los
+  // borradores para los que se pidió esa comparación.
+  List<CambioPosicion> cambiosPosicionData = [];
+  Object? cambiosFailure;
+  final cambiosRequests = <String>[];
   final calls = <String>[];
   String? createdDraftFor;
   Conformidad? savedConformidad;
@@ -513,6 +520,14 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   }
 
   @override
+  Future<List<CambioPosicion>> cambiosPosicion(String id) async {
+    cambiosRequests.add(id);
+    _check();
+    if (cambiosFailure != null) throw cambiosFailure!;
+    return [...cambiosPosicionData];
+  }
+
+  @override
   Future<Descriptivo> crearBorrador(String posicionId) async {
     _check();
     createdDraftFor = posicionId;
@@ -542,7 +557,11 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     calls.add('congelar:$id');
     final frozen = descriptivosData
         .firstWhere((item) => item.id == id)
-        .copyWith(estaCongelado: true, congeladoEn: '2026-10-05T12:00:00Z');
+        .copyWith(
+          estaCongelado: true,
+          estadoVersion: 'aprobada',
+          congeladoEn: '2026-10-05T12:00:00Z',
+        );
     descriptivosData = [
       for (final item in descriptivosData)
         if (item.id == id) frozen else item,

@@ -50,7 +50,7 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
       title: 'Eliminar borrador',
       message:
           '¿Eliminar el borrador v${descriptivo.version} de «${descriptivo.posicionEtiqueta}»? Se pierde lo capturado.',
-      details: 'Una versión congelada no se puede eliminar.',
+      details: 'Una versión aprobada no se puede eliminar.',
       onConfirm: () => ref
           .read(recruitmentRepositoryProvider)
           .deleteDescriptivo(descriptivo.id),
@@ -71,7 +71,7 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
     final filter = _query.filters['congelado'] ?? '';
     return FeaturePage(
       title: 'Descriptivos de puesto',
-      description: 'Lo que hace cada posición: sus funciones, condiciones y perfil. Cada versión aprobada queda congelada como historial.',
+      description: 'Lo que hace cada posición: sus funciones, condiciones y perfil. Cada versión aprobada queda como historial.',
       tabs: const FeatureTabs(
         current: '/reclutamiento/descriptivos',
         destinations: recruitmentTabs,
@@ -112,7 +112,7 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
                   for (final (value, label) in const [
                     ('', 'Todos'),
                     ('false', 'Borradores'),
-                    ('true', 'Congelados'),
+                    ('true', 'Aprobadas e históricas'),
                   ])
                     ChoiceChip(
                       label: Text(label),
@@ -171,10 +171,12 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
                         DataCell(Text('v${d.version}')),
                         DataCell(
                           AppBadge(
-                            label: d.estaCongelado ? 'Congelado' : 'Borrador',
-                            tone: d.estaCongelado
-                                ? AppBadgeTone.success
-                                : AppBadgeTone.warning,
+                            label: d.etiquetaVersion,
+                            tone: !d.estaCongelado
+                                ? AppBadgeTone.warning
+                                : d.esHistorica
+                                ? AppBadgeTone.neutral
+                                : AppBadgeTone.success,
                           ),
                         ),
                         DataCell(Text(shownDate(d.fechaElaboracion) ?? '')),

@@ -194,15 +194,34 @@ abstract class Conformidad with _$Conformidad {
       _$ConformidadFromJson(json);
 }
 
+/// Un dato vinculado del borrador que ya no coincide con lo que hoy dice la
+/// posición: lo guardado en la versión y lo actual, para elegir si incorporarlo.
+@freezed
+abstract class CambioPosicion with _$CambioPosicion {
+  const factory CambioPosicion({
+    required String campo,
+    required String etiqueta,
+    @Default('') String guardado,
+    required String actual,
+  }) = _CambioPosicion;
+  factory CambioPosicion.fromJson(Map<String, dynamic> json) =>
+      _$CambioPosicionFromJson(json);
+}
+
 @freezed
 abstract class Descriptivo with _$Descriptivo {
+  const Descriptivo._();
   const factory Descriptivo({
     required String id,
     required String posicion,
     @JsonKey(name: 'posicion_etiqueta') @Default('') String posicionEtiqueta,
     required int version,
     @JsonKey(name: 'congelado_en') String? congeladoEn,
+    // «Congelado» es término interno: la persona ve Borrador, Aprobada o
+    // Histórica. Se deriva en el servidor (la aprobada más reciente es la
+    // vigente); si no llega, se infiere de si está congelado.
     @JsonKey(name: 'esta_congelado') @Default(false) bool estaCongelado,
+    @JsonKey(name: 'estado_version') String? estadoVersion,
     @JsonKey(name: 'nombre_puesto') @Default('') String nombrePuesto,
     @Default('') String empresa,
     @JsonKey(name: 'area_departamento') @Default('') String areaDepartamento,
@@ -253,4 +272,13 @@ abstract class Descriptivo with _$Descriptivo {
   }) = _Descriptivo;
   factory Descriptivo.fromJson(Map<String, dynamic> json) =>
       _$DescriptivoFromJson(json);
+
+  String get etiquetaVersion => switch (estadoVersion) {
+    'aprobada' => 'Aprobada',
+    'historica' => 'Histórica',
+    'borrador' => 'Borrador',
+    _ => estaCongelado ? 'Aprobada' : 'Borrador',
+  };
+
+  bool get esHistorica => estadoVersion == 'historica';
 }

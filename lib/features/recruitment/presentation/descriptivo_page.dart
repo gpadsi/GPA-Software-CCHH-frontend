@@ -15,17 +15,32 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
+import '../application/requisicion_exit_guard.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'conformidades_card.dart';
+import 'discard_changes_dialog.dart';
 import 'recruitment_ui.dart';
+import 'requisicion_before_unload.dart';
 
 /// Cuántos renglones vacíos trae un borrador sin funciones ni indicadores:
 /// los mismos que el formulario oficial (5 y 3), aunque aquí se puede agregar
 /// más.
 const _defaultFunciones = 5;
 const _defaultIndicadores = 3;
+
+/// Ancho de la columna de contenido (y de la barra de acciones).
+const _contentMaxWidth = 900.0;
+
+/// Las secciones de la página, en el orden en que se recorren.
+const _sectionNames = [
+  'Identificación',
+  'Propósito y funciones',
+  'Perfil',
+  'Competencias y recursos',
+  'Indicadores y conformidades',
+];
 
 class DescriptivoPage extends ConsumerWidget {
   const DescriptivoPage({super.key, required this.descriptivoId});
@@ -51,36 +66,35 @@ class DescriptivoPage extends ConsumerWidget {
         : (catalogs.hasError && !catalogs.hasValue)
         ? catalogs.error
         : null;
+    if (error == null && loaded != null && options != null) {
+      return DescriptivoEditor(
+        // Cambia solo al aprobar: el editor se rearma ya sin edición.
+        key: ValueKey('${loaded.id}:${loaded.congeladoEn}'),
+        descriptivo: loaded,
+        catalogs: options,
+      );
+    }
     return FeaturePage(
-      title: loaded == null
-          ? 'Descriptivo de puesto'
-          : loaded.nombrePuesto.trim().isNotEmpty
-          ? loaded.nombrePuesto
-          : loaded.posicionEtiqueta,
-      description: loaded == null
-          ? 'Detalle del descriptivo de puesto.'
-          : '${loaded.posicionEtiqueta} · versión ${loaded.version}',
+      title: 'Descriptivo de puesto',
+      description: 'Detalle del descriptivo de puesto.',
       tabs: const FeatureTabs(
         current: '/reclutamiento/descriptivos',
         destinations: recruitmentTabs,
       ),
       child: error != null
           ? FeatureError(error: error, onRetry: () => _reload(ref))
-          : loaded != null && options != null
-          ? DescriptivoEditor(
-              // Cambia solo al congelar: el editor se rearma ya sin edición.
-              key: ValueKey('${loaded.id}:${loaded.congeladoEn}'),
-              descriptivo: loaded,
-              catalogs: options,
-            )
           : const FeatureLoading(),
     );
   }
 }
 
-/// Formulario del Descriptivo de puesto (FO-C0-CH-04). Es editable mientras sea
-/// borrador y la cuenta pueda escribir; en una versión congelada, o para
-/// cualquier otra cuenta, muestra lo mismo sin dejar cambiarlo.
+/// Página del Descriptivo de puesto (FO-C0-CH-04). Es editable mientras sea
+/// borrador y la cuenta pueda escribir; en una versión aprobada o histórica, o
+/// para cualquier otra cuenta, muestra lo mismo sin dejar cambiarlo.
+///
+/// Todo lo capturado vive en este estado (controladores y selecciones), no en
+/// los widgets de cada sección: navegar entre secciones, recibir un error o
+/// recargar un catálogo no borra nada.
 class DescriptivoEditor extends ConsumerStatefulWidget {
   const DescriptivoEditor({
     super.key,
@@ -97,56 +111,76 @@ class DescriptivoEditor extends ConsumerStatefulWidget {
 
 class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   final _form = GlobalKey<FormState>();
-  late final Descriptivo _d = widget.descriptivo;
+
+  // Lo último que el servidor devolvió al guardar; al abrir, lo que cargó.
+  late Descriptivo _saved = widget.descriptivo;
 
   // Texto libre.
-  late final _nombrePuesto = _ctl(_d.nombrePuesto);
-  late final _empresa = _ctl(_d.empresa);
-  late final _area = _ctl(_d.areaDepartamento);
-  late final _reportaA = _ctl(_d.reportaA);
-  late final _supervisaA = _ctl(_d.supervisaA);
-  late final _edadOtro = _ctl(_d.edadOtro);
-  late final _diasOtro = _ctl(_d.diasPorLaborarOtro);
-  late final _horarioOtro = _ctl(_d.horarioOtro);
-  late final _proposito = _ctl(_d.proposito);
-  late final _decOperativas = _ctl(_d.decisionesOperativas);
-  late final _decFuncionales = _ctl(_d.decisionesFuncionales);
-  late final _decEstrategicas = _ctl(_d.decisionesEstrategicas);
-  late final _relInternas = _ctl(_d.relacionesInternas);
-  late final _relExternas = _ctl(_d.relacionesExternas);
-  late final _escolaridad = _ctl(_d.escolaridadMinima);
-  late final _experiencia = _ctl(_d.experienciaRequerida);
-  late final _idiomas = _ctl(_d.idiomas);
-  late final _compTecnicas = _ctl(_d.competenciasTecnicas);
-  late final _compOtras = _ctl(_d.competenciasOtras);
-  late final _recursosOtro = _ctl(_d.recursosOtro);
+  late final _nombrePuesto = _ctl(_saved.nombrePuesto);
+  late final _supervisaA = _ctl(_saved.supervisaA);
+  late final _edadOtro = _ctl(_saved.edadOtro);
+  late final _diasOtro = _ctl(_saved.diasPorLaborarOtro);
+  late final _horarioOtro = _ctl(_saved.horarioOtro);
+  late final _proposito = _ctl(_saved.proposito);
+  late final _decOperativas = _ctl(_saved.decisionesOperativas);
+  late final _decFuncionales = _ctl(_saved.decisionesFuncionales);
+  late final _decEstrategicas = _ctl(_saved.decisionesEstrategicas);
+  late final _relInternas = _ctl(_saved.relacionesInternas);
+  late final _relExternas = _ctl(_saved.relacionesExternas);
+  late final _escolaridad = _ctl(_saved.escolaridadMinima);
+  late final _experiencia = _ctl(_saved.experienciaRequerida);
+  late final _idiomas = _ctl(_saved.idiomas);
+  late final _compTecnicas = _ctl(_saved.competenciasTecnicas);
+  late final _compOtras = _ctl(_saved.competenciasOtras);
+  late final _recursosOtro = _ctl(_saved.recursosOtro);
+
+  // Datos vinculados a la posición: se muestran, no se vuelven a escribir. Solo
+  // cambian al incorporar un cambio de la posición (ver _cambiosDeLaPosicion).
+  late final Map<String, String> _linked = {
+    'empresa': _saved.empresa,
+    'area_departamento': _saved.areaDepartamento,
+    'reporta_a': _saved.reportaA,
+  };
 
   // Listas numeradas: un campo por renglón.
   late final List<TextEditingController> _funciones = _lines(
-    _d.funciones,
+    _saved.funciones,
     _defaultFunciones,
   );
   late final List<TextEditingController> _indicadores = _lines(
-    _d.indicadores,
+    _saved.indicadores,
     _defaultIndicadores,
   );
 
   // Selecciones.
-  late DateTime? _fecha = parseIsoDate(_d.fechaElaboracion);
-  late int? _edad = _d.edad;
-  late int? _dias = _d.diasPorLaborar;
-  late int? _horario = _d.horario;
-  late bool? _viajar = _d.disponibilidadViajar;
-  late final Set<int> _competencias = {..._d.competencias};
-  late final Set<int> _recursos = {..._d.recursos};
+  late DateTime? _fecha = parseIsoDate(_saved.fechaElaboracion);
+  late int? _edad = _saved.edad;
+  late int? _dias = _saved.diasPorLaborar;
+  late int? _horario = _saved.horario;
+  late bool? _viajar = _saved.disponibilidadViajar;
+  late final Set<int> _competencias = {..._saved.competencias};
+  late final Set<int> _recursos = {..._saved.recursos};
 
   final _all = <TextEditingController>[];
   bool _dirty = false;
   bool _saving = false;
   bool _exporting = false;
+  bool _leaving = false;
   String? _error;
 
-  bool get _editable => ref.read(canManageHrProvider) && !_d.estaCongelado;
+  // Navegación entre secciones.
+  final _sections = List.generate(_sectionNames.length, (_) => GlobalKey());
+  final _scroll = ScrollController();
+  int _active = 0;
+
+  // Protección de salida (la misma de la requisición).
+  late final RequisicionExitGuard _guard;
+  late final Future<bool> Function() _exitCallback;
+  late final RequisicionBeforeUnload _unload;
+  Future<bool>? _confirmation;
+
+  bool get _canManage => ref.read(canManageHrProvider);
+  bool get _editable => _canManage && !_saved.estaCongelado;
 
   TextEditingController _ctl(String text) {
     final controller = TextEditingController(text: text);
@@ -158,7 +192,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   // lectura solo los que tienen texto.
   List<TextEditingController> _lines(List<TextoNumerado> items, int minimum) {
     final rows = [for (final item in items) _ctl(item.texto)];
-    if (_editableAtStart) {
+    if (_canManage && !widget.descriptivo.estaCongelado) {
       while (rows.length < minimum) {
         rows.add(_ctl(''));
       }
@@ -166,11 +200,21 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     return rows;
   }
 
-  bool get _editableAtStart =>
-      ref.read(canManageHrProvider) && !widget.descriptivo.estaCongelado;
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_updateSection);
+    _guard = ref.read(requisicionExitGuardProvider);
+    _exitCallback = _confirmExit;
+    _guard.confirm = _exitCallback;
+    _unload = RequisicionBeforeUnload(() => _dirty || _saving);
+  }
 
   @override
   void dispose() {
+    if (_guard.confirm == _exitCallback) _guard.confirm = null;
+    _unload.dispose();
+    _scroll.dispose();
     for (final controller in _all) {
       controller.dispose();
     }
@@ -181,11 +225,64 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   // modificado: habilita «Guardar borrador» y avisa de lo no guardado.
   void _touch() => setState(() => _dirty = true);
 
-  Descriptivo _snapshot() => _d.copyWith(
+  Future<bool> _confirmExit() async {
+    if (_leaving || !_editable) return true;
+    if (_saving) return false;
+    if (!_dirty) return true;
+    final pending = _confirmation;
+    if (pending != null) return pending;
+    final future = _confirmation = confirmDiscardChanges(
+      context,
+      message: 'Hay cambios sin guardar en el descriptivo.',
+    );
+    final discard = await future;
+    _confirmation = null;
+    if (discard && mounted) setState(() => _leaving = true);
+    return discard;
+  }
+
+  Future<void> _back() async {
+    if (!await _confirmExit() || !mounted) return;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/reclutamiento/descriptivos');
+    }
+  }
+
+  void _updateSection() {
+    final viewport = _sections[0].currentContext
+        ?.findAncestorStateOfType<ScrollableState>()
+        ?.context
+        .findRenderObject();
+    if (viewport is! RenderBox) return;
+    final top = viewport.localToGlobal(Offset.zero).dy;
+    var active = 0;
+    for (var i = 0; i < _sections.length; i++) {
+      final box = _sections[i].currentContext?.findRenderObject();
+      if (box is RenderBox && box.localToGlobal(Offset.zero).dy <= top + 100) {
+        active = i;
+      }
+    }
+    if (active != _active && mounted) setState(() => _active = active);
+  }
+
+  Duration get _jumpDuration => MediaQuery.disableAnimationsOf(context)
+      ? Duration.zero
+      : const Duration(milliseconds: 180);
+
+  Future<void> _jump(int section) async {
+    final target = _sections[section].currentContext;
+    if (target == null) return;
+    await Scrollable.ensureVisible(target, duration: _jumpDuration);
+    if (mounted) setState(() => _active = section);
+  }
+
+  Descriptivo _snapshot() => _saved.copyWith(
     nombrePuesto: _nombrePuesto.text,
-    empresa: _empresa.text,
-    areaDepartamento: _area.text,
-    reportaA: _reportaA.text,
+    empresa: _linked['empresa']!,
+    areaDepartamento: _linked['area_departamento']!,
+    reportaA: _linked['reporta_a']!,
     supervisaA: _supervisaA.text,
     fechaElaboracion: toIsoDate(_fecha!),
     edad: _edad,
@@ -230,13 +327,45 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
           .showSnackBar(SnackBar(content: Text(message)));
 
   void _reload() {
-    ref.invalidate(descriptivoDetailProvider(_d.id));
+    ref.invalidate(descriptivoDetailProvider(_saved.id));
     ref.invalidate(descriptivosPageProvider);
+  }
+
+  // Lleva al primer campo con error aunque esté en otra sección.
+  void _revealFirstError() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final root = _form.currentContext;
+      if (!mounted || root == null) return;
+      BuildContext? first;
+      void visit(Element element) {
+        if (first != null) return;
+        if (element is StatefulElement &&
+            element.state is FormFieldState &&
+            (element.state as FormFieldState).hasError) {
+          first = element;
+          return;
+        }
+        element.visitChildren(visit);
+      }
+
+      (root as Element).visitChildren(visit);
+      final target = first;
+      if (target != null) {
+        Scrollable.ensureVisible(
+          target,
+          alignment: .15,
+          duration: _jumpDuration,
+        );
+      }
+    });
   }
 
   bool _validate() {
     final ok = _form.currentState?.validate() ?? false;
-    if (!ok) _say('Revisa los campos marcados en rojo.');
+    if (!ok) {
+      _say('Revisa los campos marcados en rojo.');
+      _revealFirstError();
+    }
     return ok;
   }
 
@@ -247,12 +376,14 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
       _error = null;
     });
     try {
-      await ref
+      final saved = await ref
           .read(recruitmentRepositoryProvider)
           .saveDescriptivo(_snapshot());
+      ref.invalidate(descriptivoCambiosProvider(_saved.id));
       _reload();
       if (mounted) {
         setState(() {
+          _saved = saved;
           _dirty = false;
           _saving = false;
         });
@@ -270,31 +401,38 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     }
   }
 
-  Future<void> _freeze() async {
+  Future<void> _approve() async {
     if (!_validate()) return;
+    // Todo lo que necesita la confirmación se toma antes de abrir el diálogo:
+    // si la página se cierra mientras está abierto, no hay estado que consultar
+    // y se aprueba exactamente lo que se estaba viendo.
+    final repository = ref.read(recruitmentRepositoryProvider);
+    final content = _snapshot();
     final done = await showConfirmDialog(
       context,
-      title: 'Congelar versión ${_d.version}',
-      message: 'Al congelarla queda como la versión aprobada: ya no se podrá modificar ni borrar. Para cambiar algo después se abre un borrador nuevo a partir de ella.',
-      confirmLabel: 'Congelar',
+      title: 'Aprobar versión ${content.version}',
+      message: 'Al aprobarla queda como la versión vigente: ya no se podrá modificar ni borrar. Para cambiar algo después se abre un borrador nuevo a partir de ella.',
+      confirmLabel: 'Aprobar',
       destructive: false,
       onConfirm: () async {
-        // Lo que se está viendo es lo que se congela: primero se guarda.
-        final repository = ref.read(recruitmentRepositoryProvider);
-        await repository.saveDescriptivo(_snapshot());
-        await repository.congelar(_d.id);
+        // Lo que se está viendo es lo que se aprueba: primero se guarda.
+        await repository.saveDescriptivo(content);
+        await repository.congelar(content.id);
       },
       errorMessage: recruitmentMutationError,
     );
     if (done && mounted) {
+      setState(() => _dirty = false);
       _reload();
-      _say('Versión ${_d.version} congelada.');
+      _say('Versión ${content.version} aprobada.');
     }
   }
 
   Future<void> _copy() async {
     try {
-      final nuevo = await ref.read(recruitmentRepositoryProvider).copiar(_d.id);
+      final nuevo = await ref
+          .read(recruitmentRepositoryProvider)
+          .copiar(_saved.id);
       ref.invalidate(descriptivosPageProvider);
       if (mounted) {
         _say('Se abrió un borrador nuevo a partir de esta versión.');
@@ -306,15 +444,19 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   }
 
   Future<void> _delete() async {
+    final repository = ref.read(recruitmentRepositoryProvider);
+    final id = _saved.id;
     final done = await showConfirmDialog(
       context,
       title: 'Eliminar borrador',
-      message: '¿Eliminar el borrador v${_d.version}? Se pierde lo capturado.',
-      onConfirm: () =>
-          ref.read(recruitmentRepositoryProvider).deleteDescriptivo(_d.id),
+      message:
+          '¿Eliminar el borrador v${_saved.version}? Se pierde lo capturado.',
+      onConfirm: () => repository.deleteDescriptivo(id),
       errorMessage: recruitmentMutationError,
     );
     if (done && mounted) {
+      // Se confirmó eliminar: ya no hay nada que proteger al salir.
+      setState(() => _leaving = true);
       ref.invalidate(descriptivosPageProvider);
       context.go('/reclutamiento/descriptivos');
     }
@@ -328,7 +470,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     try {
       final file = await ref
           .read(recruitmentRepositoryProvider)
-          .exportarWord(_d.id);
+          .exportarWord(_saved.id);
       await ref.read(fileSaverProvider).save(file);
       if (mounted) _say('Se descargó «${file.name}».');
     } on Object catch (error) {
@@ -409,24 +551,23 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
         : null,
   );
 
-  Widget _section(String title, List<Widget> children, {String? note}) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-        child: AppCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium),
-              if (note != null) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Text(note, style: Theme.of(context).textTheme.bodySmall),
-              ],
-              const SizedBox(height: AppSpacing.lg),
-              ...children,
-            ],
-          ),
-        ),
-      );
+  Widget _card(String title, List<Widget> children, {String? note}) => Padding(
+    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+    child: AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          if (note != null) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(note, style: Theme.of(context).textTheme.bodySmall),
+          ],
+          const SizedBox(height: AppSpacing.lg),
+          ...children,
+        ],
+      ),
+    ),
+  );
 
   Widget _checks(List<RecruitmentCatalogEntry> options, Set<int> selected) =>
       Wrap(
@@ -458,8 +599,16 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
         ],
       );
 
+  // Una lista numerada: se agregan, se reordenan y se quitan renglones sin
+  // recrear el documento. Mover un renglón mueve su controlador, así que el
+  // texto (y su foco) viaja con él.
   Widget _numbered(List<TextEditingController> rows, String noun) {
     final capitalized = '${noun[0].toUpperCase()}${noun.substring(1)}';
+    void move(int from, int to) {
+      setState(() => rows.insert(to, rows.removeAt(from)));
+      _touch();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -487,7 +636,28 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
                     minLines: 2,
                   ),
                 ),
-                if (_editable)
+                if (_editable) ...[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Subir $noun ${index + 1}',
+                        visualDensity: VisualDensity.compact,
+                        onPressed: index == 0
+                            ? null
+                            : () => move(index, index - 1),
+                        icon: const Icon(Icons.arrow_upward),
+                      ),
+                      IconButton(
+                        tooltip: 'Bajar $noun ${index + 1}',
+                        visualDensity: VisualDensity.compact,
+                        onPressed: index == rows.length - 1
+                            ? null
+                            : () => move(index, index + 1),
+                        icon: const Icon(Icons.arrow_downward),
+                      ),
+                    ],
+                  ),
                   IconButton(
                     tooltip: 'Quitar $noun ${index + 1}',
                     onPressed: () {
@@ -502,6 +672,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
                     },
                     icon: const Icon(Icons.delete_outline),
                   ),
+                ],
               ],
             ),
           ),
@@ -521,264 +692,550 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final c = widget.catalogs;
+  // Empresa, área y «Reporta a» vienen de la posición: se muestran como datos
+  // vinculados, no como campos para volver a escribir.
+  Widget _vinculados() {
     final type = Theme.of(context).textTheme;
-    final canManage = ref.watch(canManageHrProvider);
-    final editable = canManage && !_d.estaCongelado;
-    final edad = entryIn(c.rangosEdad, _edad);
-    final dias = entryIn(c.dias, _dias);
-    final horario = entryIn(c.horarios, _horario);
+    Widget fila(String label, String key, String missing) => DetailField(
+      label,
+      _linked[key]!.trim().isEmpty ? missing : _linked[key],
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.link, size: 18, color: AppColors.textSecondary),
+            const SizedBox(width: AppSpacing.xs),
+            Text('Vinculado a la posición', style: type.labelLarge),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          _saved.estaCongelado
+              ? 'Estos datos quedaron como estaban al aprobar la versión.'
+              : 'Se copiaron de la posición al crear el borrador y no cambian solos. Para corregirlos, cambia la posición.',
+          style: type.bodySmall,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        fila('Empresa', 'empresa', 'Sin dato'),
+        fila('Área / Departamento', 'area_departamento', 'Sin dato'),
+        // Sin jefe registrado en la posición no es lo mismo que «No tiene».
+        fila('Reporta a', 'reporta_a', 'Sin relación registrada'),
+      ],
+    );
+  }
 
-    return Form(
-      key: _form,
-      child: Align(
-        alignment: Alignment.topLeft,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  crossAxisAlignment: WrapCrossAlignment.center,
+  // Si la posición cambió después de crear el borrador, se muestra qué cambió
+  // y la persona elige qué incorporar. Lo demás que escribió se conserva.
+  Widget _cambiosDeLaPosicion() {
+    if (!_editable) return const SizedBox.shrink();
+    final cambios = ref.watch(descriptivoCambiosProvider(_saved.id));
+    final type = Theme.of(context).textTheme;
+    return cambios.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              'No se pudo revisar si la posición cambió.',
+              style: type.bodySmall,
+            ),
+            TextButton(
+              onPressed: () =>
+                  ref.invalidate(descriptivoCambiosProvider(_saved.id)),
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+      data: (items) {
+        final pendientes = [
+          for (final cambio in items)
+            if (_linked[cambio.campo] != cambio.actual) cambio,
+        ];
+        if (pendientes.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+          child: Semantics(
+            container: true,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.warningSurface,
+                borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AppBadge(
-                      label: _d.estaCongelado
-                          ? 'Congelado${shownDate(_d.congeladoEn) == null ? '' : ' el ${shownDate(_d.congeladoEn)}'}'
-                          : 'Borrador',
-                      tone: _d.estaCongelado
-                          ? AppBadgeTone.success
-                          : AppBadgeTone.warning,
+                    Text('La posición tiene cambios', style: type.titleSmall),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Elige cuáles incorporar a este borrador. Lo que ya escribiste se conserva.',
+                      style: type.bodySmall,
                     ),
-                    if (editable)
-                      AppButton(
-                        label: 'Guardar borrador',
-                        icon: Icons.save_outlined,
-                        isLoading: _saving,
-                        onPressed: _dirty ? _save : null,
+                    for (final cambio in pendientes) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text(cambio.etiqueta, style: type.labelLarge),
+                      Text(
+                        'En esta versión: ${cambio.guardado.trim().isEmpty ? 'Sin dato' : cambio.guardado}',
+                        style: type.bodyMedium,
                       ),
-                    if (editable)
-                      AppButton(
-                        label: 'Congelar versión',
-                        icon: Icons.lock_outline,
-                        variant: AppButtonVariant.secondary,
-                        onPressed: _saving ? null : _freeze,
+                      Text(
+                        'En la posición ahora: ${cambio.actual}',
+                        style: type.bodyMedium,
                       ),
-                    AppButton(
-                      label: 'Descargar Word oficial',
-                      icon: Icons.download_outlined,
-                      variant: AppButtonVariant.secondary,
-                      isLoading: _exporting,
-                      onPressed: _export,
-                    ),
-                    if (canManage && _d.estaCongelado)
-                      AppButton(
-                        label: 'Copiar a un borrador nuevo',
-                        icon: Icons.copy_all_outlined,
-                        variant: AppButtonVariant.secondary,
-                        onPressed: _copy,
+                      const SizedBox(height: AppSpacing.xs),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: AppButton(
+                          label: 'Incorporar «${cambio.etiqueta}»',
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () {
+                            setState(() {
+                              _linked[cambio.campo] = cambio.actual;
+                              _dirty = true;
+                            });
+                          },
+                        ),
                       ),
-                    if (editable)
-                      AppButton(
-                        label: 'Eliminar borrador',
-                        icon: Icons.delete_outline,
-                        variant: AppButtonVariant.secondary,
-                        onPressed: _delete,
-                      ),
+                    ],
                   ],
                 ),
               ),
-              if (editable && _dirty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Text(
-                    'Tienes cambios sin guardar.',
-                    style: type.bodySmall,
-                  ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String get _versionLabel {
+    final aprobada = shownDate(_saved.congeladoEn);
+    return switch (_saved.estadoVersion) {
+      'borrador' => 'Borrador',
+      _ when !_saved.estaCongelado => 'Borrador',
+      _ when _saved.esHistorica =>
+        aprobada == null ? 'Histórica' : 'Histórica · aprobada el $aprobada',
+      _ => aprobada == null ? 'Aprobada' : 'Aprobada el $aprobada',
+    };
+  }
+
+  AppBadgeTone get _versionTone => !_saved.estaCongelado
+      ? AppBadgeTone.warning
+      : _saved.esHistorica
+      ? AppBadgeTone.neutral
+      : AppBadgeTone.success;
+
+  // Lo que siempre se ve arriba: de dónde se vuelve, qué documento es y en qué
+  // versión está. Compacto a propósito: el resto se desplaza.
+  Widget _header() {
+    final type = Theme.of(context).textTheme;
+    final title = _saved.nombrePuesto.trim().isNotEmpty
+        ? _saved.nombrePuesto
+        : _saved.posicionEtiqueta;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton(
+            onPressed: _saving ? null : _back,
+            child: const Text('Volver'),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: type.titleLarge,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  child: Semantics(
-                    liveRegion: true,
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorSurface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.controlRadius,
-                        ),
-                      ),
-                      child: Text(
-                        _error!,
-                        style: type.bodyMedium?.copyWith(
-                          color: AppColors.error,
-                        ),
-                      ),
-                    ),
-                  ),
+                Text(
+                  '${_saved.posicionEtiqueta} · versión ${_saved.version}',
+                  style: type.bodyMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              if (!canManage)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  child: Text(
-                    'Solo Capital Humano edita los descriptivos. Aquí puedes consultarlo y descargarlo.',
-                    style: type.bodySmall,
-                  ),
-                ),
-              _section('Datos generales', [
-                _pair(
-                  _text('Nombre del puesto', _nombrePuesto, limit: 150),
-                  _text('Empresa', _empresa, limit: 150),
-                ),
-                _gap,
-                _pair(
-                  _text('Área / Departamento', _area, limit: 150),
-                  _text('Reporta a', _reportaA, limit: 150),
-                ),
-                _gap,
-                _text(
-                  'Supervisa a',
-                  _supervisaA,
-                  multiline: true,
-                  hint: 'Puestos y número de personas a cargo, si aplica.',
-                ),
-                _gap,
-                AppDateField(
-                  label: 'Fecha de elaboración / actualización',
-                  value: _fecha,
-                  isRequired: true,
-                  enabled: editable,
-                  onChanged: (value) {
-                    _fecha = value;
-                    _touch();
-                  },
-                ),
-              ]),
-              _section('Condiciones del puesto', [
-                _choice('Edad', _edad, c.rangosEdad, (v) => _edad = v),
-                if (isOtro(edad)) ...[
-                  _gap,
-                  _text('Edad (otro)', _edadOtro, limit: 100),
-                ],
-                _gap,
-                DropdownButtonFormField<bool?>(
-                  key: ValueKey('viajar:$_viajar'),
-                  initialValue: _viajar,
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Disponibilidad para viajar',
-                  ),
-                  items: const [
-                    DropdownMenuItem<bool?>(
-                      value: null,
-                      child: Text('Sin definir'),
-                    ),
-                    DropdownMenuItem<bool?>(value: true, child: Text('Sí')),
-                    DropdownMenuItem<bool?>(value: false, child: Text('No')),
-                  ],
-                  onChanged: editable
-                      ? (value) {
-                          setState(() => _viajar = value);
-                          _touch();
-                        }
-                      : null,
-                ),
-                _gap,
-                _choice(
-                  'Días por laborar',
-                  _dias,
-                  c.dias,
-                  (v) => setState(() => _dias = v),
-                ),
-                if (isOtro(dias)) ...[
-                  _gap,
-                  _text('Días por laborar (otro)', _diasOtro, limit: 100),
-                ],
-                _gap,
-                _choice(
-                  'Horario por cubrir',
-                  _horario,
-                  c.horarios,
-                  (v) => setState(() => _horario = v),
-                ),
-                if (isOtro(horario)) ...[
-                  _gap,
-                  _text('Horario (otro)', _horarioOtro, limit: 100),
-                ],
-              ]),
-              _section('Propósito del puesto', [
-                _text('Propósito', _proposito, multiline: true),
-              ]),
-              _section('Toma de decisiones', [
-                _text('Decisiones operativas', _decOperativas, multiline: true),
-                _gap,
-                _text(
-                  'Decisiones funcionales',
-                  _decFuncionales,
-                  multiline: true,
-                ),
-                _gap,
-                _text(
-                  'Decisiones estratégicas',
-                  _decEstrategicas,
-                  multiline: true,
-                ),
-              ]),
-              _section('Relaciones', [
-                _text('Relaciones internas', _relInternas, multiline: true),
-                _gap,
-                _text('Relaciones externas', _relExternas, multiline: true),
-              ]),
-              _section('Perfil del puesto', [
-                _text('Escolaridad mínima', _escolaridad, multiline: true),
-                _gap,
-                _text('Experiencia requerida', _experiencia, multiline: true),
-                _gap,
-                _text('Idiomas', _idiomas, multiline: true),
-                _gap,
-                _text(
-                  'Competencias y/o habilidades técnicas',
-                  _compTecnicas,
-                  multiline: true,
-                ),
-              ]),
-              _section('Competencias conductuales', [
-                _checks(c.competencias, _competencias),
-                _gap,
-                _text('Otras competencias', _compOtras, limit: 255),
-              ]),
-              _section('Recursos necesarios', [
-                _checks(c.recursos, _recursos),
-                _gap,
-                _text('Otros recursos', _recursosOtro, limit: 255),
-              ]),
-              _section(
-                'Funciones y responsabilidades',
-                [_numbered(_funciones, 'responsabilidad')],
-                note: 'Los renglones vacíos no se guardan. El orden es el de la lista.',
+                const SizedBox(height: AppSpacing.xs),
+                AppBadge(label: _versionLabel, tone: _versionTone),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Descargar, copiar y eliminar: se usan poco, así que viven al inicio del
+  // contenido y no ocupan el alto que siempre se ve.
+  Widget _acciones() {
+    final type = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              AppButton(
+                label: 'Descargar Word oficial',
+                icon: Icons.download_outlined,
+                variant: AppButtonVariant.secondary,
+                isLoading: _exporting,
+                onPressed: _export,
               ),
-              _section('Indicadores de desempeño', [
-                _numbered(_indicadores, 'indicador'),
-              ]),
-              if (canManage && _d.estaCongelado)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  child: ConformidadesCard(
-                    descriptivo: _d,
-                    roles: c.roles,
-                    onChanged: _reload,
-                  ),
+              if (_canManage && _saved.estaCongelado)
+                AppButton(
+                  label: 'Copiar a un borrador nuevo',
+                  icon: Icons.copy_all_outlined,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: _copy,
+                ),
+              if (_editable)
+                AppButton(
+                  label: 'Eliminar borrador',
+                  icon: Icons.delete_outline,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: _delete,
                 ),
             ],
+          ),
+          if (_saved.esHistorica)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(
+                'Hay una versión aprobada más reciente de esta posición.',
+                style: type.bodySmall,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionChips() => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+    child: Row(
+      children: [
+        for (var i = 0; i < _sectionNames.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: ChoiceChip(
+              label: Text(_sectionNames[i]),
+              chipAnimationStyle: MediaQuery.disableAnimationsOf(context)
+                  ? ChipAnimationStyle(
+                      enableAnimation: AnimationStyle.noAnimation,
+                      selectAnimation: AnimationStyle.noAnimation,
+                      avatarDrawerAnimation: AnimationStyle.noAnimation,
+                      deleteDrawerAnimation: AnimationStyle.noAnimation,
+                    )
+                  : null,
+              selected: i == _active,
+              onSelected: (_) => _jump(i),
+            ),
+          ),
+      ],
+    ),
+  );
+
+  // Guardar y aprobar siempre a la vista, sin importar la sección. La barra
+  // ocupa todo el ancho y sus botones se alinean con la columna del contenido.
+  Widget _actionBar() {
+    final type = Theme.of(context).textTheme;
+    return Material(
+      color: AppColors.surface,
+      elevation: 3,
+      child: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                alignment: WrapAlignment.end,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  if (_dirty)
+                    Text('Tienes cambios sin guardar.', style: type.bodySmall),
+                  AppButton(
+                    label: 'Guardar borrador',
+                    icon: Icons.save_outlined,
+                    isLoading: _saving,
+                    onPressed: _dirty ? _save : null,
+                  ),
+                  AppButton(
+                    label: 'Aprobar versión',
+                    icon: Icons.verified_outlined,
+                    variant: AppButtonVariant.secondary,
+                    onPressed: _saving ? null : _approve,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _errorBanner() {
+    final type = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Semantics(
+        liveRegion: true,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.errorSurface,
+            borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
+          ),
+          child: Text(
+            _error!,
+            style: type.bodyMedium?.copyWith(color: AppColors.error),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.catalogs;
+    final type = Theme.of(context).textTheme;
+    final canManage = ref.watch(canManageHrProvider);
+    final edad = entryIn(c.rangosEdad, _edad);
+    final dias = entryIn(c.dias, _dias);
+    final horario = entryIn(c.horarios, _horario);
+
+    return PopScope(
+      canPop: !_editable || (!_dirty && !_saving) || _leaving,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _back();
+      },
+      child: FocusTraversalGroup(
+        policy: WidgetOrderTraversalPolicy(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+                  child: Column(
+                    children: [
+                      _header(),
+                      _sectionChips(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: _scroll,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Form(
+                            key: _form,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _acciones(),
+                                if (_error != null) _errorBanner(),
+                                if (!canManage)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: AppSpacing.lg,
+                                    ),
+                                    child: Text(
+                                      'Solo Capital Humano edita los descriptivos. Aquí puedes consultarlo y descargarlo.',
+                                      style: type.bodySmall,
+                                    ),
+                                  ),
+                                ..._identificacion(c, edad, dias, horario),
+                                ..._propositoYFunciones(),
+                                ..._perfil(),
+                                ..._competenciasYRecursos(c),
+                                ..._indicadoresYConformidades(c, canManage),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (_editable) _actionBar(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _identificacion(
+    DescriptivoCatalogs c,
+    RecruitmentCatalogEntry? edad,
+    RecruitmentCatalogEntry? dias,
+    RecruitmentCatalogEntry? horario,
+  ) => [
+    SectionTitle(_sectionNames[0], key: _sections[0], padTop: false),
+    _card('Datos del puesto', [
+      _vinculados(),
+      _cambiosDeLaPosicion(),
+      _pair(
+        _text('Nombre del puesto', _nombrePuesto, limit: 150),
+        AppDateField(
+          label: 'Fecha de elaboración / actualización',
+          value: _fecha,
+          isRequired: true,
+          enabled: _editable,
+          onChanged: (value) {
+            _fecha = value;
+            _touch();
+          },
+        ),
+      ),
+      _gap,
+      _text(
+        'Supervisa a',
+        _supervisaA,
+        multiline: true,
+        hint: 'Puestos y número de personas a cargo, si aplica.',
+      ),
+    ]),
+    _card('Condiciones del puesto', [
+      _choice('Edad', _edad, c.rangosEdad, (v) => _edad = v),
+      if (isOtro(edad)) ...[_gap, _text('Edad (otro)', _edadOtro, limit: 100)],
+      _gap,
+      DropdownButtonFormField<bool?>(
+        key: ValueKey('viajar:$_viajar'),
+        initialValue: _viajar,
+        isExpanded: true,
+        decoration: const InputDecoration(
+          labelText: 'Disponibilidad para viajar',
+        ),
+        items: const [
+          DropdownMenuItem<bool?>(value: null, child: Text('Sin definir')),
+          DropdownMenuItem<bool?>(value: true, child: Text('Sí')),
+          DropdownMenuItem<bool?>(value: false, child: Text('No')),
+        ],
+        onChanged: _editable
+            ? (value) {
+                setState(() => _viajar = value);
+                _touch();
+              }
+            : null,
+      ),
+      _gap,
+      _choice(
+        'Días por laborar',
+        _dias,
+        c.dias,
+        (v) => setState(() => _dias = v),
+      ),
+      if (isOtro(dias)) ...[
+        _gap,
+        _text('Días por laborar (otro)', _diasOtro, limit: 100),
+      ],
+      _gap,
+      _choice(
+        'Horario por cubrir',
+        _horario,
+        c.horarios,
+        (v) => setState(() => _horario = v),
+      ),
+      if (isOtro(horario)) ...[
+        _gap,
+        _text('Horario (otro)', _horarioOtro, limit: 100),
+      ],
+    ]),
+  ];
+
+  List<Widget> _propositoYFunciones() => [
+    SectionTitle(_sectionNames[1], key: _sections[1]),
+    _card('Propósito del puesto', [
+      _text('Propósito', _proposito, multiline: true),
+    ]),
+    _card('Funciones y responsabilidades', [
+      _numbered(_funciones, 'responsabilidad'),
+    ], note: 'Los renglones vacíos no se guardan. El orden es el de la lista.'),
+    _card('Toma de decisiones', [
+      _text('Decisiones operativas', _decOperativas, multiline: true),
+      _gap,
+      _text('Decisiones funcionales', _decFuncionales, multiline: true),
+      _gap,
+      _text('Decisiones estratégicas', _decEstrategicas, multiline: true),
+    ]),
+    _card('Relaciones', [
+      _text('Relaciones internas', _relInternas, multiline: true),
+      _gap,
+      _text('Relaciones externas', _relExternas, multiline: true),
+    ]),
+  ];
+
+  List<Widget> _perfil() => [
+    SectionTitle(_sectionNames[2], key: _sections[2]),
+    _card('Perfil del puesto', [
+      _text('Escolaridad mínima', _escolaridad, multiline: true),
+      _gap,
+      _text('Experiencia requerida', _experiencia, multiline: true),
+      _gap,
+      _text('Idiomas', _idiomas, multiline: true),
+      _gap,
+      _text(
+        'Competencias y/o habilidades técnicas',
+        _compTecnicas,
+        multiline: true,
+      ),
+    ]),
+  ];
+
+  List<Widget> _competenciasYRecursos(DescriptivoCatalogs c) => [
+    SectionTitle(_sectionNames[3], key: _sections[3]),
+    _card('Competencias conductuales', [
+      _checks(c.competencias, _competencias),
+      _gap,
+      _text('Otras competencias', _compOtras, limit: 255),
+    ]),
+    _card('Recursos necesarios', [
+      _checks(c.recursos, _recursos),
+      _gap,
+      _text('Otros recursos', _recursosOtro, limit: 255),
+    ]),
+  ];
+
+  List<Widget> _indicadoresYConformidades(
+    DescriptivoCatalogs c,
+    bool canManage,
+  ) => [
+    SectionTitle(_sectionNames[4], key: _sections[4]),
+    _card('Indicadores de desempeño', [_numbered(_indicadores, 'indicador')]),
+    if (canManage && _saved.estaCongelado)
+      Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        child: ConformidadesCard(
+          // El último que cargó el servidor: así las firmas recién
+          // registradas aparecen al recargar.
+          descriptivo: widget.descriptivo,
+          roles: c.roles,
+          onChanged: _reload,
+        ),
+      ),
+  ];
 }

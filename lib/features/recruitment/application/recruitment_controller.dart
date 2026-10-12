@@ -90,6 +90,14 @@ Future<ApiPage<Descriptivo>> descriptivosPage(
 Future<Descriptivo> descriptivoDetail(Ref ref, String id) =>
     ref.watch(recruitmentRepositoryProvider).descriptivo(id);
 
+/// Qué datos vinculados de un borrador ya no coinciden con la posición. Solo
+/// se pide para un borrador que se puede editar.
+final descriptivoCambiosProvider = FutureProvider.autoDispose
+    .family<List<CambioPosicion>, String>(
+      (ref, id) => ref.watch(recruitmentRepositoryProvider).cambiosPosicion(id),
+      retry: manualRetryOnly,
+    );
+
 final requisicionesListStateProvider =
     NotifierProvider<RequisicionesListController, RequisicionesListState>(
       RequisicionesListController.new,

@@ -250,6 +250,22 @@ Map<String, dynamic> _$ConformidadToJson(_Conformidad instance) =>
       'nombre_manual': instance.nombreManual,
     };
 
+_CambioPosicion _$CambioPosicionFromJson(Map<String, dynamic> json) =>
+    _CambioPosicion(
+      campo: json['campo'] as String,
+      etiqueta: json['etiqueta'] as String,
+      guardado: json['guardado'] as String? ?? '',
+      actual: json['actual'] as String,
+    );
+
+Map<String, dynamic> _$CambioPosicionToJson(_CambioPosicion instance) =>
+    <String, dynamic>{
+      'campo': instance.campo,
+      'etiqueta': instance.etiqueta,
+      'guardado': instance.guardado,
+      'actual': instance.actual,
+    };
+
 _Descriptivo _$DescriptivoFromJson(Map<String, dynamic> json) => _Descriptivo(
   id: json['id'] as String,
   posicion: json['posicion'] as String,
@@ -257,6 +273,7 @@ _Descriptivo _$DescriptivoFromJson(Map<String, dynamic> json) => _Descriptivo(
   version: (json['version'] as num).toInt(),
   congeladoEn: json['congelado_en'] as String?,
   estaCongelado: json['esta_congelado'] as bool? ?? false,
+  estadoVersion: json['estado_version'] as String?,
   nombrePuesto: json['nombre_puesto'] as String? ?? '',
   empresa: json['empresa'] as String? ?? '',
   areaDepartamento: json['area_departamento'] as String? ?? '',
@@ -317,6 +334,7 @@ Map<String, dynamic> _$DescriptivoToJson(_Descriptivo instance) =>
       'version': instance.version,
       'congelado_en': instance.congeladoEn,
       'esta_congelado': instance.estaCongelado,
+      'estado_version': instance.estadoVersion,
       'nombre_puesto': instance.nombrePuesto,
       'empresa': instance.empresa,
       'area_departamento': instance.areaDepartamento,

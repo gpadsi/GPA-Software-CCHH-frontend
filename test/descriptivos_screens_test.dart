@@ -57,7 +57,7 @@ void main() {
         expect(find.text('v1'), findsOneWidget);
         expect(find.text('Borrador'), findsOneWidget);
         expect(find.text('v2'), findsOneWidget);
-        expect(find.text('Congelado'), findsWidgets);
+        expect(find.text('Aprobada'), findsOneWidget);
         // Lo más reciente primero.
         expect(
           repository.lastDescriptivosQuery.ordering,
@@ -100,7 +100,7 @@ void main() {
       await tester.tap(find.text('Borradores'));
       await tester.pumpAndSettle();
       expect(repository.lastDescriptivosQuery.filters['congelado'], 'false');
-      await tester.tap(find.text('Congelados'));
+      await tester.tap(find.text('Aprobadas e históricas'));
       await tester.pumpAndSettle();
       expect(repository.lastDescriptivosQuery.filters['congelado'], 'true');
       await tester.tap(find.text('Todos'));
@@ -364,7 +364,9 @@ void main() {
       );
       expect(find.text('Borrador'), findsOneWidget);
       expect(_field('Operador de Soldadura'), findsOneWidget);
-      expect(_field('GPA Azimatronics'), findsOneWidget);
+      // Empresa, área y «Reporta a» se ven como datos vinculados, no como campos.
+      expect(find.text('GPA Azimatronics'), findsOneWidget);
+      expect(_field('GPA Azimatronics'), findsNothing);
       expect(_field('Soldar piezas según el plano.'), findsOneWidget);
       expect(_field('Soldar piezas'), findsOneWidget);
       expect(_field('Piezas sin retrabajo'), findsOneWidget);
@@ -553,49 +555,7 @@ void main() {
       expect(_field('Operador B'), findsOneWidget);
     });
 
-    testWidgets(
-      'congelar guarda lo que se ve y luego congela, tras confirmar',
-      (tester) async {
-        final repository = FakeRecruitmentRepository();
-        await pumpRecruitment(
-          tester,
-          path: '/reclutamiento/descriptivos/d1',
-          repository: repository,
-          height: 3200,
-        );
-        await _edit(tester, _field('Operador de Soldadura'), 'Operador B');
-        await _tapText(tester, 'Congelar versión');
-        expect(find.text('Congelar versión 1'), findsOneWidget);
-        // Todavía no se tocó nada del servidor.
-        expect(repository.calls, isEmpty);
-
-        await tester.tap(find.text('Congelar'));
-        await tester.pumpAndSettle();
-        expect(repository.calls, ['guardar:d1', 'congelar:d1']);
-        expect(repository.savedDescriptivo?.nombrePuesto, 'Operador B');
-        // El editor se rearma ya sin edición.
-        expect(find.text('Guardar borrador'), findsNothing);
-        expect(find.text('Congelar versión'), findsNothing);
-        expect(find.text('Copiar a un borrador nuevo'), findsOneWidget);
-      },
-    );
-
-    testWidgets('cancelar la confirmación no congela nada', (tester) async {
-      final repository = FakeRecruitmentRepository();
-      await pumpRecruitment(
-        tester,
-        path: '/reclutamiento/descriptivos/d1',
-        repository: repository,
-        height: 3200,
-      );
-      await _tapText(tester, 'Congelar versión');
-      await tester.tap(find.text('Cancelar'));
-      await tester.pumpAndSettle();
-      expect(repository.calls, isEmpty);
-      expect(find.text('Guardar borrador'), findsOneWidget);
-    });
-
-    testWidgets('si congelar falla, el diálogo se queda y dice por qué', (
+    testWidgets('aprobar guarda lo que se ve y luego aprueba, tras confirmar', (
       tester,
     ) async {
       final repository = FakeRecruitmentRepository();
@@ -605,17 +565,62 @@ void main() {
         repository: repository,
         height: 3200,
       );
-      await _tapText(tester, 'Congelar versión');
+      await _edit(tester, _field('Operador de Soldadura'), 'Operador B');
+      await _tapText(tester, 'Aprobar versión');
+      expect(find.text('Aprobar versión 1'), findsOneWidget);
+      // Todavía no se tocó nada del servidor.
+      expect(repository.calls, isEmpty);
+
+      await tester.tap(find.text('Aprobar'));
+      await tester.pumpAndSettle();
+      expect(repository.calls, ['guardar:d1', 'congelar:d1']);
+      expect(repository.savedDescriptivo?.nombrePuesto, 'Operador B');
+      // El editor se rearma ya sin edición.
+      expect(find.text('Guardar borrador'), findsNothing);
+      expect(find.text('Aprobar versión'), findsNothing);
+      expect(
+        find.text('Aprobada el ${shownDate('2026-10-05')}'),
+        findsOneWidget,
+      );
+      expect(find.text('Copiar a un borrador nuevo'), findsOneWidget);
+    });
+
+    testWidgets('cancelar la confirmación no aprueba nada', (tester) async {
+      final repository = FakeRecruitmentRepository();
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/descriptivos/d1',
+        repository: repository,
+        height: 3200,
+      );
+      await _tapText(tester, 'Aprobar versión');
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect(repository.calls, isEmpty);
+      expect(find.text('Guardar borrador'), findsOneWidget);
+    });
+
+    testWidgets('si aprobar falla, el diálogo se queda y dice por qué', (
+      tester,
+    ) async {
+      final repository = FakeRecruitmentRepository();
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/descriptivos/d1',
+        repository: repository,
+        height: 3200,
+      );
+      await _tapText(tester, 'Aprobar versión');
       repository.failure = _http(400, {
         'non_field_errors': [
-          'Esta versión del Descriptivo ya estaba congelada.',
+          'Esta versión del Descriptivo ya estaba aprobada.',
         ],
       });
-      await tester.tap(find.text('Congelar'));
+      await tester.tap(find.text('Aprobar'));
       await tester.pumpAndSettle();
-      expect(find.text('Congelar versión 1'), findsOneWidget);
+      expect(find.text('Aprobar versión 1'), findsOneWidget);
       expect(
-        find.text('Esta versión del Descriptivo ya estaba congelada.'),
+        find.text('Esta versión del Descriptivo ya estaba aprobada.'),
         findsOneWidget,
       );
     });
@@ -681,7 +686,7 @@ void main() {
     });
   });
 
-  group('una versión congelada', () {
+  group('una versión aprobada', () {
     testWidgets('no se edita: sin guardar, congelar ni eliminar', (
       tester,
     ) async {
@@ -691,9 +696,9 @@ void main() {
         repository: FakeRecruitmentRepository(),
         height: 3200,
       );
-      expect(find.textContaining('Congelado el'), findsOneWidget);
+      expect(find.textContaining('Aprobada el'), findsOneWidget);
       expect(find.text('Guardar borrador'), findsNothing);
-      expect(find.text('Congelar versión'), findsNothing);
+      expect(find.text('Aprobar versión'), findsNothing);
       expect(find.text('Eliminar borrador'), findsNothing);
       expect(find.text('Descargar Word oficial'), findsOneWidget);
       expect(find.text('Copiar a un borrador nuevo'), findsOneWidget);
@@ -872,7 +877,7 @@ void main() {
         height: 3200,
       );
       expect(find.text('Guardar borrador'), findsNothing);
-      expect(find.text('Congelar versión'), findsNothing);
+      expect(find.text('Aprobar versión'), findsNothing);
       expect(find.text('Eliminar borrador'), findsNothing);
       expect(find.text('Agregar responsabilidad'), findsNothing);
       expect(
@@ -890,7 +895,7 @@ void main() {
       expect(repository.calls, ['word:d1']);
     });
 
-    testWidgets('en una versión congelada no ve las conformidades', (
+    testWidgets('en una versión aprobada no ve las conformidades', (
       tester,
     ) async {
       await pumpRecruitment(

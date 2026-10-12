@@ -2996,9 +2996,288 @@ as String,
 
 
 /// @nodoc
+mixin _$CambioPosicion {
+
+ String get campo; String get etiqueta; String get guardado; String get actual;
+/// Create a copy of CambioPosicion
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CambioPosicionCopyWith<CambioPosicion> get copyWith => _$CambioPosicionCopyWithImpl<CambioPosicion>(this as CambioPosicion, _$identity);
+
+  /// Serializes this CambioPosicion to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as CambioPosicion;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CambioPosicion&&(identical(other.campo, _this.campo) || other.campo == _this.campo)&&(identical(other.etiqueta, _this.etiqueta) || other.etiqueta == _this.etiqueta)&&(identical(other.guardado, _this.guardado) || other.guardado == _this.guardado)&&(identical(other.actual, _this.actual) || other.actual == _this.actual));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as CambioPosicion;
+  return Object.hash(runtimeType,_this.campo,_this.etiqueta,_this.guardado,_this.actual);
+}
+
+@override
+String toString() {
+  final _this = this as CambioPosicion;
+  return 'CambioPosicion(campo: ${_this.campo}, etiqueta: ${_this.etiqueta}, guardado: ${_this.guardado}, actual: ${_this.actual})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CambioPosicionCopyWith<$Res>  {
+  factory $CambioPosicionCopyWith(CambioPosicion value, $Res Function(CambioPosicion) _then) = _$CambioPosicionCopyWithImpl;
+@useResult
+$Res call({
+ String campo, String etiqueta, String guardado, String actual
+});
+
+
+
+
+}
+/// @nodoc
+class _$CambioPosicionCopyWithImpl<$Res>
+    implements $CambioPosicionCopyWith<$Res> {
+  _$CambioPosicionCopyWithImpl(this._self, this._then);
+
+  final CambioPosicion _self;
+  final $Res Function(CambioPosicion) _then;
+
+/// Create a copy of CambioPosicion
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? campo = null,Object? etiqueta = null,Object? guardado = null,Object? actual = null,}) {
+  return _then(CambioPosicion(
+campo: null == campo ? _self.campo : campo // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,guardado: null == guardado ? _self.guardado : guardado // ignore: cast_nullable_to_non_nullable
+as String,actual: null == actual ? _self.actual : actual // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CambioPosicion].
+extension CambioPosicionPatterns on CambioPosicion {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CambioPosicion value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CambioPosicion() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CambioPosicion value)  $default,){
+final _that = this;
+switch (_that) {
+case _CambioPosicion():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CambioPosicion value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CambioPosicion() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String campo,  String etiqueta,  String guardado,  String actual)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CambioPosicion() when $default != null:
+return $default(_that.campo,_that.etiqueta,_that.guardado,_that.actual);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String campo,  String etiqueta,  String guardado,  String actual)  $default,) {final _that = this;
+switch (_that) {
+case _CambioPosicion():
+return $default(_that.campo,_that.etiqueta,_that.guardado,_that.actual);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String campo,  String etiqueta,  String guardado,  String actual)?  $default,) {final _that = this;
+switch (_that) {
+case _CambioPosicion() when $default != null:
+return $default(_that.campo,_that.etiqueta,_that.guardado,_that.actual);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CambioPosicion implements CambioPosicion {
+  const _CambioPosicion({required this.campo, required this.etiqueta, this.guardado = '', required this.actual});
+  factory _CambioPosicion.fromJson(Map<String, dynamic> json) => _$CambioPosicionFromJson(json);
+
+@override final  String campo;
+@override final  String etiqueta;
+@override@JsonKey() final  String guardado;
+@override final  String actual;
+
+/// Create a copy of CambioPosicion
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CambioPosicionCopyWith<_CambioPosicion> get copyWith => __$CambioPosicionCopyWithImpl<_CambioPosicion>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CambioPosicionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CambioPosicion&&(identical(other.campo, campo) || other.campo == campo)&&(identical(other.etiqueta, etiqueta) || other.etiqueta == etiqueta)&&(identical(other.guardado, guardado) || other.guardado == guardado)&&(identical(other.actual, actual) || other.actual == actual));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,campo,etiqueta,guardado,actual);
+}
+
+@override
+String toString() {
+    return 'CambioPosicion(campo: $campo, etiqueta: $etiqueta, guardado: $guardado, actual: $actual)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CambioPosicionCopyWith<$Res> implements $CambioPosicionCopyWith<$Res> {
+  factory _$CambioPosicionCopyWith(_CambioPosicion value, $Res Function(_CambioPosicion) _then) = __$CambioPosicionCopyWithImpl;
+@override @useResult
+$Res call({
+ String campo, String etiqueta, String guardado, String actual
+});
+
+
+
+
+}
+/// @nodoc
+class __$CambioPosicionCopyWithImpl<$Res>
+    implements _$CambioPosicionCopyWith<$Res> {
+  __$CambioPosicionCopyWithImpl(this._self, this._then);
+
+  final _CambioPosicion _self;
+  final $Res Function(_CambioPosicion) _then;
+
+/// Create a copy of CambioPosicion
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? campo = null,Object? etiqueta = null,Object? guardado = null,Object? actual = null,}) {
+  return _then(_CambioPosicion(
+campo: null == campo ? _self.campo : campo // ignore: cast_nullable_to_non_nullable
+as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
+as String,guardado: null == guardado ? _self.guardado : guardado // ignore: cast_nullable_to_non_nullable
+as String,actual: null == actual ? _self.actual : actual // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$Descriptivo {
 
- String get id; String get posicion;@JsonKey(name: 'posicion_etiqueta') String get posicionEtiqueta; int get version;@JsonKey(name: 'congelado_en') String? get congeladoEn;@JsonKey(name: 'esta_congelado') bool get estaCongelado;@JsonKey(name: 'nombre_puesto') String get nombrePuesto; String get empresa;@JsonKey(name: 'area_departamento') String get areaDepartamento;@JsonKey(name: 'reporta_a') String get reportaA;@JsonKey(name: 'supervisa_a') String get supervisaA;@JsonKey(name: 'fecha_elaboracion') String get fechaElaboracion; int? get edad;@JsonKey(name: 'edad_otro') String get edadOtro;@JsonKey(name: 'disponibilidad_viajar') bool? get disponibilidadViajar;@JsonKey(name: 'dias_por_laborar') int? get diasPorLaborar;@JsonKey(name: 'dias_por_laborar_otro') String get diasPorLaborarOtro; int? get horario;@JsonKey(name: 'horario_otro') String get horarioOtro; String get proposito;@JsonKey(name: 'decisiones_operativas') String get decisionesOperativas;@JsonKey(name: 'decisiones_funcionales') String get decisionesFuncionales;@JsonKey(name: 'decisiones_estrategicas') String get decisionesEstrategicas;@JsonKey(name: 'relaciones_internas') String get relacionesInternas;@JsonKey(name: 'relaciones_externas') String get relacionesExternas;@JsonKey(name: 'escolaridad_minima') String get escolaridadMinima;@JsonKey(name: 'experiencia_requerida') String get experienciaRequerida; String get idiomas;@JsonKey(name: 'competencias_tecnicas') String get competenciasTecnicas; List<int> get competencias;@JsonKey(name: 'competencias_otras') String get competenciasOtras; List<int> get recursos;@JsonKey(name: 'recursos_otro') String get recursosOtro; List<TextoNumerado> get funciones; List<TextoNumerado> get indicadores; List<Conformidad> get conformidades;
+ String get id; String get posicion;@JsonKey(name: 'posicion_etiqueta') String get posicionEtiqueta; int get version;@JsonKey(name: 'congelado_en') String? get congeladoEn;@JsonKey(name: 'esta_congelado') bool get estaCongelado;@JsonKey(name: 'estado_version') String? get estadoVersion;@JsonKey(name: 'nombre_puesto') String get nombrePuesto; String get empresa;@JsonKey(name: 'area_departamento') String get areaDepartamento;@JsonKey(name: 'reporta_a') String get reportaA;@JsonKey(name: 'supervisa_a') String get supervisaA;@JsonKey(name: 'fecha_elaboracion') String get fechaElaboracion; int? get edad;@JsonKey(name: 'edad_otro') String get edadOtro;@JsonKey(name: 'disponibilidad_viajar') bool? get disponibilidadViajar;@JsonKey(name: 'dias_por_laborar') int? get diasPorLaborar;@JsonKey(name: 'dias_por_laborar_otro') String get diasPorLaborarOtro; int? get horario;@JsonKey(name: 'horario_otro') String get horarioOtro; String get proposito;@JsonKey(name: 'decisiones_operativas') String get decisionesOperativas;@JsonKey(name: 'decisiones_funcionales') String get decisionesFuncionales;@JsonKey(name: 'decisiones_estrategicas') String get decisionesEstrategicas;@JsonKey(name: 'relaciones_internas') String get relacionesInternas;@JsonKey(name: 'relaciones_externas') String get relacionesExternas;@JsonKey(name: 'escolaridad_minima') String get escolaridadMinima;@JsonKey(name: 'experiencia_requerida') String get experienciaRequerida; String get idiomas;@JsonKey(name: 'competencias_tecnicas') String get competenciasTecnicas; List<int> get competencias;@JsonKey(name: 'competencias_otras') String get competenciasOtras; List<int> get recursos;@JsonKey(name: 'recursos_otro') String get recursosOtro; List<TextoNumerado> get funciones; List<TextoNumerado> get indicadores; List<Conformidad> get conformidades;
 /// Create a copy of Descriptivo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3012,20 +3291,20 @@ $DescriptivoCopyWith<Descriptivo> get copyWith => _$DescriptivoCopyWithImpl<Desc
 @override
 bool operator ==(Object other) {
   final _this = this as Descriptivo;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Descriptivo&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.posicion, _this.posicion) || other.posicion == _this.posicion)&&(identical(other.posicionEtiqueta, _this.posicionEtiqueta) || other.posicionEtiqueta == _this.posicionEtiqueta)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.congeladoEn, _this.congeladoEn) || other.congeladoEn == _this.congeladoEn)&&(identical(other.estaCongelado, _this.estaCongelado) || other.estaCongelado == _this.estaCongelado)&&(identical(other.nombrePuesto, _this.nombrePuesto) || other.nombrePuesto == _this.nombrePuesto)&&(identical(other.empresa, _this.empresa) || other.empresa == _this.empresa)&&(identical(other.areaDepartamento, _this.areaDepartamento) || other.areaDepartamento == _this.areaDepartamento)&&(identical(other.reportaA, _this.reportaA) || other.reportaA == _this.reportaA)&&(identical(other.supervisaA, _this.supervisaA) || other.supervisaA == _this.supervisaA)&&(identical(other.fechaElaboracion, _this.fechaElaboracion) || other.fechaElaboracion == _this.fechaElaboracion)&&(identical(other.edad, _this.edad) || other.edad == _this.edad)&&(identical(other.edadOtro, _this.edadOtro) || other.edadOtro == _this.edadOtro)&&(identical(other.disponibilidadViajar, _this.disponibilidadViajar) || other.disponibilidadViajar == _this.disponibilidadViajar)&&(identical(other.diasPorLaborar, _this.diasPorLaborar) || other.diasPorLaborar == _this.diasPorLaborar)&&(identical(other.diasPorLaborarOtro, _this.diasPorLaborarOtro) || other.diasPorLaborarOtro == _this.diasPorLaborarOtro)&&(identical(other.horario, _this.horario) || other.horario == _this.horario)&&(identical(other.horarioOtro, _this.horarioOtro) || other.horarioOtro == _this.horarioOtro)&&(identical(other.proposito, _this.proposito) || other.proposito == _this.proposito)&&(identical(other.decisionesOperativas, _this.decisionesOperativas) || other.decisionesOperativas == _this.decisionesOperativas)&&(identical(other.decisionesFuncionales, _this.decisionesFuncionales) || other.decisionesFuncionales == _this.decisionesFuncionales)&&(identical(other.decisionesEstrategicas, _this.decisionesEstrategicas) || other.decisionesEstrategicas == _this.decisionesEstrategicas)&&(identical(other.relacionesInternas, _this.relacionesInternas) || other.relacionesInternas == _this.relacionesInternas)&&(identical(other.relacionesExternas, _this.relacionesExternas) || other.relacionesExternas == _this.relacionesExternas)&&(identical(other.escolaridadMinima, _this.escolaridadMinima) || other.escolaridadMinima == _this.escolaridadMinima)&&(identical(other.experienciaRequerida, _this.experienciaRequerida) || other.experienciaRequerida == _this.experienciaRequerida)&&(identical(other.idiomas, _this.idiomas) || other.idiomas == _this.idiomas)&&(identical(other.competenciasTecnicas, _this.competenciasTecnicas) || other.competenciasTecnicas == _this.competenciasTecnicas)&&const DeepCollectionEquality().equals(other.competencias, _this.competencias)&&(identical(other.competenciasOtras, _this.competenciasOtras) || other.competenciasOtras == _this.competenciasOtras)&&const DeepCollectionEquality().equals(other.recursos, _this.recursos)&&(identical(other.recursosOtro, _this.recursosOtro) || other.recursosOtro == _this.recursosOtro)&&const DeepCollectionEquality().equals(other.funciones, _this.funciones)&&const DeepCollectionEquality().equals(other.indicadores, _this.indicadores)&&const DeepCollectionEquality().equals(other.conformidades, _this.conformidades));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Descriptivo&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.posicion, _this.posicion) || other.posicion == _this.posicion)&&(identical(other.posicionEtiqueta, _this.posicionEtiqueta) || other.posicionEtiqueta == _this.posicionEtiqueta)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.congeladoEn, _this.congeladoEn) || other.congeladoEn == _this.congeladoEn)&&(identical(other.estaCongelado, _this.estaCongelado) || other.estaCongelado == _this.estaCongelado)&&(identical(other.estadoVersion, _this.estadoVersion) || other.estadoVersion == _this.estadoVersion)&&(identical(other.nombrePuesto, _this.nombrePuesto) || other.nombrePuesto == _this.nombrePuesto)&&(identical(other.empresa, _this.empresa) || other.empresa == _this.empresa)&&(identical(other.areaDepartamento, _this.areaDepartamento) || other.areaDepartamento == _this.areaDepartamento)&&(identical(other.reportaA, _this.reportaA) || other.reportaA == _this.reportaA)&&(identical(other.supervisaA, _this.supervisaA) || other.supervisaA == _this.supervisaA)&&(identical(other.fechaElaboracion, _this.fechaElaboracion) || other.fechaElaboracion == _this.fechaElaboracion)&&(identical(other.edad, _this.edad) || other.edad == _this.edad)&&(identical(other.edadOtro, _this.edadOtro) || other.edadOtro == _this.edadOtro)&&(identical(other.disponibilidadViajar, _this.disponibilidadViajar) || other.disponibilidadViajar == _this.disponibilidadViajar)&&(identical(other.diasPorLaborar, _this.diasPorLaborar) || other.diasPorLaborar == _this.diasPorLaborar)&&(identical(other.diasPorLaborarOtro, _this.diasPorLaborarOtro) || other.diasPorLaborarOtro == _this.diasPorLaborarOtro)&&(identical(other.horario, _this.horario) || other.horario == _this.horario)&&(identical(other.horarioOtro, _this.horarioOtro) || other.horarioOtro == _this.horarioOtro)&&(identical(other.proposito, _this.proposito) || other.proposito == _this.proposito)&&(identical(other.decisionesOperativas, _this.decisionesOperativas) || other.decisionesOperativas == _this.decisionesOperativas)&&(identical(other.decisionesFuncionales, _this.decisionesFuncionales) || other.decisionesFuncionales == _this.decisionesFuncionales)&&(identical(other.decisionesEstrategicas, _this.decisionesEstrategicas) || other.decisionesEstrategicas == _this.decisionesEstrategicas)&&(identical(other.relacionesInternas, _this.relacionesInternas) || other.relacionesInternas == _this.relacionesInternas)&&(identical(other.relacionesExternas, _this.relacionesExternas) || other.relacionesExternas == _this.relacionesExternas)&&(identical(other.escolaridadMinima, _this.escolaridadMinima) || other.escolaridadMinima == _this.escolaridadMinima)&&(identical(other.experienciaRequerida, _this.experienciaRequerida) || other.experienciaRequerida == _this.experienciaRequerida)&&(identical(other.idiomas, _this.idiomas) || other.idiomas == _this.idiomas)&&(identical(other.competenciasTecnicas, _this.competenciasTecnicas) || other.competenciasTecnicas == _this.competenciasTecnicas)&&const DeepCollectionEquality().equals(other.competencias, _this.competencias)&&(identical(other.competenciasOtras, _this.competenciasOtras) || other.competenciasOtras == _this.competenciasOtras)&&const DeepCollectionEquality().equals(other.recursos, _this.recursos)&&(identical(other.recursosOtro, _this.recursosOtro) || other.recursosOtro == _this.recursosOtro)&&const DeepCollectionEquality().equals(other.funciones, _this.funciones)&&const DeepCollectionEquality().equals(other.indicadores, _this.indicadores)&&const DeepCollectionEquality().equals(other.conformidades, _this.conformidades));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Descriptivo;
-  return Object.hashAll([runtimeType,_this.id,_this.posicion,_this.posicionEtiqueta,_this.version,_this.congeladoEn,_this.estaCongelado,_this.nombrePuesto,_this.empresa,_this.areaDepartamento,_this.reportaA,_this.supervisaA,_this.fechaElaboracion,_this.edad,_this.edadOtro,_this.disponibilidadViajar,_this.diasPorLaborar,_this.diasPorLaborarOtro,_this.horario,_this.horarioOtro,_this.proposito,_this.decisionesOperativas,_this.decisionesFuncionales,_this.decisionesEstrategicas,_this.relacionesInternas,_this.relacionesExternas,_this.escolaridadMinima,_this.experienciaRequerida,_this.idiomas,_this.competenciasTecnicas,const DeepCollectionEquality().hash(_this.competencias),_this.competenciasOtras,const DeepCollectionEquality().hash(_this.recursos),_this.recursosOtro,const DeepCollectionEquality().hash(_this.funciones),const DeepCollectionEquality().hash(_this.indicadores),const DeepCollectionEquality().hash(_this.conformidades)]);
+  return Object.hashAll([runtimeType,_this.id,_this.posicion,_this.posicionEtiqueta,_this.version,_this.congeladoEn,_this.estaCongelado,_this.estadoVersion,_this.nombrePuesto,_this.empresa,_this.areaDepartamento,_this.reportaA,_this.supervisaA,_this.fechaElaboracion,_this.edad,_this.edadOtro,_this.disponibilidadViajar,_this.diasPorLaborar,_this.diasPorLaborarOtro,_this.horario,_this.horarioOtro,_this.proposito,_this.decisionesOperativas,_this.decisionesFuncionales,_this.decisionesEstrategicas,_this.relacionesInternas,_this.relacionesExternas,_this.escolaridadMinima,_this.experienciaRequerida,_this.idiomas,_this.competenciasTecnicas,const DeepCollectionEquality().hash(_this.competencias),_this.competenciasOtras,const DeepCollectionEquality().hash(_this.recursos),_this.recursosOtro,const DeepCollectionEquality().hash(_this.funciones),const DeepCollectionEquality().hash(_this.indicadores),const DeepCollectionEquality().hash(_this.conformidades)]);
 }
 
 @override
 String toString() {
   final _this = this as Descriptivo;
-  return 'Descriptivo(id: ${_this.id}, posicion: ${_this.posicion}, posicionEtiqueta: ${_this.posicionEtiqueta}, version: ${_this.version}, congeladoEn: ${_this.congeladoEn}, estaCongelado: ${_this.estaCongelado}, nombrePuesto: ${_this.nombrePuesto}, empresa: ${_this.empresa}, areaDepartamento: ${_this.areaDepartamento}, reportaA: ${_this.reportaA}, supervisaA: ${_this.supervisaA}, fechaElaboracion: ${_this.fechaElaboracion}, edad: ${_this.edad}, edadOtro: ${_this.edadOtro}, disponibilidadViajar: ${_this.disponibilidadViajar}, diasPorLaborar: ${_this.diasPorLaborar}, diasPorLaborarOtro: ${_this.diasPorLaborarOtro}, horario: ${_this.horario}, horarioOtro: ${_this.horarioOtro}, proposito: ${_this.proposito}, decisionesOperativas: ${_this.decisionesOperativas}, decisionesFuncionales: ${_this.decisionesFuncionales}, decisionesEstrategicas: ${_this.decisionesEstrategicas}, relacionesInternas: ${_this.relacionesInternas}, relacionesExternas: ${_this.relacionesExternas}, escolaridadMinima: ${_this.escolaridadMinima}, experienciaRequerida: ${_this.experienciaRequerida}, idiomas: ${_this.idiomas}, competenciasTecnicas: ${_this.competenciasTecnicas}, competencias: ${_this.competencias}, competenciasOtras: ${_this.competenciasOtras}, recursos: ${_this.recursos}, recursosOtro: ${_this.recursosOtro}, funciones: ${_this.funciones}, indicadores: ${_this.indicadores}, conformidades: ${_this.conformidades})';
+  return 'Descriptivo(id: ${_this.id}, posicion: ${_this.posicion}, posicionEtiqueta: ${_this.posicionEtiqueta}, version: ${_this.version}, congeladoEn: ${_this.congeladoEn}, estaCongelado: ${_this.estaCongelado}, estadoVersion: ${_this.estadoVersion}, nombrePuesto: ${_this.nombrePuesto}, empresa: ${_this.empresa}, areaDepartamento: ${_this.areaDepartamento}, reportaA: ${_this.reportaA}, supervisaA: ${_this.supervisaA}, fechaElaboracion: ${_this.fechaElaboracion}, edad: ${_this.edad}, edadOtro: ${_this.edadOtro}, disponibilidadViajar: ${_this.disponibilidadViajar}, diasPorLaborar: ${_this.diasPorLaborar}, diasPorLaborarOtro: ${_this.diasPorLaborarOtro}, horario: ${_this.horario}, horarioOtro: ${_this.horarioOtro}, proposito: ${_this.proposito}, decisionesOperativas: ${_this.decisionesOperativas}, decisionesFuncionales: ${_this.decisionesFuncionales}, decisionesEstrategicas: ${_this.decisionesEstrategicas}, relacionesInternas: ${_this.relacionesInternas}, relacionesExternas: ${_this.relacionesExternas}, escolaridadMinima: ${_this.escolaridadMinima}, experienciaRequerida: ${_this.experienciaRequerida}, idiomas: ${_this.idiomas}, competenciasTecnicas: ${_this.competenciasTecnicas}, competencias: ${_this.competencias}, competenciasOtras: ${_this.competenciasOtras}, recursos: ${_this.recursos}, recursosOtro: ${_this.recursosOtro}, funciones: ${_this.funciones}, indicadores: ${_this.indicadores}, conformidades: ${_this.conformidades})';
 }
 
 
@@ -3036,7 +3315,7 @@ abstract mixin class $DescriptivoCopyWith<$Res>  {
   factory $DescriptivoCopyWith(Descriptivo value, $Res Function(Descriptivo) _then) = _$DescriptivoCopyWithImpl;
 @useResult
 $Res call({
- String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int version,@JsonKey(name: 'congelado_en') String? congeladoEn,@JsonKey(name: 'esta_congelado') bool estaCongelado,@JsonKey(name: 'nombre_puesto') String nombrePuesto, String empresa,@JsonKey(name: 'area_departamento') String areaDepartamento,@JsonKey(name: 'reporta_a') String reportaA,@JsonKey(name: 'supervisa_a') String supervisaA,@JsonKey(name: 'fecha_elaboracion') String fechaElaboracion, int? edad,@JsonKey(name: 'edad_otro') String edadOtro,@JsonKey(name: 'disponibilidad_viajar') bool? disponibilidadViajar,@JsonKey(name: 'dias_por_laborar') int? diasPorLaborar,@JsonKey(name: 'dias_por_laborar_otro') String diasPorLaborarOtro, int? horario,@JsonKey(name: 'horario_otro') String horarioOtro, String proposito,@JsonKey(name: 'decisiones_operativas') String decisionesOperativas,@JsonKey(name: 'decisiones_funcionales') String decisionesFuncionales,@JsonKey(name: 'decisiones_estrategicas') String decisionesEstrategicas,@JsonKey(name: 'relaciones_internas') String relacionesInternas,@JsonKey(name: 'relaciones_externas') String relacionesExternas,@JsonKey(name: 'escolaridad_minima') String escolaridadMinima,@JsonKey(name: 'experiencia_requerida') String experienciaRequerida, String idiomas,@JsonKey(name: 'competencias_tecnicas') String competenciasTecnicas, List<int> competencias,@JsonKey(name: 'competencias_otras') String competenciasOtras, List<int> recursos,@JsonKey(name: 'recursos_otro') String recursosOtro, List<TextoNumerado> funciones, List<TextoNumerado> indicadores, List<Conformidad> conformidades
+ String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int version,@JsonKey(name: 'congelado_en') String? congeladoEn,@JsonKey(name: 'esta_congelado') bool estaCongelado,@JsonKey(name: 'estado_version') String? estadoVersion,@JsonKey(name: 'nombre_puesto') String nombrePuesto, String empresa,@JsonKey(name: 'area_departamento') String areaDepartamento,@JsonKey(name: 'reporta_a') String reportaA,@JsonKey(name: 'supervisa_a') String supervisaA,@JsonKey(name: 'fecha_elaboracion') String fechaElaboracion, int? edad,@JsonKey(name: 'edad_otro') String edadOtro,@JsonKey(name: 'disponibilidad_viajar') bool? disponibilidadViajar,@JsonKey(name: 'dias_por_laborar') int? diasPorLaborar,@JsonKey(name: 'dias_por_laborar_otro') String diasPorLaborarOtro, int? horario,@JsonKey(name: 'horario_otro') String horarioOtro, String proposito,@JsonKey(name: 'decisiones_operativas') String decisionesOperativas,@JsonKey(name: 'decisiones_funcionales') String decisionesFuncionales,@JsonKey(name: 'decisiones_estrategicas') String decisionesEstrategicas,@JsonKey(name: 'relaciones_internas') String relacionesInternas,@JsonKey(name: 'relaciones_externas') String relacionesExternas,@JsonKey(name: 'escolaridad_minima') String escolaridadMinima,@JsonKey(name: 'experiencia_requerida') String experienciaRequerida, String idiomas,@JsonKey(name: 'competencias_tecnicas') String competenciasTecnicas, List<int> competencias,@JsonKey(name: 'competencias_otras') String competenciasOtras, List<int> recursos,@JsonKey(name: 'recursos_otro') String recursosOtro, List<TextoNumerado> funciones, List<TextoNumerado> indicadores, List<Conformidad> conformidades
 });
 
 
@@ -3053,7 +3332,7 @@ class _$DescriptivoCopyWithImpl<$Res>
 
 /// Create a copy of Descriptivo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? version = null,Object? congeladoEn = freezed,Object? estaCongelado = null,Object? nombrePuesto = null,Object? empresa = null,Object? areaDepartamento = null,Object? reportaA = null,Object? supervisaA = null,Object? fechaElaboracion = null,Object? edad = freezed,Object? edadOtro = null,Object? disponibilidadViajar = freezed,Object? diasPorLaborar = freezed,Object? diasPorLaborarOtro = null,Object? horario = freezed,Object? horarioOtro = null,Object? proposito = null,Object? decisionesOperativas = null,Object? decisionesFuncionales = null,Object? decisionesEstrategicas = null,Object? relacionesInternas = null,Object? relacionesExternas = null,Object? escolaridadMinima = null,Object? experienciaRequerida = null,Object? idiomas = null,Object? competenciasTecnicas = null,Object? competencias = null,Object? competenciasOtras = null,Object? recursos = null,Object? recursosOtro = null,Object? funciones = null,Object? indicadores = null,Object? conformidades = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? version = null,Object? congeladoEn = freezed,Object? estaCongelado = null,Object? estadoVersion = freezed,Object? nombrePuesto = null,Object? empresa = null,Object? areaDepartamento = null,Object? reportaA = null,Object? supervisaA = null,Object? fechaElaboracion = null,Object? edad = freezed,Object? edadOtro = null,Object? disponibilidadViajar = freezed,Object? diasPorLaborar = freezed,Object? diasPorLaborarOtro = null,Object? horario = freezed,Object? horarioOtro = null,Object? proposito = null,Object? decisionesOperativas = null,Object? decisionesFuncionales = null,Object? decisionesEstrategicas = null,Object? relacionesInternas = null,Object? relacionesExternas = null,Object? escolaridadMinima = null,Object? experienciaRequerida = null,Object? idiomas = null,Object? competenciasTecnicas = null,Object? competencias = null,Object? competenciasOtras = null,Object? recursos = null,Object? recursosOtro = null,Object? funciones = null,Object? indicadores = null,Object? conformidades = null,}) {
   return _then(Descriptivo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,posicion: null == posicion ? _self.posicion : posicion // ignore: cast_nullable_to_non_nullable
@@ -3061,7 +3340,8 @@ as String,posicionEtiqueta: null == posicionEtiqueta ? _self.posicionEtiqueta : 
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,congeladoEn: freezed == congeladoEn ? _self.congeladoEn : congeladoEn // ignore: cast_nullable_to_non_nullable
 as String?,estaCongelado: null == estaCongelado ? _self.estaCongelado : estaCongelado // ignore: cast_nullable_to_non_nullable
-as bool,nombrePuesto: null == nombrePuesto ? _self.nombrePuesto : nombrePuesto // ignore: cast_nullable_to_non_nullable
+as bool,estadoVersion: freezed == estadoVersion ? _self.estadoVersion : estadoVersion // ignore: cast_nullable_to_non_nullable
+as String?,nombrePuesto: null == nombrePuesto ? _self.nombrePuesto : nombrePuesto // ignore: cast_nullable_to_non_nullable
 as String,empresa: null == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
 as String,areaDepartamento: null == areaDepartamento ? _self.areaDepartamento : areaDepartamento // ignore: cast_nullable_to_non_nullable
 as String,reportaA: null == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable
@@ -3176,10 +3456,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'estado_version')  String? estadoVersion, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Descriptivo() when $default != null:
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.estadoVersion,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
   return orElse();
 
 }
@@ -3197,10 +3477,10 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'estado_version')  String? estadoVersion, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)  $default,) {final _that = this;
 switch (_that) {
 case _Descriptivo():
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.estadoVersion,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3217,10 +3497,10 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String posicion, @JsonKey(name: 'posicion_etiqueta')  String posicionEtiqueta,  int version, @JsonKey(name: 'congelado_en')  String? congeladoEn, @JsonKey(name: 'esta_congelado')  bool estaCongelado, @JsonKey(name: 'estado_version')  String? estadoVersion, @JsonKey(name: 'nombre_puesto')  String nombrePuesto,  String empresa, @JsonKey(name: 'area_departamento')  String areaDepartamento, @JsonKey(name: 'reporta_a')  String reportaA, @JsonKey(name: 'supervisa_a')  String supervisaA, @JsonKey(name: 'fecha_elaboracion')  String fechaElaboracion,  int? edad, @JsonKey(name: 'edad_otro')  String edadOtro, @JsonKey(name: 'disponibilidad_viajar')  bool? disponibilidadViajar, @JsonKey(name: 'dias_por_laborar')  int? diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro')  String diasPorLaborarOtro,  int? horario, @JsonKey(name: 'horario_otro')  String horarioOtro,  String proposito, @JsonKey(name: 'decisiones_operativas')  String decisionesOperativas, @JsonKey(name: 'decisiones_funcionales')  String decisionesFuncionales, @JsonKey(name: 'decisiones_estrategicas')  String decisionesEstrategicas, @JsonKey(name: 'relaciones_internas')  String relacionesInternas, @JsonKey(name: 'relaciones_externas')  String relacionesExternas, @JsonKey(name: 'escolaridad_minima')  String escolaridadMinima, @JsonKey(name: 'experiencia_requerida')  String experienciaRequerida,  String idiomas, @JsonKey(name: 'competencias_tecnicas')  String competenciasTecnicas,  List<int> competencias, @JsonKey(name: 'competencias_otras')  String competenciasOtras,  List<int> recursos, @JsonKey(name: 'recursos_otro')  String recursosOtro,  List<TextoNumerado> funciones,  List<TextoNumerado> indicadores,  List<Conformidad> conformidades)?  $default,) {final _that = this;
 switch (_that) {
 case _Descriptivo() when $default != null:
-return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
+return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_that.congeladoEn,_that.estaCongelado,_that.estadoVersion,_that.nombrePuesto,_that.empresa,_that.areaDepartamento,_that.reportaA,_that.supervisaA,_that.fechaElaboracion,_that.edad,_that.edadOtro,_that.disponibilidadViajar,_that.diasPorLaborar,_that.diasPorLaborarOtro,_that.horario,_that.horarioOtro,_that.proposito,_that.decisionesOperativas,_that.decisionesFuncionales,_that.decisionesEstrategicas,_that.relacionesInternas,_that.relacionesExternas,_that.escolaridadMinima,_that.experienciaRequerida,_that.idiomas,_that.competenciasTecnicas,_that.competencias,_that.competenciasOtras,_that.recursos,_that.recursosOtro,_that.funciones,_that.indicadores,_that.conformidades);case _:
   return null;
 
 }
@@ -3231,8 +3511,8 @@ return $default(_that.id,_that.posicion,_that.posicionEtiqueta,_that.version,_th
 /// @nodoc
 @JsonSerializable()
 
-class _Descriptivo implements Descriptivo {
-  const _Descriptivo({required this.id, required this.posicion, @JsonKey(name: 'posicion_etiqueta') this.posicionEtiqueta = '', required this.version, @JsonKey(name: 'congelado_en') this.congeladoEn, @JsonKey(name: 'esta_congelado') this.estaCongelado = false, @JsonKey(name: 'nombre_puesto') this.nombrePuesto = '', this.empresa = '', @JsonKey(name: 'area_departamento') this.areaDepartamento = '', @JsonKey(name: 'reporta_a') this.reportaA = '', @JsonKey(name: 'supervisa_a') this.supervisaA = '', @JsonKey(name: 'fecha_elaboracion') required this.fechaElaboracion, this.edad, @JsonKey(name: 'edad_otro') this.edadOtro = '', @JsonKey(name: 'disponibilidad_viajar') this.disponibilidadViajar, @JsonKey(name: 'dias_por_laborar') this.diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro') this.diasPorLaborarOtro = '', this.horario, @JsonKey(name: 'horario_otro') this.horarioOtro = '', this.proposito = '', @JsonKey(name: 'decisiones_operativas') this.decisionesOperativas = '', @JsonKey(name: 'decisiones_funcionales') this.decisionesFuncionales = '', @JsonKey(name: 'decisiones_estrategicas') this.decisionesEstrategicas = '', @JsonKey(name: 'relaciones_internas') this.relacionesInternas = '', @JsonKey(name: 'relaciones_externas') this.relacionesExternas = '', @JsonKey(name: 'escolaridad_minima') this.escolaridadMinima = '', @JsonKey(name: 'experiencia_requerida') this.experienciaRequerida = '', this.idiomas = '', @JsonKey(name: 'competencias_tecnicas') this.competenciasTecnicas = '',  List<int> competencias = const <int>[], @JsonKey(name: 'competencias_otras') this.competenciasOtras = '',  List<int> recursos = const <int>[], @JsonKey(name: 'recursos_otro') this.recursosOtro = '',  List<TextoNumerado> funciones = const <TextoNumerado>[],  List<TextoNumerado> indicadores = const <TextoNumerado>[],  List<Conformidad> conformidades = const <Conformidad>[]}): _competencias = competencias,_recursos = recursos,_funciones = funciones,_indicadores = indicadores,_conformidades = conformidades;
+class _Descriptivo extends Descriptivo {
+  const _Descriptivo({required this.id, required this.posicion, @JsonKey(name: 'posicion_etiqueta') this.posicionEtiqueta = '', required this.version, @JsonKey(name: 'congelado_en') this.congeladoEn, @JsonKey(name: 'esta_congelado') this.estaCongelado = false, @JsonKey(name: 'estado_version') this.estadoVersion, @JsonKey(name: 'nombre_puesto') this.nombrePuesto = '', this.empresa = '', @JsonKey(name: 'area_departamento') this.areaDepartamento = '', @JsonKey(name: 'reporta_a') this.reportaA = '', @JsonKey(name: 'supervisa_a') this.supervisaA = '', @JsonKey(name: 'fecha_elaboracion') required this.fechaElaboracion, this.edad, @JsonKey(name: 'edad_otro') this.edadOtro = '', @JsonKey(name: 'disponibilidad_viajar') this.disponibilidadViajar, @JsonKey(name: 'dias_por_laborar') this.diasPorLaborar, @JsonKey(name: 'dias_por_laborar_otro') this.diasPorLaborarOtro = '', this.horario, @JsonKey(name: 'horario_otro') this.horarioOtro = '', this.proposito = '', @JsonKey(name: 'decisiones_operativas') this.decisionesOperativas = '', @JsonKey(name: 'decisiones_funcionales') this.decisionesFuncionales = '', @JsonKey(name: 'decisiones_estrategicas') this.decisionesEstrategicas = '', @JsonKey(name: 'relaciones_internas') this.relacionesInternas = '', @JsonKey(name: 'relaciones_externas') this.relacionesExternas = '', @JsonKey(name: 'escolaridad_minima') this.escolaridadMinima = '', @JsonKey(name: 'experiencia_requerida') this.experienciaRequerida = '', this.idiomas = '', @JsonKey(name: 'competencias_tecnicas') this.competenciasTecnicas = '',  List<int> competencias = const <int>[], @JsonKey(name: 'competencias_otras') this.competenciasOtras = '',  List<int> recursos = const <int>[], @JsonKey(name: 'recursos_otro') this.recursosOtro = '',  List<TextoNumerado> funciones = const <TextoNumerado>[],  List<TextoNumerado> indicadores = const <TextoNumerado>[],  List<Conformidad> conformidades = const <Conformidad>[]}): _competencias = competencias,_recursos = recursos,_funciones = funciones,_indicadores = indicadores,_conformidades = conformidades,super._();
   factory _Descriptivo.fromJson(Map<String, dynamic> json) => _$DescriptivoFromJson(json);
 
 @override final  String id;
@@ -3241,6 +3521,7 @@ class _Descriptivo implements Descriptivo {
 @override final  int version;
 @override@JsonKey(name: 'congelado_en') final  String? congeladoEn;
 @override@JsonKey(name: 'esta_congelado') final  bool estaCongelado;
+@override@JsonKey(name: 'estado_version') final  String? estadoVersion;
 @override@JsonKey(name: 'nombre_puesto') final  String nombrePuesto;
 @override@JsonKey() final  String empresa;
 @override@JsonKey(name: 'area_departamento') final  String areaDepartamento;
@@ -3315,18 +3596,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Descriptivo&&(identical(other.id, id) || other.id == id)&&(identical(other.posicion, posicion) || other.posicion == posicion)&&(identical(other.posicionEtiqueta, posicionEtiqueta) || other.posicionEtiqueta == posicionEtiqueta)&&(identical(other.version, version) || other.version == version)&&(identical(other.congeladoEn, congeladoEn) || other.congeladoEn == congeladoEn)&&(identical(other.estaCongelado, estaCongelado) || other.estaCongelado == estaCongelado)&&(identical(other.nombrePuesto, nombrePuesto) || other.nombrePuesto == nombrePuesto)&&(identical(other.empresa, empresa) || other.empresa == empresa)&&(identical(other.areaDepartamento, areaDepartamento) || other.areaDepartamento == areaDepartamento)&&(identical(other.reportaA, reportaA) || other.reportaA == reportaA)&&(identical(other.supervisaA, supervisaA) || other.supervisaA == supervisaA)&&(identical(other.fechaElaboracion, fechaElaboracion) || other.fechaElaboracion == fechaElaboracion)&&(identical(other.edad, edad) || other.edad == edad)&&(identical(other.edadOtro, edadOtro) || other.edadOtro == edadOtro)&&(identical(other.disponibilidadViajar, disponibilidadViajar) || other.disponibilidadViajar == disponibilidadViajar)&&(identical(other.diasPorLaborar, diasPorLaborar) || other.diasPorLaborar == diasPorLaborar)&&(identical(other.diasPorLaborarOtro, diasPorLaborarOtro) || other.diasPorLaborarOtro == diasPorLaborarOtro)&&(identical(other.horario, horario) || other.horario == horario)&&(identical(other.horarioOtro, horarioOtro) || other.horarioOtro == horarioOtro)&&(identical(other.proposito, proposito) || other.proposito == proposito)&&(identical(other.decisionesOperativas, decisionesOperativas) || other.decisionesOperativas == decisionesOperativas)&&(identical(other.decisionesFuncionales, decisionesFuncionales) || other.decisionesFuncionales == decisionesFuncionales)&&(identical(other.decisionesEstrategicas, decisionesEstrategicas) || other.decisionesEstrategicas == decisionesEstrategicas)&&(identical(other.relacionesInternas, relacionesInternas) || other.relacionesInternas == relacionesInternas)&&(identical(other.relacionesExternas, relacionesExternas) || other.relacionesExternas == relacionesExternas)&&(identical(other.escolaridadMinima, escolaridadMinima) || other.escolaridadMinima == escolaridadMinima)&&(identical(other.experienciaRequerida, experienciaRequerida) || other.experienciaRequerida == experienciaRequerida)&&(identical(other.idiomas, idiomas) || other.idiomas == idiomas)&&(identical(other.competenciasTecnicas, competenciasTecnicas) || other.competenciasTecnicas == competenciasTecnicas)&&const DeepCollectionEquality().equals(other.competencias, _competencias)&&(identical(other.competenciasOtras, competenciasOtras) || other.competenciasOtras == competenciasOtras)&&const DeepCollectionEquality().equals(other.recursos, _recursos)&&(identical(other.recursosOtro, recursosOtro) || other.recursosOtro == recursosOtro)&&const DeepCollectionEquality().equals(other.funciones, _funciones)&&const DeepCollectionEquality().equals(other.indicadores, _indicadores)&&const DeepCollectionEquality().equals(other.conformidades, _conformidades));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Descriptivo&&(identical(other.id, id) || other.id == id)&&(identical(other.posicion, posicion) || other.posicion == posicion)&&(identical(other.posicionEtiqueta, posicionEtiqueta) || other.posicionEtiqueta == posicionEtiqueta)&&(identical(other.version, version) || other.version == version)&&(identical(other.congeladoEn, congeladoEn) || other.congeladoEn == congeladoEn)&&(identical(other.estaCongelado, estaCongelado) || other.estaCongelado == estaCongelado)&&(identical(other.estadoVersion, estadoVersion) || other.estadoVersion == estadoVersion)&&(identical(other.nombrePuesto, nombrePuesto) || other.nombrePuesto == nombrePuesto)&&(identical(other.empresa, empresa) || other.empresa == empresa)&&(identical(other.areaDepartamento, areaDepartamento) || other.areaDepartamento == areaDepartamento)&&(identical(other.reportaA, reportaA) || other.reportaA == reportaA)&&(identical(other.supervisaA, supervisaA) || other.supervisaA == supervisaA)&&(identical(other.fechaElaboracion, fechaElaboracion) || other.fechaElaboracion == fechaElaboracion)&&(identical(other.edad, edad) || other.edad == edad)&&(identical(other.edadOtro, edadOtro) || other.edadOtro == edadOtro)&&(identical(other.disponibilidadViajar, disponibilidadViajar) || other.disponibilidadViajar == disponibilidadViajar)&&(identical(other.diasPorLaborar, diasPorLaborar) || other.diasPorLaborar == diasPorLaborar)&&(identical(other.diasPorLaborarOtro, diasPorLaborarOtro) || other.diasPorLaborarOtro == diasPorLaborarOtro)&&(identical(other.horario, horario) || other.horario == horario)&&(identical(other.horarioOtro, horarioOtro) || other.horarioOtro == horarioOtro)&&(identical(other.proposito, proposito) || other.proposito == proposito)&&(identical(other.decisionesOperativas, decisionesOperativas) || other.decisionesOperativas == decisionesOperativas)&&(identical(other.decisionesFuncionales, decisionesFuncionales) || other.decisionesFuncionales == decisionesFuncionales)&&(identical(other.decisionesEstrategicas, decisionesEstrategicas) || other.decisionesEstrategicas == decisionesEstrategicas)&&(identical(other.relacionesInternas, relacionesInternas) || other.relacionesInternas == relacionesInternas)&&(identical(other.relacionesExternas, relacionesExternas) || other.relacionesExternas == relacionesExternas)&&(identical(other.escolaridadMinima, escolaridadMinima) || other.escolaridadMinima == escolaridadMinima)&&(identical(other.experienciaRequerida, experienciaRequerida) || other.experienciaRequerida == experienciaRequerida)&&(identical(other.idiomas, idiomas) || other.idiomas == idiomas)&&(identical(other.competenciasTecnicas, competenciasTecnicas) || other.competenciasTecnicas == competenciasTecnicas)&&const DeepCollectionEquality().equals(other.competencias, _competencias)&&(identical(other.competenciasOtras, competenciasOtras) || other.competenciasOtras == competenciasOtras)&&const DeepCollectionEquality().equals(other.recursos, _recursos)&&(identical(other.recursosOtro, recursosOtro) || other.recursosOtro == recursosOtro)&&const DeepCollectionEquality().equals(other.funciones, _funciones)&&const DeepCollectionEquality().equals(other.indicadores, _indicadores)&&const DeepCollectionEquality().equals(other.conformidades, _conformidades));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hashAll([runtimeType,id,posicion,posicionEtiqueta,version,congeladoEn,estaCongelado,nombrePuesto,empresa,areaDepartamento,reportaA,supervisaA,fechaElaboracion,edad,edadOtro,disponibilidadViajar,diasPorLaborar,diasPorLaborarOtro,horario,horarioOtro,proposito,decisionesOperativas,decisionesFuncionales,decisionesEstrategicas,relacionesInternas,relacionesExternas,escolaridadMinima,experienciaRequerida,idiomas,competenciasTecnicas,const DeepCollectionEquality().hash(_competencias),competenciasOtras,const DeepCollectionEquality().hash(_recursos),recursosOtro,const DeepCollectionEquality().hash(_funciones),const DeepCollectionEquality().hash(_indicadores),const DeepCollectionEquality().hash(_conformidades)]);
+    return Object.hashAll([runtimeType,id,posicion,posicionEtiqueta,version,congeladoEn,estaCongelado,estadoVersion,nombrePuesto,empresa,areaDepartamento,reportaA,supervisaA,fechaElaboracion,edad,edadOtro,disponibilidadViajar,diasPorLaborar,diasPorLaborarOtro,horario,horarioOtro,proposito,decisionesOperativas,decisionesFuncionales,decisionesEstrategicas,relacionesInternas,relacionesExternas,escolaridadMinima,experienciaRequerida,idiomas,competenciasTecnicas,const DeepCollectionEquality().hash(_competencias),competenciasOtras,const DeepCollectionEquality().hash(_recursos),recursosOtro,const DeepCollectionEquality().hash(_funciones),const DeepCollectionEquality().hash(_indicadores),const DeepCollectionEquality().hash(_conformidades)]);
 }
 
 @override
 String toString() {
-    return 'Descriptivo(id: $id, posicion: $posicion, posicionEtiqueta: $posicionEtiqueta, version: $version, congeladoEn: $congeladoEn, estaCongelado: $estaCongelado, nombrePuesto: $nombrePuesto, empresa: $empresa, areaDepartamento: $areaDepartamento, reportaA: $reportaA, supervisaA: $supervisaA, fechaElaboracion: $fechaElaboracion, edad: $edad, edadOtro: $edadOtro, disponibilidadViajar: $disponibilidadViajar, diasPorLaborar: $diasPorLaborar, diasPorLaborarOtro: $diasPorLaborarOtro, horario: $horario, horarioOtro: $horarioOtro, proposito: $proposito, decisionesOperativas: $decisionesOperativas, decisionesFuncionales: $decisionesFuncionales, decisionesEstrategicas: $decisionesEstrategicas, relacionesInternas: $relacionesInternas, relacionesExternas: $relacionesExternas, escolaridadMinima: $escolaridadMinima, experienciaRequerida: $experienciaRequerida, idiomas: $idiomas, competenciasTecnicas: $competenciasTecnicas, competencias: $competencias, competenciasOtras: $competenciasOtras, recursos: $recursos, recursosOtro: $recursosOtro, funciones: $funciones, indicadores: $indicadores, conformidades: $conformidades)';
+    return 'Descriptivo(id: $id, posicion: $posicion, posicionEtiqueta: $posicionEtiqueta, version: $version, congeladoEn: $congeladoEn, estaCongelado: $estaCongelado, estadoVersion: $estadoVersion, nombrePuesto: $nombrePuesto, empresa: $empresa, areaDepartamento: $areaDepartamento, reportaA: $reportaA, supervisaA: $supervisaA, fechaElaboracion: $fechaElaboracion, edad: $edad, edadOtro: $edadOtro, disponibilidadViajar: $disponibilidadViajar, diasPorLaborar: $diasPorLaborar, diasPorLaborarOtro: $diasPorLaborarOtro, horario: $horario, horarioOtro: $horarioOtro, proposito: $proposito, decisionesOperativas: $decisionesOperativas, decisionesFuncionales: $decisionesFuncionales, decisionesEstrategicas: $decisionesEstrategicas, relacionesInternas: $relacionesInternas, relacionesExternas: $relacionesExternas, escolaridadMinima: $escolaridadMinima, experienciaRequerida: $experienciaRequerida, idiomas: $idiomas, competenciasTecnicas: $competenciasTecnicas, competencias: $competencias, competenciasOtras: $competenciasOtras, recursos: $recursos, recursosOtro: $recursosOtro, funciones: $funciones, indicadores: $indicadores, conformidades: $conformidades)';
 }
 
 
@@ -3337,7 +3618,7 @@ abstract mixin class _$DescriptivoCopyWith<$Res> implements $DescriptivoCopyWith
   factory _$DescriptivoCopyWith(_Descriptivo value, $Res Function(_Descriptivo) _then) = __$DescriptivoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int version,@JsonKey(name: 'congelado_en') String? congeladoEn,@JsonKey(name: 'esta_congelado') bool estaCongelado,@JsonKey(name: 'nombre_puesto') String nombrePuesto, String empresa,@JsonKey(name: 'area_departamento') String areaDepartamento,@JsonKey(name: 'reporta_a') String reportaA,@JsonKey(name: 'supervisa_a') String supervisaA,@JsonKey(name: 'fecha_elaboracion') String fechaElaboracion, int? edad,@JsonKey(name: 'edad_otro') String edadOtro,@JsonKey(name: 'disponibilidad_viajar') bool? disponibilidadViajar,@JsonKey(name: 'dias_por_laborar') int? diasPorLaborar,@JsonKey(name: 'dias_por_laborar_otro') String diasPorLaborarOtro, int? horario,@JsonKey(name: 'horario_otro') String horarioOtro, String proposito,@JsonKey(name: 'decisiones_operativas') String decisionesOperativas,@JsonKey(name: 'decisiones_funcionales') String decisionesFuncionales,@JsonKey(name: 'decisiones_estrategicas') String decisionesEstrategicas,@JsonKey(name: 'relaciones_internas') String relacionesInternas,@JsonKey(name: 'relaciones_externas') String relacionesExternas,@JsonKey(name: 'escolaridad_minima') String escolaridadMinima,@JsonKey(name: 'experiencia_requerida') String experienciaRequerida, String idiomas,@JsonKey(name: 'competencias_tecnicas') String competenciasTecnicas, List<int> competencias,@JsonKey(name: 'competencias_otras') String competenciasOtras, List<int> recursos,@JsonKey(name: 'recursos_otro') String recursosOtro, List<TextoNumerado> funciones, List<TextoNumerado> indicadores, List<Conformidad> conformidades
+ String id, String posicion,@JsonKey(name: 'posicion_etiqueta') String posicionEtiqueta, int version,@JsonKey(name: 'congelado_en') String? congeladoEn,@JsonKey(name: 'esta_congelado') bool estaCongelado,@JsonKey(name: 'estado_version') String? estadoVersion,@JsonKey(name: 'nombre_puesto') String nombrePuesto, String empresa,@JsonKey(name: 'area_departamento') String areaDepartamento,@JsonKey(name: 'reporta_a') String reportaA,@JsonKey(name: 'supervisa_a') String supervisaA,@JsonKey(name: 'fecha_elaboracion') String fechaElaboracion, int? edad,@JsonKey(name: 'edad_otro') String edadOtro,@JsonKey(name: 'disponibilidad_viajar') bool? disponibilidadViajar,@JsonKey(name: 'dias_por_laborar') int? diasPorLaborar,@JsonKey(name: 'dias_por_laborar_otro') String diasPorLaborarOtro, int? horario,@JsonKey(name: 'horario_otro') String horarioOtro, String proposito,@JsonKey(name: 'decisiones_operativas') String decisionesOperativas,@JsonKey(name: 'decisiones_funcionales') String decisionesFuncionales,@JsonKey(name: 'decisiones_estrategicas') String decisionesEstrategicas,@JsonKey(name: 'relaciones_internas') String relacionesInternas,@JsonKey(name: 'relaciones_externas') String relacionesExternas,@JsonKey(name: 'escolaridad_minima') String escolaridadMinima,@JsonKey(name: 'experiencia_requerida') String experienciaRequerida, String idiomas,@JsonKey(name: 'competencias_tecnicas') String competenciasTecnicas, List<int> competencias,@JsonKey(name: 'competencias_otras') String competenciasOtras, List<int> recursos,@JsonKey(name: 'recursos_otro') String recursosOtro, List<TextoNumerado> funciones, List<TextoNumerado> indicadores, List<Conformidad> conformidades
 });
 
 
@@ -3354,7 +3635,7 @@ class __$DescriptivoCopyWithImpl<$Res>
 
 /// Create a copy of Descriptivo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? version = null,Object? congeladoEn = freezed,Object? estaCongelado = null,Object? nombrePuesto = null,Object? empresa = null,Object? areaDepartamento = null,Object? reportaA = null,Object? supervisaA = null,Object? fechaElaboracion = null,Object? edad = freezed,Object? edadOtro = null,Object? disponibilidadViajar = freezed,Object? diasPorLaborar = freezed,Object? diasPorLaborarOtro = null,Object? horario = freezed,Object? horarioOtro = null,Object? proposito = null,Object? decisionesOperativas = null,Object? decisionesFuncionales = null,Object? decisionesEstrategicas = null,Object? relacionesInternas = null,Object? relacionesExternas = null,Object? escolaridadMinima = null,Object? experienciaRequerida = null,Object? idiomas = null,Object? competenciasTecnicas = null,Object? competencias = null,Object? competenciasOtras = null,Object? recursos = null,Object? recursosOtro = null,Object? funciones = null,Object? indicadores = null,Object? conformidades = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? posicion = null,Object? posicionEtiqueta = null,Object? version = null,Object? congeladoEn = freezed,Object? estaCongelado = null,Object? estadoVersion = freezed,Object? nombrePuesto = null,Object? empresa = null,Object? areaDepartamento = null,Object? reportaA = null,Object? supervisaA = null,Object? fechaElaboracion = null,Object? edad = freezed,Object? edadOtro = null,Object? disponibilidadViajar = freezed,Object? diasPorLaborar = freezed,Object? diasPorLaborarOtro = null,Object? horario = freezed,Object? horarioOtro = null,Object? proposito = null,Object? decisionesOperativas = null,Object? decisionesFuncionales = null,Object? decisionesEstrategicas = null,Object? relacionesInternas = null,Object? relacionesExternas = null,Object? escolaridadMinima = null,Object? experienciaRequerida = null,Object? idiomas = null,Object? competenciasTecnicas = null,Object? competencias = null,Object? competenciasOtras = null,Object? recursos = null,Object? recursosOtro = null,Object? funciones = null,Object? indicadores = null,Object? conformidades = null,}) {
   return _then(_Descriptivo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,posicion: null == posicion ? _self.posicion : posicion // ignore: cast_nullable_to_non_nullable
@@ -3362,7 +3643,8 @@ as String,posicionEtiqueta: null == posicionEtiqueta ? _self.posicionEtiqueta : 
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,congeladoEn: freezed == congeladoEn ? _self.congeladoEn : congeladoEn // ignore: cast_nullable_to_non_nullable
 as String?,estaCongelado: null == estaCongelado ? _self.estaCongelado : estaCongelado // ignore: cast_nullable_to_non_nullable
-as bool,nombrePuesto: null == nombrePuesto ? _self.nombrePuesto : nombrePuesto // ignore: cast_nullable_to_non_nullable
+as bool,estadoVersion: freezed == estadoVersion ? _self.estadoVersion : estadoVersion // ignore: cast_nullable_to_non_nullable
+as String?,nombrePuesto: null == nombrePuesto ? _self.nombrePuesto : nombrePuesto // ignore: cast_nullable_to_non_nullable
 as String,empresa: null == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
 as String,areaDepartamento: null == areaDepartamento ? _self.areaDepartamento : areaDepartamento // ignore: cast_nullable_to_non_nullable
 as String,reportaA: null == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable

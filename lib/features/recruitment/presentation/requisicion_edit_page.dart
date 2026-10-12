@@ -9,7 +9,6 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_date_field.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/search_picker_field.dart';
 import '../application/recruitment_controller.dart';
@@ -17,6 +16,7 @@ import '../application/requisicion_exit_guard.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
+import 'discard_changes_dialog.dart';
 import 'posicion_contexto_card.dart';
 import 'recruitment_ui.dart';
 import 'requisiciones_page.dart';
@@ -234,24 +234,10 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
     if (_busy) return false;
     if (!_dirty) return true;
     if (_confirmation != null) return _confirmation!;
-    _confirmation = showAppDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('¿Descartar cambios?'),
-        content: const Text('Hay cambios sin guardar en la requisición.'),
-        actions: [
-          AppButton(
-            label: 'Seguir editando',
-            variant: AppButtonVariant.secondary,
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-          ),
-          AppButton(
-            label: 'Descartar',
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-          ),
-        ],
-      ),
-    ).then((value) => value == true);
+    _confirmation = confirmDiscardChanges(
+      context,
+      message: 'Hay cambios sin guardar en la requisición.',
+    );
     final discard = await _confirmation!;
     _confirmation = null;
     if (discard && mounted) setState(() => _leaving = true);

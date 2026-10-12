@@ -572,6 +572,69 @@ void main() {
       },
     );
 
+    test('lee las etiquetas de versión que deriva el servidor', () async {
+      for (final (estado, etiqueta) in const [
+        ('borrador', 'Borrador'),
+        ('aprobada', 'Aprobada'),
+        ('historica', 'Histórica'),
+      ]) {
+        final repository = RecruitmentRepository(
+          client(
+            (request) => response({
+              'id': 'd1',
+              'posicion': 'pos1',
+              'version': 1,
+              'fecha_elaboracion': '2026-09-24',
+              'esta_congelado': estado != 'borrador',
+              'estado_version': estado,
+            }),
+          ),
+        );
+        expect((await repository.descriptivo('d1')).etiquetaVersion, etiqueta);
+      }
+    });
+
+    test('sin etiqueta del servidor se infiere de si está aprobado', () {
+      expect(
+        descriptivoBorrador.copyWith(estadoVersion: null).etiquetaVersion,
+        'Borrador',
+      );
+      expect(
+        descriptivoCongelado.copyWith(estadoVersion: null).etiquetaVersion,
+        'Aprobada',
+      );
+    });
+
+    test('cambiosPosicion lee lo guardado frente a lo actual', () async {
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.method, 'GET');
+          expect(request.path, 'recruitment/descriptivos/d1/cambios-posicion/');
+          return response({
+            'cambios': [
+              {
+                'campo': 'reporta_a',
+                'etiqueta': 'Reporta a',
+                'guardado': '',
+                'actual': 'Jefe de Línea',
+              },
+            ],
+          });
+        }),
+      );
+      final cambios = await repository.cambiosPosicion('d1');
+      expect(cambios.single.campo, 'reporta_a');
+      expect(cambios.single.guardado, '');
+      expect(cambios.single.actual, 'Jefe de Línea');
+    });
+
+    test('cambiosPosicion sin diferencias devuelve una lista vacía', () async {
+      final repository = RecruitmentRepository(
+        client((request) => response({'cambios': []})),
+      );
+      expect(await repository.cambiosPosicion('d2'), isEmpty);
+    });
+
     test('exportarWord pide bytes y toma el nombre del servidor', () async {
       final repository = RecruitmentRepository(
         client((request) {

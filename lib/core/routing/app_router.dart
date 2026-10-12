@@ -130,6 +130,10 @@ GoRouter createAppRouter({
         ),
         GoRoute(
           path: '/reclutamiento/descriptivos/:id',
+          onExit: (context, state) =>
+              ProviderScope.containerOf(context)
+                  .read(requisicionExitGuardProvider)
+                  .mayLeave(),
           pageBuilder: (context, state) => _page(
             context,
             state,

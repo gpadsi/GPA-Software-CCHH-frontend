@@ -317,6 +317,18 @@ class RecruitmentRepository {
     return Descriptivo.fromJson(response.data!);
   }
 
+  /// Datos vinculados del borrador que difieren de lo que hoy dice la posición
+  /// (vacío si no hay diferencias o si la versión ya está aprobada).
+  Future<List<CambioPosicion>> cambiosPosicion(String id) async {
+    final response = await api.get<Map<String, dynamic>>(
+      'recruitment/descriptivos/$id/cambios-posicion/',
+    );
+    return [
+      for (final item in response.data!['cambios'] as List<dynamic>)
+        CambioPosicion.fromJson(item as Map<String, dynamic>),
+    ];
+  }
+
   /// Aprueba el borrador: desde aquí es inmutable.
   Future<Descriptivo> congelar(String id) async {
     final response = await api.post<Map<String, dynamic>>(
@@ -342,7 +354,7 @@ class RecruitmentRepository {
     mimeType: _docx,
   );
 
-  // --- Conformidades de un descriptivo congelado -----------------------
+  // --- Conformidades de un descriptivo aprobado ------------------------
 
   Future<void> saveConformidad(Conformidad c, {required bool creating}) async {
     final payload = {
