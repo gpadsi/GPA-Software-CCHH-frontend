@@ -186,6 +186,25 @@ class RecruitmentRepository {
     return Requisicion.fromJson(response.data!);
   }
 
+  Future<Requisicion> cambiarEstadoRequisicion(
+    String id,
+    int estadoId, {
+    String? motivo,
+    String? fecha,
+    String? autorizadoPor,
+  }) async {
+    final response = await api.patch<Map<String, dynamic>>(
+      'recruitment/requisiciones/$id/',
+      data: {
+        'estado': estadoId,
+        'motivo_suspension': ?motivo?.trim(),
+        'fecha_suspension': ?fecha,
+        'autorizado_por_suspension': ?autorizadoPor?.trim(),
+      },
+    );
+    return Requisicion.fromJson(response.data!);
+  }
+
   Future<void> deleteRequisicion(String id) =>
       api.delete<void>('recruitment/requisiciones/$id/');
 
@@ -384,6 +403,9 @@ String recruitmentMutationError(Object error) {
       'estado': 'Estado',
       'justificacion': 'Justificación',
       'fecha_solicitud': 'Fecha de solicitud',
+      'motivo_suspension': 'Motivo',
+      'fecha_suspension': 'Fecha de suspensión',
+      'autorizado_por_suspension': 'Autorizado por',
       'nombre_manual': 'Nombre',
       'fecha': 'Fecha',
       'persona': 'Persona',

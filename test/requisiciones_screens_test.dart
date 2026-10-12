@@ -1,7 +1,7 @@
 // Pantallas de Requisiciones (paso 3 del plan del front, 2026-10-05): lista,
 // alta y edición, detalle con aprobaciones y descarga del Excel oficial.
 import 'package:capital_humano_front/core/widgets/app_button.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/features/recruitment/presentation/requisicion_edit_page.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_field.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/recruitment_ui.dart';
@@ -22,18 +22,6 @@ DioException _http(int code, [Object? data]) => DioException(
   ),
   type: DioExceptionType.badResponse,
 );
-
-/// El campo «Estado» del formulario (y no el encabezado de la tabla ni el
-/// filtro de la página, que están detrás del panel y se llaman igual).
-Future<void> openEstadoDelPanel(WidgetTester tester) async {
-  final field = find.descendant(
-    of: find.byType(AppFormPanel),
-    matching: find.text('Estado'),
-  );
-  await tester.ensureVisible(field.first);
-  await tester.tap(field.first);
-  await tester.pumpAndSettle();
-}
 
 void main() {
   group('lista de requisiciones', () {
@@ -218,7 +206,9 @@ void main() {
       expect(find.text('Abrir'), findsNothing);
       expect(
         tester
-            .widget<AppButton>(find.widgetWithText(AppButton, 'Guardar'))
+            .widget<AppButton>(
+              find.widgetWithText(AppButton, 'Guardar borrador'),
+            )
             .onPressed,
         isNull,
       );
@@ -260,11 +250,15 @@ void main() {
       expect(find.text('Pídela a Capital Humano'), findsNothing);
       await tester.tap(find.text('Abrir'));
       await tester.pumpAndSettle();
+      if (find.text('Descartar').evaluate().isNotEmpty) {
+        await tester.tap(find.text('Descartar'));
+        await tester.pumpAndSettle();
+      }
       expect(
         router.routeInformationProvider.value.uri.path,
         '/reclutamiento/requisiciones/r1',
       );
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(RequisicionEditPage), findsNothing);
       expect(repository.savedRequisicion, isNull);
     });
 
@@ -276,7 +270,7 @@ void main() {
     }
 
     testWidgets(
-      'una Nueva Posición exige justificación y arranca en Borrador',
+      'una Nueva Posición guarda borrador sin justificación y conserva edición',
       (tester) async {
         final repository = FakeRecruitmentRepository();
         final router = await pumpRecruitment(
@@ -287,7 +281,7 @@ void main() {
 
         await tester.tap(find.text('Nueva requisición').first);
         await tester.pumpAndSettle();
-        expect(find.byType(AppFormPanel), findsOneWidget);
+        expect(find.byType(RequisicionEditPage), findsOneWidget);
 
         await pickPosicion(tester);
         expect(repository.searches, ['ingen']);
@@ -297,34 +291,18 @@ void main() {
           option: 'Nueva Posición',
         );
 
-        // Sin justificación no guarda, y lo dice el propio formulario.
         await saveForm(tester);
-        expect(
-          find.text('Este tipo de requisición exige justificación.'),
-          findsOneWidget,
-        );
-        expect(repository.savedRequisicion, isNull);
-
-        await tester.enterText(
-          find.widgetWithText(
-            TextFormField,
-            'Justificación de la requisición (obligatoria para este tipo)',
-          ),
-          'Se abre una línea nueva',
-        );
-        await saveForm(tester);
-
         final saved = repository.savedRequisicion!;
         expect(repository.requisicionCreated, isTrue);
         expect(saved.posicion, 'pos2');
         expect(saved.tipo, tipoNueva.id);
         expect(saved.estado, estadoBorrador.id);
-        expect(saved.justificacion, 'Se abre una línea nueva');
+        expect(saved.justificacion, '');
         expect(saved.fechaSolicitud, toIsoDate(DateTime.now()));
         // Se abre el detalle de lo recién creado.
         expect(
           router.routeInformationProvider.value.uri.path,
-          '/reclutamiento/requisiciones/nueva',
+          '/reclutamiento/requisiciones/r-nueva/editar',
         );
       },
     );
@@ -363,55 +341,34 @@ void main() {
       expect(repository.savedRequisicion, isNull);
     });
 
-    testWidgets('quien solicita solo puede elegir Borrador o Pendiente', (
-      tester,
-    ) async {
-      final repository = FakeRecruitmentRepository();
-      await pumpRecruitment(
-        tester,
-        path: '/reclutamiento',
-        repository: repository,
-        user: testColaborador,
-      );
-      await tester.tap(find.text('Nueva requisición').first);
-      await tester.pumpAndSettle();
-      await openEstadoDelPanel(tester);
-      // Solo las opciones del menú (la tabla de atrás también dice «Autorizada»).
-      Finder option(String name) =>
-          find.widgetWithText(DropdownMenuItem<int>, name);
-      expect(option('Pendiente de Autorización'), findsWidgets);
-      expect(option('Borrador'), findsWidgets);
-      expect(option('Autorizada'), findsNothing);
-      expect(option('Cubierta'), findsNothing);
-      expect(find.textContaining('Capital Humano la autoriza'), findsOneWidget);
-    });
-
     testWidgets(
-      'Capital Humano ve todos los estados y la suspensión al editar',
+      'solicitante tiene acciones de borrador sin selector de estado',
       (tester) async {
-        final repository = FakeRecruitmentRepository();
         await pumpRecruitment(
           tester,
-          path: '/reclutamiento',
-          repository: repository,
+          path: '/reclutamiento/requisiciones/nueva',
+          repository: FakeRecruitmentRepository(),
+          user: testColaborador,
         );
-        await tapTooltip(
-          tester,
-          'Editar requisición de ${posicionUno.etiqueta}',
-        );
-        expect(find.text('Editar requisición'), findsOneWidget);
-        expect(find.text('Suspensión (solo si aplica)'), findsOneWidget);
-        await openEstadoDelPanel(tester);
-        expect(
-          find.widgetWithText(DropdownMenuItem<int>, 'Autorizada'),
-          findsWidgets,
-        );
-        expect(
-          find.widgetWithText(DropdownMenuItem<int>, 'Cubierta'),
-          findsWidgets,
-        );
+        expect(find.text('Guardar borrador'), findsOneWidget);
+        expect(find.text('Enviar a autorización'), findsOneWidget);
+        expect(find.text('Estado'), findsNothing);
       },
     );
+    testWidgets('gestor conserva estado sin capturar suspensión', (
+      tester,
+    ) async {
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/requisiciones/r1/editar',
+        repository: FakeRecruitmentRepository(),
+      );
+      expect(find.text('Guardar cambios'), findsOneWidget);
+      expect(find.text('Guardar borrador'), findsNothing);
+      expect(find.text('Enviar a autorización'), findsNothing);
+      expect(find.text('Estado'), findsNothing);
+      expect(find.text('Suspensión (solo si aplica)'), findsNothing);
+    });
 
     testWidgets(
       'editar parte de lo capturado, no deja cambiar la posición y guarda',
@@ -431,6 +388,9 @@ void main() {
         expect(find.byType(SearchPickerField<AreaSolicitante>), findsOneWidget);
         expect(find.widgetWithText(TextFormField, 'Soldadura'), findsOneWidget);
 
+        await tester.ensureVisible(
+          find.widgetWithText(TextFormField, 'Soldadura'),
+        );
         await tester.enterText(
           find.widgetWithText(TextFormField, 'Soldadura'),
           'Maquinados',
@@ -459,6 +419,9 @@ void main() {
         repository: repository,
       );
       await tapTooltip(tester, 'Editar requisición de ${posicionUno.etiqueta}');
+      await tester.ensureVisible(
+        find.widgetWithText(TextFormField, '12500.00'),
+      );
       await tester.enterText(
         find.widgetWithText(TextFormField, '12500.00'),
         '12.345',
@@ -489,12 +452,10 @@ void main() {
         });
         await saveForm(tester);
         expect(
-          find.text(
-            'Posición: Esta Posición ya tiene una Requisición abierta.',
-          ),
+          find.text('Esta Posición ya tiene una Requisición abierta.'),
           findsOneWidget,
         );
-        expect(find.byType(AppFormPanel), findsOneWidget);
+        expect(find.byType(RequisicionEditPage), findsOneWidget);
       },
     );
   });

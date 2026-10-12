@@ -89,3 +89,36 @@ Future<ApiPage<Descriptivo>> descriptivosPage(
 @Riverpod(retry: manualRetryOnly)
 Future<Descriptivo> descriptivoDetail(Ref ref, String id) =>
     ref.watch(recruitmentRepositoryProvider).descriptivo(id);
+
+final requisicionesListStateProvider =
+    NotifierProvider<RequisicionesListController, RequisicionesListState>(
+      RequisicionesListController.new,
+    );
+
+class RequisicionesListState {
+  const RequisicionesListState({
+    this.page = 0,
+    this.query = const TableQuery(),
+    this.offset = 0,
+  });
+  final int page;
+  final TableQuery query;
+  final double offset;
+}
+
+class RequisicionesListController extends Notifier<RequisicionesListState> {
+  @override
+  RequisicionesListState build() {
+    ref.watch(sessionControllerProvider.select((s) => s.user?.id));
+    return const RequisicionesListState();
+  }
+
+  void apply(TableQuery query) => state = RequisicionesListState(query: query);
+  void page(int value) =>
+      state = RequisicionesListState(page: value, query: state.query);
+  void scroll(double value) => state = RequisicionesListState(
+    page: state.page,
+    query: state.query,
+    offset: value,
+  );
+}

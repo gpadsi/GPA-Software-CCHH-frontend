@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
@@ -13,12 +15,13 @@ import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
+import '../application/requisicion_transiciones.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'aprobacion_form.dart';
 import 'recruitment_ui.dart';
-import 'requisicion_form.dart';
+import 'requisicion_suspension_dialog.dart';
 import 'requisiciones_page.dart';
 
 class RequisicionDetailPage extends ConsumerStatefulWidget {
@@ -32,6 +35,15 @@ class RequisicionDetailPage extends ConsumerStatefulWidget {
 
 class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
   bool _exporting = false;
+  String? _working;
+  bool _submitting = false;
+  final _suspenderFocus = FocusNode(debugLabel: 'Suspender');
+
+  @override
+  void dispose() {
+    _suspenderFocus.dispose();
+    super.dispose();
+  }
 
   void _refresh() {
     ref.invalidate(requisicionDetailProvider(widget.requisicionId));
@@ -43,14 +55,116 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
 
-  Future<void> _edit(Requisicion requisicion) async {
-    final saved = await showAppPanel<Requisicion>(
-      context: context,
-      builder: (_) => RequisicionForm(requisicion: requisicion),
-    );
-    if (saved != null && mounted) {
-      _refresh();
-      _say('Requisición guardada.');
+  void _edit(Requisicion requisicion) =>
+      context.go('/reclutamiento/requisiciones/${requisicion.id}/editar');
+
+  Future<void> _transition(
+    TransicionRequisicion action,
+    RecruitmentCatalogEntry destino,
+  ) async {
+    if (_working != null) return;
+    setState(() => _working = action.destino);
+    Future<void> patch({
+      String? motivo,
+      String? fecha,
+      String? autorizadoPor,
+    }) async {
+      setState(() => _submitting = true);
+      try {
+        await ref
+            .read(recruitmentRepositoryProvider)
+            .cambiarEstadoRequisicion(
+              widget.requisicionId,
+              destino.id,
+              motivo: motivo,
+              fecha: fecha,
+              autorizadoPor: autorizadoPor,
+            );
+      } finally {
+        if (mounted) setState(() => _submitting = false);
+      }
+      if (mounted) {
+        _refresh();
+        _say('Estado actualizado: ${destino.name}.');
+      }
+    }
+
+    try {
+      if (action.captura) {
+        await showAppDialog<bool>(
+          context: context,
+          builder: (_) => RequisicionSuspensionDialog(
+            onSuspend: (motivo, fecha, autorizadoPor) => patch(
+              motivo: motivo,
+              fecha: fecha,
+              autorizadoPor: autorizadoPor,
+            ),
+          ),
+        );
+      } else if (action.confirmacion) {
+        await showConfirmDialog(
+          context,
+          title: '${action.etiqueta} requisición',
+          message:
+              '¿Cambiar el estado de esta requisición a «${destino.name}»?',
+          confirmLabel: action.etiqueta,
+          destructive:
+              action.destino == 'cancelada' || action.destino == 'rechazada',
+          errorMessage: recruitmentMutationError,
+          onConfirm: () => patch(),
+        );
+      } else {
+        await patch();
+      }
+    } on Object catch (error) {
+      if (!mounted) return;
+      final data = error is DioException ? error.response?.data : null;
+      final fieldErrors =
+          error is DioException &&
+          error.response?.statusCode == 400 &&
+          data is Map &&
+          data.keys.any((key) => key != 'detail' && key != 'non_field_errors');
+      if (action.destino == 'pendiente-de-autorizacion' && fieldErrors) {
+        final complete = await showAppDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Completa la requisición'),
+            content: Text(recruitmentMutationError(error)),
+            actions: [
+              AppButton(
+                label: 'Cerrar',
+                variant: AppButtonVariant.secondary,
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+              ),
+              AppButton(
+                label: 'Completar',
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+              ),
+            ],
+          ),
+        );
+        if (complete == true && mounted) {
+          context.go(
+            '/reclutamiento/requisiciones/${widget.requisicionId}/editar',
+          );
+        }
+      } else {
+        _say(recruitmentMutationError(error));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _working = null);
+        if (action.captura) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _suspenderFocus.context != null) {
+              final button = _suspenderFocus.descendants
+                  .where((n) => n.canRequestFocus)
+                  .firstOrNull;
+              (button ?? _suspenderFocus).requestFocus();
+            }
+          });
+        }
+      }
     }
   }
 
@@ -136,7 +250,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
           AppButton(
             label: 'Editar',
             icon: Icons.edit_outlined,
-            onPressed: () => _edit(loaded),
+            onPressed: _working == null ? () => _edit(loaded) : null,
           ),
         if (loaded != null)
           AppButton(
@@ -150,7 +264,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
           label: 'Actualizar',
           icon: Icons.refresh,
           variant: AppButtonVariant.secondary,
-          onPressed: _refresh,
+          onPressed: _working == null ? _refresh : null,
         ),
       ],
       child: switch ((requisicion, catalogs)) {
@@ -175,6 +289,12 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
   }) {
     final estado = entryIn(c.estados, r.estado);
     final tipo = entryIn(c.tipos, r.tipo);
+    final transiciones = transicionesDisponibles(
+      r,
+      c.estados,
+      puedeGestionar: canManage,
+      esDueno: me != null && r.creadoPor == me,
+    );
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(
@@ -182,6 +302,39 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (transiciones.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                child: Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    for (final action in transiciones)
+                      Focus(
+                        focusNode: action.captura ? _suspenderFocus : null,
+                        child: AppButton(
+                          label: action.etiqueta,
+                          variant:
+                              action.destino == 'cancelada' ||
+                                  action.destino == 'rechazada'
+                              ? AppButtonVariant.danger
+                              : action == transiciones.first
+                              ? AppButtonVariant.primary
+                              : AppButtonVariant.secondary,
+                          isLoading: _working == action.destino && _submitting,
+                          onPressed: _working == null
+                              ? () => _transition(
+                                  action,
+                                  c.estados.firstWhere(
+                                    (e) => e.code == action.destino,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             _Card(
               title: 'Solicitud',
               children: [

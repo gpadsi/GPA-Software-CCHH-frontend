@@ -73,6 +73,11 @@ Future<void> pumpDebounce(WidgetTester tester) async {
 }
 
 Future<void> saveForm(WidgetTester tester, {String label = 'Guardar'}) async {
+  if (label == 'Guardar' && find.text(label).evaluate().isEmpty) {
+    label = find.text('Guardar borrador').evaluate().isNotEmpty
+        ? 'Guardar borrador'
+        : 'Guardar cambios';
+  }
   await tester.ensureVisible(find.text(label));
   await tester.tap(find.text(label));
   await tester.pumpAndSettle();

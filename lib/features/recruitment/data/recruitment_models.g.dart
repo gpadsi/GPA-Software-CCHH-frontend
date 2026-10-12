@@ -115,6 +115,11 @@ _PosicionContexto _$PosicionContextoFromJson(Map<String, dynamic> json) =>
             ),
       empresa: json['empresa'] as String?,
       reportaA: json['reporta_a'] as String?,
+      areaSolicitanteSugerida: json['area_solicitante_sugerida'] == null
+          ? null
+          : AreaSolicitante.fromJson(
+              json['area_solicitante_sugerida'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$PosicionContextoToJson(_PosicionContexto instance) =>
@@ -130,6 +135,7 @@ Map<String, dynamic> _$PosicionContextoToJson(_PosicionContexto instance) =>
       'tramite_abierto': instance.tramiteAbierto,
       'empresa': instance.empresa,
       'reporta_a': instance.reportaA,
+      'area_solicitante_sugerida': instance.areaSolicitanteSugerida,
     };
 
 _Aprobacion _$AprobacionFromJson(Map<String, dynamic> json) => _Aprobacion(

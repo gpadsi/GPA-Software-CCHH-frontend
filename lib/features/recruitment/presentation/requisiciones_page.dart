@@ -12,7 +12,6 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/app_fade_switcher.dart';
 import '../../../core/widgets/app_filter_field.dart';
-import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -23,7 +22,6 @@ import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_ui.dart';
 import 'recruitment_creation.dart';
-import 'requisicion_form.dart';
 
 /// Quién puede editar una requisición: Capital Humano y Admin las de todos, y
 /// cualquier otra cuenta la que ella misma levantó (la API aplica la misma
@@ -39,32 +37,40 @@ class RequisicionesPage extends ConsumerStatefulWidget {
 }
 
 class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
-  int _page = 0;
-  TableQuery _query = const TableQuery();
+  int get _page => ref.read(requisicionesListStateProvider).page;
+  TableQuery get _query => ref.read(requisicionesListStateProvider).query;
+  late final ScrollController _scroll;
+  late final RequisicionesListController _list;
+  late final double _savedOffset;
+  bool _restored = false;
+  @override
+  void initState() {
+    super.initState();
+    _list = ref.read(requisicionesListStateProvider.notifier);
+    _savedOffset = ref.read(requisicionesListStateProvider).offset;
+    _scroll = ScrollController();
+    _scroll.addListener(() {
+      if (_restored) _list.scroll(_scroll.offset);
+    });
+  }
 
-  // Buscar, ordenar o filtrar vuelve a la primera página: la página 3 de otra
-  // consulta puede no existir.
-  void _apply(TableQuery query) => setState(() {
-    _query = query;
-    _page = 0;
-  });
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _apply(TableQuery query) {
+    _list.apply(query);
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+  }
 
   void _refresh() => ref.invalidate(requisicionesPageProvider);
 
   Future<void> _create() => abrirNuevaRequisicion(context, ref);
 
-  Future<void> _edit(Requisicion requisicion) async {
-    final saved = await showAppPanel<Requisicion>(
-      context: context,
-      builder: (_) => RequisicionForm(requisicion: requisicion),
-    );
-    if (saved != null && mounted) {
-      _refresh();
-      ref.invalidate(requisicionDetailProvider);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Requisición guardada.')));
-    }
-  }
+  void _edit(Requisicion requisicion) =>
+      context.go('/reclutamiento/requisiciones/${requisicion.id}/editar');
 
   Future<void> _delete(Requisicion requisicion, int pageLength) async {
     final deleted = await showConfirmDialog(
@@ -78,7 +84,7 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
       errorMessage: recruitmentMutationError,
     );
     if (deleted && mounted) {
-      if (pageLength == 1 && _page > 0) setState(() => _page--);
+      if (pageLength == 1 && _page > 0) _list.page(_page - 1);
       _refresh();
       ScaffoldMessenger.of(
         context,
@@ -88,96 +94,117 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Solo página y filtros reconstruyen la lista; el desplazamiento se guarda
+    // en cada movimiento del scroll y no debe volver a dibujarla cada vez.
+    ref.watch(
+      requisicionesListStateProvider.select(
+        (state) => (state.page, state.query),
+      ),
+    );
     final catalogs = ref.watch(requisicionCatalogsProvider);
     final page = ref.watch(requisicionesPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
-      title: 'Reclutamiento',
-      description: 'Las requisiciones para cubrir una posición, ya sea por reemplazo o por una posición nueva.',
-      tabs: const FeatureTabs(
-        current: '/reclutamiento',
-        destinations: recruitmentTabs,
-      ),
-      actions: [
-        AppButton(
-          label: 'Nueva requisición',
-          icon: Icons.add,
-          onPressed: _create,
+    if (!_restored && page.hasValue && catalogs.hasValue) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_scroll.hasClients) return;
+        _scroll.jumpTo(_savedOffset.clamp(0, _scroll.position.maxScrollExtent));
+        _restored = true;
+      });
+    }
+    return PrimaryScrollController(
+      controller: _scroll,
+      automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
+      child: FeaturePage(
+        title: 'Reclutamiento',
+        description: 'Las requisiciones para cubrir una posición, ya sea por reemplazo o por una posición nueva.',
+        tabs: const FeatureTabs(
+          current: '/reclutamiento',
+          destinations: recruitmentTabs,
         ),
-        AppButton(
-          label: 'Actualizar',
-          icon: Icons.refresh,
-          variant: AppButtonVariant.secondary,
-          onPressed: () {
-            ref.invalidate(requisicionCatalogsProvider);
-            _refresh();
-          },
-        ),
-      ],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.md,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              SizedBox(
-                width: 440,
-                child: AppTableToolbar(
-                  hint: 'Buscar por puesto, unidad, área, tipo o estado',
-                  value: _query.search,
-                  onSearch: (value) => _apply(_query.copyWith(search: value)),
-                ),
-              ),
-              ...?catalogs.value == null
-                  ? null
-                  : [
-                      AppFilterField<int>(
-                        label: 'Estado',
-                        value: int.tryParse(_query.filters['estado'] ?? ''),
-                        options: [
-                          for (final item in catalogs.value!.estados)
-                            (value: item.id, label: item.name),
-                        ],
-                        onChanged: (value) => _apply(
-                          _query.withFilter('estado', value?.toString() ?? ''),
-                        ),
-                      ),
-                      AppFilterField<int>(
-                        label: 'Tipo',
-                        value: int.tryParse(_query.filters['tipo'] ?? ''),
-                        options: [
-                          for (final item in catalogs.value!.tipos)
-                            (value: item.id, label: item.name),
-                        ],
-                        onChanged: (value) => _apply(
-                          _query.withFilter('tipo', value?.toString() ?? ''),
-                        ),
-                      ),
-                    ],
-            ],
+        actions: [
+          AppButton(
+            label: 'Nueva requisición',
+            icon: Icons.add,
+            onPressed: _create,
           ),
-          const SizedBox(height: AppSpacing.md),
-          AppFadeSwitcher(
-            child: switch ((catalogs, page)) {
-              (AsyncError(:final error), _) ||
-              (_, AsyncError(:final error)) => FeatureError(
-                error: error,
-                onRetry: () {
-                  ref.invalidate(requisicionCatalogsProvider);
-                  _refresh();
-                },
-              ),
-              (
-                AsyncData(value: final catalogs),
-                AsyncData(value: final page),
-              ) =>
-                _table(catalogs, page, canManage),
-              _ => const FeatureLoading(),
+          AppButton(
+            label: 'Actualizar',
+            icon: Icons.refresh,
+            variant: AppButtonVariant.secondary,
+            onPressed: () {
+              ref.invalidate(requisicionCatalogsProvider);
+              _refresh();
             },
           ),
         ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Wrap(
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.md,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                SizedBox(
+                  width: 440,
+                  child: AppTableToolbar(
+                    hint: 'Buscar por puesto, unidad, área, tipo o estado',
+                    value: _query.search,
+                    onSearch: (value) => _apply(_query.copyWith(search: value)),
+                  ),
+                ),
+                ...?catalogs.value == null
+                    ? null
+                    : [
+                        AppFilterField<int>(
+                          label: 'Estado',
+                          value: int.tryParse(_query.filters['estado'] ?? ''),
+                          options: [
+                            for (final item in catalogs.value!.estados)
+                              (value: item.id, label: item.name),
+                          ],
+                          onChanged: (value) => _apply(
+                            _query.withFilter(
+                              'estado',
+                              value?.toString() ?? '',
+                            ),
+                          ),
+                        ),
+                        AppFilterField<int>(
+                          label: 'Tipo',
+                          value: int.tryParse(_query.filters['tipo'] ?? ''),
+                          options: [
+                            for (final item in catalogs.value!.tipos)
+                              (value: item.id, label: item.name),
+                          ],
+                          onChanged: (value) => _apply(
+                            _query.withFilter('tipo', value?.toString() ?? ''),
+                          ),
+                        ),
+                      ],
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppFadeSwitcher(
+              child: switch ((catalogs, page)) {
+                (AsyncError(:final error), _) ||
+                (_, AsyncError(:final error)) => FeatureError(
+                  error: error,
+                  onRetry: () {
+                    ref.invalidate(requisicionCatalogsProvider);
+                    _refresh();
+                  },
+                ),
+                (
+                  AsyncData(value: final catalogs),
+                  AsyncData(value: final page),
+                ) =>
+                  _table(catalogs, page, canManage),
+                _ => const FeatureLoading(),
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -262,7 +289,10 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
       totalCount: page.count,
       pageIndex: _page,
       pageSize: 25,
-      onPageChanged: (value) => setState(() => _page = value),
+      onPageChanged: (value) {
+        _list.page(value);
+        if (_scroll.hasClients) _scroll.jumpTo(0);
+      },
     );
   }
 }

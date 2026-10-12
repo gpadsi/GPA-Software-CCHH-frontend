@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dashboard/presentation/dashboard_page.dart';
@@ -16,6 +17,9 @@ import '../../features/placeholders/presentation/module_placeholder_page.dart';
 import '../../features/recruitment/presentation/descriptivo_page.dart';
 import '../../features/recruitment/presentation/descriptivos_page.dart';
 import '../../features/recruitment/presentation/requisicion_detail_page.dart';
+import '../../features/recruitment/application/requisicion_exit_guard.dart';
+import '../../features/recruitment/data/recruitment_models.dart';
+import '../../features/recruitment/presentation/requisicion_edit_page.dart';
 import '../../features/recruitment/presentation/requisiciones_page.dart';
 import '../../features/positions/presentation/positions_page.dart';
 import '../../features/positions/presentation/puestos_page.dart';
@@ -130,6 +134,37 @@ GoRouter createAppRouter({
             context,
             state,
             DescriptivoPage(descriptivoId: state.pathParameters['id']!),
+          ),
+        ),
+        GoRoute(
+          path: '/reclutamiento/requisiciones/nueva',
+          onExit: (context, state) =>
+              ProviderScope.containerOf(context)
+                  .read(requisicionExitGuardProvider)
+                  .mayLeave(),
+          pageBuilder: (context, state) => _page(
+            context,
+            state,
+            RequisicionEditPage(
+              posicionId: state.uri.queryParameters['posicion'],
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/reclutamiento/requisiciones/:id/editar',
+          onExit: (context, state) =>
+              ProviderScope.containerOf(context)
+                  .read(requisicionExitGuardProvider)
+                  .mayLeave(),
+          pageBuilder: (context, state) => _page(
+            context,
+            state,
+            RequisicionEditPage(
+              requisicionId: state.pathParameters['id']!,
+              initialRequisicion: state.extra is Requisicion
+                  ? state.extra as Requisicion
+                  : null,
+            ),
           ),
         ),
         GoRoute(

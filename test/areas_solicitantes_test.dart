@@ -437,8 +437,12 @@ void main() {
       );
       expect(find.textContaining('Agregar «'), findsNothing);
       expect(repository.createdAreaName, isNull);
-      await tester.tap(find.text('Cancelar').last);
+      await tester.tap(find.text('Volver'));
       await tester.pumpAndSettle();
+      if (find.text('Descartar').evaluate().isNotEmpty) {
+        await tester.tap(find.text('Descartar'));
+        await tester.pumpAndSettle();
+      }
       await tester.tap(find.text('Nueva requisición').first);
       await tester.pumpAndSettle();
       final posicion = find.descendant(
@@ -496,11 +500,15 @@ void main() {
         );
         await saveForm(tester);
         expect(repository.savedRequisicion!.areaSolicitante, areaSoldadura.id);
+        await tester.tap(find.text('Volver'));
+        await tester.pumpAndSettle();
         await tapTooltip(
           tester,
           'Editar requisición de ${posicionUno.etiqueta}',
         );
         await _escribir(tester, _areaField(), 'Texto sin seleccionar');
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
         await saveForm(tester);
         expect(repository.savedRequisicion!.areaSolicitante, isNull);
       },

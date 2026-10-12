@@ -128,6 +128,57 @@ void main() {
   });
 
   group('RecruitmentRepository: requisiciones', () {
+    test('cambiar estado solo manda estado y devuelve lo respondido', () async {
+      final updated = requisicionPropia.copyWith(estado: estadoAutorizada.id);
+      final repository = RecruitmentRepository(
+        client((request) {
+          expect(request.method, 'PATCH');
+          expect(request.path, 'recruitment/requisiciones/r1/');
+          expect(request.data, {'estado': estadoAutorizada.id});
+          return response(updated.toJson());
+        }),
+      );
+      expect(
+        await repository.cambiarEstadoRequisicion('r1', estadoAutorizada.id),
+        updated,
+      );
+    });
+
+    test(
+      'suspender manda solo estado y los tres datos de suspensión',
+      () async {
+        final updated = requisicionPropia.copyWith(
+          estado: 5,
+          motivoSuspension: 'Falta material',
+          fechaSuspension: '2026-10-08',
+          autorizadoPorSuspension: '',
+        );
+        final repository = RecruitmentRepository(
+          client((request) {
+            expect(request.method, 'PATCH');
+            expect(request.path, 'recruitment/requisiciones/r1/');
+            expect(request.data, {
+              'estado': 5,
+              'motivo_suspension': 'Falta material',
+              'fecha_suspension': '2026-10-08',
+              'autorizado_por_suspension': '',
+            });
+            return response(updated.toJson());
+          }),
+        );
+        expect(
+          await repository.cambiarEstadoRequisicion(
+            'r1',
+            5,
+            motivo: ' Falta material ',
+            fecha: '2026-10-08',
+            autorizadoPor: ' ',
+          ),
+          updated,
+        );
+      },
+    );
+
     test('lista con búsqueda, orden y filtros del servidor', () async {
       final repository = RecruitmentRepository(
         client((request) {

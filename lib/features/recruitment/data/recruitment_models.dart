@@ -94,6 +94,8 @@ abstract class PosicionContexto with _$PosicionContexto {
     @JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto,
     String? empresa,
     @JsonKey(name: 'reporta_a') String? reportaA,
+    @JsonKey(name: 'area_solicitante_sugerida')
+    AreaSolicitante? areaSolicitanteSugerida,
   }) = _PosicionContexto;
   factory PosicionContexto.fromJson(Map<String, dynamic> json) =>
       _$PosicionContextoFromJson(json);

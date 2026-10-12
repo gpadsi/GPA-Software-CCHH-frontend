@@ -439,7 +439,7 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
         .firstOrNull
         ?.name;
     final result = r.copyWith(
-      id: creating ? 'nueva' : r.id,
+      id: creating ? 'r-nueva' : r.id,
       posicionEtiqueta:
           requisicionesData
               .where((item) => item.id == r.id)

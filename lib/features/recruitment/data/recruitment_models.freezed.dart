@@ -1450,7 +1450,7 @@ $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
 /// @nodoc
 mixin _$PosicionContexto {
 
- String get id; String get etiqueta; String? get puesto; String get unidad; String? get area; String get estatus;@JsonKey(name: 'estatus_code') String get estatusCode; bool get ocupada;@JsonKey(name: 'tramite_abierto') TramiteAbierto? get tramiteAbierto; String? get empresa;@JsonKey(name: 'reporta_a') String? get reportaA;
+ String get id; String get etiqueta; String? get puesto; String get unidad; String? get area; String get estatus;@JsonKey(name: 'estatus_code') String get estatusCode; bool get ocupada;@JsonKey(name: 'tramite_abierto') TramiteAbierto? get tramiteAbierto; String? get empresa;@JsonKey(name: 'reporta_a') String? get reportaA;@JsonKey(name: 'area_solicitante_sugerida') AreaSolicitante? get areaSolicitanteSugerida;
 /// Create a copy of PosicionContexto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1464,20 +1464,20 @@ $PosicionContextoCopyWith<PosicionContexto> get copyWith => _$PosicionContextoCo
 @override
 bool operator ==(Object other) {
   final _this = this as PosicionContexto;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PosicionContexto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.etiqueta, _this.etiqueta) || other.etiqueta == _this.etiqueta)&&(identical(other.puesto, _this.puesto) || other.puesto == _this.puesto)&&(identical(other.unidad, _this.unidad) || other.unidad == _this.unidad)&&(identical(other.area, _this.area) || other.area == _this.area)&&(identical(other.estatus, _this.estatus) || other.estatus == _this.estatus)&&(identical(other.estatusCode, _this.estatusCode) || other.estatusCode == _this.estatusCode)&&(identical(other.ocupada, _this.ocupada) || other.ocupada == _this.ocupada)&&(identical(other.tramiteAbierto, _this.tramiteAbierto) || other.tramiteAbierto == _this.tramiteAbierto)&&(identical(other.empresa, _this.empresa) || other.empresa == _this.empresa)&&(identical(other.reportaA, _this.reportaA) || other.reportaA == _this.reportaA));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PosicionContexto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.etiqueta, _this.etiqueta) || other.etiqueta == _this.etiqueta)&&(identical(other.puesto, _this.puesto) || other.puesto == _this.puesto)&&(identical(other.unidad, _this.unidad) || other.unidad == _this.unidad)&&(identical(other.area, _this.area) || other.area == _this.area)&&(identical(other.estatus, _this.estatus) || other.estatus == _this.estatus)&&(identical(other.estatusCode, _this.estatusCode) || other.estatusCode == _this.estatusCode)&&(identical(other.ocupada, _this.ocupada) || other.ocupada == _this.ocupada)&&(identical(other.tramiteAbierto, _this.tramiteAbierto) || other.tramiteAbierto == _this.tramiteAbierto)&&(identical(other.empresa, _this.empresa) || other.empresa == _this.empresa)&&(identical(other.reportaA, _this.reportaA) || other.reportaA == _this.reportaA)&&(identical(other.areaSolicitanteSugerida, _this.areaSolicitanteSugerida) || other.areaSolicitanteSugerida == _this.areaSolicitanteSugerida));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PosicionContexto;
-  return Object.hash(runtimeType,_this.id,_this.etiqueta,_this.puesto,_this.unidad,_this.area,_this.estatus,_this.estatusCode,_this.ocupada,_this.tramiteAbierto,_this.empresa,_this.reportaA);
+  return Object.hash(runtimeType,_this.id,_this.etiqueta,_this.puesto,_this.unidad,_this.area,_this.estatus,_this.estatusCode,_this.ocupada,_this.tramiteAbierto,_this.empresa,_this.reportaA,_this.areaSolicitanteSugerida);
 }
 
 @override
 String toString() {
   final _this = this as PosicionContexto;
-  return 'PosicionContexto(id: ${_this.id}, etiqueta: ${_this.etiqueta}, puesto: ${_this.puesto}, unidad: ${_this.unidad}, area: ${_this.area}, estatus: ${_this.estatus}, estatusCode: ${_this.estatusCode}, ocupada: ${_this.ocupada}, tramiteAbierto: ${_this.tramiteAbierto}, empresa: ${_this.empresa}, reportaA: ${_this.reportaA})';
+  return 'PosicionContexto(id: ${_this.id}, etiqueta: ${_this.etiqueta}, puesto: ${_this.puesto}, unidad: ${_this.unidad}, area: ${_this.area}, estatus: ${_this.estatus}, estatusCode: ${_this.estatusCode}, ocupada: ${_this.ocupada}, tramiteAbierto: ${_this.tramiteAbierto}, empresa: ${_this.empresa}, reportaA: ${_this.reportaA}, areaSolicitanteSugerida: ${_this.areaSolicitanteSugerida})';
 }
 
 
@@ -1488,11 +1488,11 @@ abstract mixin class $PosicionContextoCopyWith<$Res>  {
   factory $PosicionContextoCopyWith(PosicionContexto value, $Res Function(PosicionContexto) _then) = _$PosicionContextoCopyWithImpl;
 @useResult
 $Res call({
- String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA,@JsonKey(name: 'area_solicitante_sugerida') AreaSolicitante? areaSolicitanteSugerida
 });
 
 
-$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+$TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;$AreaSolicitanteCopyWith<$Res>? get areaSolicitanteSugerida;
 
 }
 /// @nodoc
@@ -1505,7 +1505,7 @@ class _$PosicionContextoCopyWithImpl<$Res>
 
 /// Create a copy of PosicionContexto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,Object? areaSolicitanteSugerida = freezed,}) {
   return _then(PosicionContexto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
@@ -1518,7 +1518,8 @@ as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nul
 as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
 as TramiteAbierto?,empresa: freezed == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
 as String?,reportaA: freezed == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,areaSolicitanteSugerida: freezed == areaSolicitanteSugerida ? _self.areaSolicitanteSugerida : areaSolicitanteSugerida // ignore: cast_nullable_to_non_nullable
+as AreaSolicitante?,
   ));
 }
 /// Create a copy of PosicionContexto
@@ -1532,6 +1533,18 @@ $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
 
   return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
     return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AreaSolicitanteCopyWith<$Res>? get areaSolicitanteSugerida {
+    if (_self.areaSolicitanteSugerida == null) {
+    return null;
+  }
+
+  return $AreaSolicitanteCopyWith<$Res>(_self.areaSolicitanteSugerida!, (value) {
+    return _then(_self.copyWith(areaSolicitanteSugerida: value));
   });
 }
 }
@@ -1615,10 +1628,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA, @JsonKey(name: 'area_solicitante_sugerida')  AreaSolicitante? areaSolicitanteSugerida)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PosicionContexto() when $default != null:
-return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA,_that.areaSolicitanteSugerida);case _:
   return orElse();
 
 }
@@ -1636,10 +1649,10 @@ return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA, @JsonKey(name: 'area_solicitante_sugerida')  AreaSolicitante? areaSolicitanteSugerida)  $default,) {final _that = this;
 switch (_that) {
 case _PosicionContexto():
-return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA,_that.areaSolicitanteSugerida);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1656,10 +1669,10 @@ return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String etiqueta,  String? puesto,  String unidad,  String? area,  String estatus, @JsonKey(name: 'estatus_code')  String estatusCode,  bool ocupada, @JsonKey(name: 'tramite_abierto')  TramiteAbierto? tramiteAbierto,  String? empresa, @JsonKey(name: 'reporta_a')  String? reportaA, @JsonKey(name: 'area_solicitante_sugerida')  AreaSolicitante? areaSolicitanteSugerida)?  $default,) {final _that = this;
 switch (_that) {
 case _PosicionContexto() when $default != null:
-return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA);case _:
+return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_that.estatus,_that.estatusCode,_that.ocupada,_that.tramiteAbierto,_that.empresa,_that.reportaA,_that.areaSolicitanteSugerida);case _:
   return null;
 
 }
@@ -1671,7 +1684,7 @@ return $default(_that.id,_that.etiqueta,_that.puesto,_that.unidad,_that.area,_th
 @JsonSerializable()
 
 class _PosicionContexto extends PosicionContexto {
-  const _PosicionContexto({required this.id, required this.etiqueta, this.puesto, required this.unidad, this.area, required this.estatus, @JsonKey(name: 'estatus_code') required this.estatusCode, required this.ocupada, @JsonKey(name: 'tramite_abierto') this.tramiteAbierto, this.empresa, @JsonKey(name: 'reporta_a') this.reportaA}): super._();
+  const _PosicionContexto({required this.id, required this.etiqueta, this.puesto, required this.unidad, this.area, required this.estatus, @JsonKey(name: 'estatus_code') required this.estatusCode, required this.ocupada, @JsonKey(name: 'tramite_abierto') this.tramiteAbierto, this.empresa, @JsonKey(name: 'reporta_a') this.reportaA, @JsonKey(name: 'area_solicitante_sugerida') this.areaSolicitanteSugerida}): super._();
   factory _PosicionContexto.fromJson(Map<String, dynamic> json) => _$PosicionContextoFromJson(json);
 
 @override final  String id;
@@ -1685,6 +1698,7 @@ class _PosicionContexto extends PosicionContexto {
 @override@JsonKey(name: 'tramite_abierto') final  TramiteAbierto? tramiteAbierto;
 @override final  String? empresa;
 @override@JsonKey(name: 'reporta_a') final  String? reportaA;
+@override@JsonKey(name: 'area_solicitante_sugerida') final  AreaSolicitante? areaSolicitanteSugerida;
 
 /// Create a copy of PosicionContexto
 /// with the given fields replaced by the non-null parameter values.
@@ -1699,18 +1713,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PosicionContexto&&(identical(other.id, id) || other.id == id)&&(identical(other.etiqueta, etiqueta) || other.etiqueta == etiqueta)&&(identical(other.puesto, puesto) || other.puesto == puesto)&&(identical(other.unidad, unidad) || other.unidad == unidad)&&(identical(other.area, area) || other.area == area)&&(identical(other.estatus, estatus) || other.estatus == estatus)&&(identical(other.estatusCode, estatusCode) || other.estatusCode == estatusCode)&&(identical(other.ocupada, ocupada) || other.ocupada == ocupada)&&(identical(other.tramiteAbierto, tramiteAbierto) || other.tramiteAbierto == tramiteAbierto)&&(identical(other.empresa, empresa) || other.empresa == empresa)&&(identical(other.reportaA, reportaA) || other.reportaA == reportaA));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PosicionContexto&&(identical(other.id, id) || other.id == id)&&(identical(other.etiqueta, etiqueta) || other.etiqueta == etiqueta)&&(identical(other.puesto, puesto) || other.puesto == puesto)&&(identical(other.unidad, unidad) || other.unidad == unidad)&&(identical(other.area, area) || other.area == area)&&(identical(other.estatus, estatus) || other.estatus == estatus)&&(identical(other.estatusCode, estatusCode) || other.estatusCode == estatusCode)&&(identical(other.ocupada, ocupada) || other.ocupada == ocupada)&&(identical(other.tramiteAbierto, tramiteAbierto) || other.tramiteAbierto == tramiteAbierto)&&(identical(other.empresa, empresa) || other.empresa == empresa)&&(identical(other.reportaA, reportaA) || other.reportaA == reportaA)&&(identical(other.areaSolicitanteSugerida, areaSolicitanteSugerida) || other.areaSolicitanteSugerida == areaSolicitanteSugerida));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,etiqueta,puesto,unidad,area,estatus,estatusCode,ocupada,tramiteAbierto,empresa,reportaA);
+    return Object.hash(runtimeType,id,etiqueta,puesto,unidad,area,estatus,estatusCode,ocupada,tramiteAbierto,empresa,reportaA,areaSolicitanteSugerida);
 }
 
 @override
 String toString() {
-    return 'PosicionContexto(id: $id, etiqueta: $etiqueta, puesto: $puesto, unidad: $unidad, area: $area, estatus: $estatus, estatusCode: $estatusCode, ocupada: $ocupada, tramiteAbierto: $tramiteAbierto, empresa: $empresa, reportaA: $reportaA)';
+    return 'PosicionContexto(id: $id, etiqueta: $etiqueta, puesto: $puesto, unidad: $unidad, area: $area, estatus: $estatus, estatusCode: $estatusCode, ocupada: $ocupada, tramiteAbierto: $tramiteAbierto, empresa: $empresa, reportaA: $reportaA, areaSolicitanteSugerida: $areaSolicitanteSugerida)';
 }
 
 
@@ -1721,11 +1735,11 @@ abstract mixin class _$PosicionContextoCopyWith<$Res> implements $PosicionContex
   factory _$PosicionContextoCopyWith(_PosicionContexto value, $Res Function(_PosicionContexto) _then) = __$PosicionContextoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA
+ String id, String etiqueta, String? puesto, String unidad, String? area, String estatus,@JsonKey(name: 'estatus_code') String estatusCode, bool ocupada,@JsonKey(name: 'tramite_abierto') TramiteAbierto? tramiteAbierto, String? empresa,@JsonKey(name: 'reporta_a') String? reportaA,@JsonKey(name: 'area_solicitante_sugerida') AreaSolicitante? areaSolicitanteSugerida
 });
 
 
-@override $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;
+@override $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto;@override $AreaSolicitanteCopyWith<$Res>? get areaSolicitanteSugerida;
 
 }
 /// @nodoc
@@ -1738,7 +1752,7 @@ class __$PosicionContextoCopyWithImpl<$Res>
 
 /// Create a copy of PosicionContexto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? etiqueta = null,Object? puesto = freezed,Object? unidad = null,Object? area = freezed,Object? estatus = null,Object? estatusCode = null,Object? ocupada = null,Object? tramiteAbierto = freezed,Object? empresa = freezed,Object? reportaA = freezed,Object? areaSolicitanteSugerida = freezed,}) {
   return _then(_PosicionContexto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,etiqueta: null == etiqueta ? _self.etiqueta : etiqueta // ignore: cast_nullable_to_non_nullable
@@ -1751,7 +1765,8 @@ as String,ocupada: null == ocupada ? _self.ocupada : ocupada // ignore: cast_nul
 as bool,tramiteAbierto: freezed == tramiteAbierto ? _self.tramiteAbierto : tramiteAbierto // ignore: cast_nullable_to_non_nullable
 as TramiteAbierto?,empresa: freezed == empresa ? _self.empresa : empresa // ignore: cast_nullable_to_non_nullable
 as String?,reportaA: freezed == reportaA ? _self.reportaA : reportaA // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,areaSolicitanteSugerida: freezed == areaSolicitanteSugerida ? _self.areaSolicitanteSugerida : areaSolicitanteSugerida // ignore: cast_nullable_to_non_nullable
+as AreaSolicitante?,
   ));
 }
 
@@ -1766,6 +1781,18 @@ $TramiteAbiertoCopyWith<$Res>? get tramiteAbierto {
 
   return $TramiteAbiertoCopyWith<$Res>(_self.tramiteAbierto!, (value) {
     return _then(_self.copyWith(tramiteAbierto: value));
+  });
+}/// Create a copy of PosicionContexto
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AreaSolicitanteCopyWith<$Res>? get areaSolicitanteSugerida {
+    if (_self.areaSolicitanteSugerida == null) {
+    return null;
+  }
+
+  return $AreaSolicitanteCopyWith<$Res>(_self.areaSolicitanteSugerida!, (value) {
+    return _then(_self.copyWith(areaSolicitanteSugerida: value));
   });
 }
 }

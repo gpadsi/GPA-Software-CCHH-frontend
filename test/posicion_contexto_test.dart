@@ -10,7 +10,7 @@ import 'package:capital_humano_front/features/recruitment/data/recruitment_model
 import 'package:capital_humano_front/features/recruitment/presentation/descriptivos_page.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/nuevo_descriptivo_form.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/posicion_contexto_card.dart';
-import 'package:capital_humano_front/features/recruitment/presentation/requisicion_form.dart';
+import 'package:capital_humano_front/features/recruitment/presentation/requisicion_edit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,6 +53,19 @@ Future<void> _openForm(
   FakeRecruitmentRepository repository,
   Widget form,
 ) async {
+  if (form is RequisicionEditPage) {
+    await pumpRecruitment(
+      tester,
+      path: Uri(
+        path: '/reclutamiento/requisiciones/nueva',
+        queryParameters: form.posicionId == null
+            ? null
+            : {'posicion': form.posicionId!},
+      ).toString(),
+      repository: repository,
+    );
+    return;
+  }
   await pumpRecruitment(
     tester,
     path: '/reclutamiento/descriptivos',
@@ -203,7 +216,7 @@ void main() {
           repository,
           descriptivo
               ? const NuevoDescriptivoForm(posicionId: 'pos1')
-              : const RequisicionForm(posicionId: 'pos1'),
+              : const RequisicionEditPage(posicionId: 'pos1'),
         );
         expect(_picker, findsNothing);
         expect(_inCard(contextoUno.puesto!), findsOneWidget);
@@ -227,7 +240,9 @@ void main() {
         await _openForm(
           tester,
           repository,
-          descriptivo ? const NuevoDescriptivoForm() : const RequisicionForm(),
+          descriptivo
+              ? const NuevoDescriptivoForm()
+              : const RequisicionEditPage(),
         );
         expect(_picker, findsOneWidget);
         expect(_card, findsNothing);
@@ -249,9 +264,9 @@ void main() {
           repository,
           descriptivo
               ? const NuevoDescriptivoForm(posicionId: 'pos1')
-              : const RequisicionForm(posicionId: 'pos1'),
+              : const RequisicionEditPage(posicionId: 'pos1'),
         );
-        final label = descriptivo ? 'Crear borrador' : 'Guardar';
+        final label = descriptivo ? 'Crear borrador' : 'Guardar borrador';
         expect(
           tester
               .widget<AppButton>(find.widgetWithText(AppButton, label))
@@ -307,7 +322,7 @@ void main() {
       await _openForm(
         tester,
         repository,
-        const RequisicionForm(posicionId: 'pos1'),
+        const RequisicionEditPage(posicionId: 'pos1'),
       );
       expect(
         find.text('Esta posición ya tiene una requisición abierta'),
@@ -317,7 +332,9 @@ void main() {
       expect(find.text('Abrir'), findsNothing);
       expect(
         tester
-            .widget<AppButton>(find.widgetWithText(AppButton, 'Guardar'))
+            .widget<AppButton>(
+              find.widgetWithText(AppButton, 'Guardar borrador'),
+            )
             .onPressed,
         isNull,
       );
@@ -369,14 +386,16 @@ void main() {
       await tester.ensureVisible(requisicion);
       await tester.tap(requisicion);
       await tester.pumpAndSettle();
-      expect(find.byType(RequisicionForm), findsOneWidget);
+      expect(find.byType(RequisicionEditPage), findsOneWidget);
       expect(
-        tester.widget<RequisicionForm>(find.byType(RequisicionForm)).posicionId,
+        tester
+            .widget<RequisicionEditPage>(find.byType(RequisicionEditPage))
+            .posicionId,
         'pos2',
       );
       expect(_picker, findsNothing);
       expect(_inCard(contextoDos.puesto!), findsOneWidget);
-      await tester.tap(find.text('Cancelar'));
+      await tester.tap(find.text('Volver'));
       await tester.pumpAndSettle();
       final descriptivo = find.byTooltip('Crear descriptivo').first;
       await tester.ensureVisible(descriptivo);
@@ -448,9 +467,9 @@ void main() {
       expect(repository.requisicionCreated, isTrue);
       expect(
         router.routeInformationProvider.value.uri.path,
-        '/reclutamiento/requisiciones/nueva',
+        '/reclutamiento/requisiciones/r-nueva/editar',
       );
-      expect(find.text('Requisición creada.'), findsOneWidget);
+      expect(find.text('Requisición guardada.'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
