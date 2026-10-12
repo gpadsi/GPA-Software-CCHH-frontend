@@ -38,8 +38,6 @@ migrate_working_dir/
 .env.*
 !.env.example
 /artifacts/
-
-# Colaboración con IA — igual que en el backend, nunca llega al repo
 .claude/
 .cursor/
 .windsurf/
