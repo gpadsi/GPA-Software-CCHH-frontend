@@ -27,6 +27,7 @@ Future<void> abrirNuevoDescriptivo(
 }) async {
   final creado = await showAppPanel<Descriptivo>(
     context: context,
+    barrierDismissible: true,
     builder: (_) => NuevoDescriptivoForm(posicionId: posicionId),
   );
   if (creado != null && context.mounted) {

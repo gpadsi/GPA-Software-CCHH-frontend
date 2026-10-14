@@ -385,8 +385,28 @@ class _PickerOptions<T extends Object> extends StatefulWidget {
 }
 
 class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
-  static const _rowHeight = 112.0;
   final _scroll = ScrollController();
+
+  /// Alto de cada fila según lo que lleva: antes todas medían 112 px aunque no
+  /// tuvieran etiqueta de trámite, y en la lista cabían dos y media. Crece con
+  /// el tamaño de texto del sistema.
+  double _extentOf(int index) {
+    final option = widget.options[index];
+    final double base;
+    if (option is _PickerItem<T>) {
+      final detail = widget.detailOf?.call(option.item);
+      final badge = widget.badgeOf?.call(option.item);
+      base =
+          52 +
+          (detail != null && detail.isNotEmpty ? 18 : 0) +
+          (badge != null && badge.isNotEmpty ? 30 : 0);
+    } else if (option is _PickerCreate<T>) {
+      base = 64;
+    } else {
+      base = 72;
+    }
+    return MediaQuery.textScalerOf(context).scale(base);
+  }
 
   @override
   void didChangeDependencies() {
@@ -395,8 +415,12 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scroll.hasClients) return;
       final position = _scroll.position;
-      final top = index * _rowHeight;
-      final bottom = top + _rowHeight;
+      if (index >= widget.options.length) return;
+      var top = 0.0;
+      for (var i = 0; i < index; i++) {
+        top += _extentOf(i);
+      }
+      final bottom = top + _extentOf(index);
       final offset = top < position.pixels
           ? top
           : bottom > position.pixels + position.viewportDimension
@@ -423,7 +447,8 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
       controller: _scroll,
       padding: EdgeInsets.zero,
       shrinkWrap: true,
-      itemExtent: _rowHeight,
+      itemExtentBuilder: (index, _) =>
+          index < widget.options.length ? _extentOf(index) : null,
       itemCount: widget.options.length,
       itemBuilder: (context, index) {
         final option = widget.options[index];

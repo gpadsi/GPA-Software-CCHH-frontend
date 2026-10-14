@@ -102,7 +102,13 @@ class _CompaniesPageState extends ConsumerState<CompaniesPage> {
                   const DataColumn(label: Text('Razón social')),
                   const DataColumn(label: Text('RFC')),
                   const DataColumn(label: Text('Registro patronal')),
-                  if (canManage) const DataColumn(label: Text('Acciones')),
+                  if (canManage)
+                    // Un solo botón (editar), dentro de un widget que la tabla
+                    // no puede inspeccionar: el ancho se indica aquí.
+                    DataColumn(
+                      label: const Text('Acciones'),
+                      columnWidth: FixedColumnWidth(AppRowActions.width(1)),
+                    ),
                 ],
                 rows: [
                   for (final company in data.results)

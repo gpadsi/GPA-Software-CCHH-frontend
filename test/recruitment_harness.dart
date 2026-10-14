@@ -28,6 +28,9 @@ Future<GoRouter> pumpRecruitment(
   SessionUser user = testUser,
   double width = 1440,
   double height = 1000,
+  // false: no esperar a que todo se asiente, para observar fotograma por
+  // fotograma lo que se arma primero.
+  bool settle = true,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = Size(width, height);
@@ -62,8 +65,10 @@ Future<GoRouter> pumpRecruitment(
       child: CapitalHumanoApp(router: router),
     ),
   );
-  await tester.pumpAndSettle();
-  expect(tester.takeException(), isNull);
+  if (settle) {
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  }
   return router;
 }
 
@@ -102,5 +107,15 @@ Future<void> choose(
 Future<void> tapTooltip(WidgetTester tester, String tooltip) async {
   await tester.ensureVisible(find.byTooltip(tooltip));
   await tester.tap(find.byTooltip(tooltip));
+  await tester.pumpAndSettle();
+}
+
+/// Abre una sección del descriptivo con su chip: solo la sección abierta existe
+/// en pantalla. En las pruebas la fila de chips se desplaza (la fuente es ancha).
+Future<void> openSection(WidgetTester tester, String name) async {
+  final chip = find.widgetWithText(ChoiceChip, name);
+  await tester.ensureVisible(chip);
+  await tester.pumpAndSettle();
+  await tester.tap(chip);
   await tester.pumpAndSettle();
 }

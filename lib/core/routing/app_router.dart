@@ -49,8 +49,10 @@ GoRouter createAppRouter({
     final requested = isSessionRoute
         ? route.uri.queryParameters['from']
         : route.uri.toString();
-    final from = appDestinations.any((item) => item.path == requested)
-        ? requested!
+    // Recargar la página (o recuperar la sesión) vuelve a la ruta en la que se
+    // estaba, no solo a los destinos del menú sino también a sus detalles.
+    final from = requested != null && canReturnTo(requested)
+        ? requested
         : '/dashboard';
     if (status == SessionStatus.restoring ||
         status == SessionStatus.unavailable) {

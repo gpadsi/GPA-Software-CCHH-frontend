@@ -374,8 +374,13 @@ void main() {
       return pedidos;
     }
 
-    DataTable table(WidgetTester tester) =>
-        tester.widget<DataTable>(find.byType(DataTable));
+    // La flecha de orden se dibuja junto al encabezado que ordena.
+    Finder arrow(String header, IconData icon) => find.descendant(
+      of: find
+          .ancestor(of: find.text(header), matching: find.byType(Row))
+          .first,
+      matching: find.byIcon(icon),
+    );
 
     testWidgets(
       'tocar un encabezado ordena ascendente; volver a tocarlo, descendente',
@@ -399,26 +404,27 @@ void main() {
       tester,
     ) async {
       await pumpTable(tester, ordering: 'age');
-      expect(table(tester).sortColumnIndex, 1);
-      expect(table(tester).sortAscending, isTrue);
+      expect(arrow('Edad', Icons.arrow_upward), findsOneWidget);
+      expect(arrow('Nombre', Icons.arrow_upward), findsNothing);
 
       await pumpTable(tester, ordering: '-last,-first');
-      expect(table(tester).sortColumnIndex, 0);
-      expect(table(tester).sortAscending, isFalse);
+      expect(arrow('Nombre', Icons.arrow_downward), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_upward), findsNothing);
 
       await pumpTable(tester, ordering: '');
-      expect(table(tester).sortColumnIndex, isNull);
+      expect(find.byIcon(Icons.arrow_upward), findsNothing);
+      expect(find.byIcon(Icons.arrow_downward), findsNothing);
     });
 
     testWidgets('una columna sin campo (Acciones) no es ordenable', (
       tester,
     ) async {
-      await pumpTable(tester);
-      final columnas = table(tester).columns;
-      expect(columnas[0].onSort, isNotNull);
-      expect(columnas[1].onSort, isNotNull);
-      expect(columnas[2].onSort, isNull);
-      expect(columnas[0].tooltip, 'Ordenar por nombre');
+      final pedidos = await pumpTable(tester);
+      await tester.tap(find.text('Acciones'));
+      expect(pedidos, isEmpty);
+      expect(find.byTooltip('Ordenar por nombre'), findsOneWidget);
+      expect(find.byTooltip('Ordenar por edad'), findsOneWidget);
+      expect(find.byTooltip('Ordenar por acciones'), findsNothing);
     });
 
     testWidgets(
@@ -580,7 +586,7 @@ void main() {
 
           await tester.tap(
             find.descendant(
-              of: find.byType(DataTable),
+              of: find.byType(AppDataTable),
               matching: find.text(caso.encabezado),
             ),
           );
@@ -589,7 +595,7 @@ void main() {
 
           await tester.tap(
             find.descendant(
-              of: find.byType(DataTable),
+              of: find.byType(AppDataTable),
               matching: find.text(caso.encabezado),
             ),
           );
@@ -707,7 +713,7 @@ void main() {
       // Ordenar vuelve a la primera página y respeta la búsqueda.
       await tester.tap(
         find.descendant(
-          of: find.byType(DataTable),
+          of: find.byType(AppDataTable),
           matching: find.text('Nombre'),
         ),
       );
@@ -718,7 +724,7 @@ void main() {
 
       await tester.tap(
         find.descendant(
-          of: find.byType(DataTable),
+          of: find.byType(AppDataTable),
           matching: find.text('Nombre'),
         ),
       );

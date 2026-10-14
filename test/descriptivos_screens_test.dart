@@ -367,8 +367,12 @@ void main() {
       // Empresa, área y «Reporta a» se ven como datos vinculados, no como campos.
       expect(find.text('GPA Azimatronics'), findsOneWidget);
       expect(_field('GPA Azimatronics'), findsNothing);
+      // Las demás secciones no se arman hasta abrirlas, y traen lo capturado.
+      expect(_field('Soldar piezas según el plano.'), findsNothing);
+      await openSection(tester, 'Propósito y funciones');
       expect(_field('Soldar piezas según el plano.'), findsOneWidget);
       expect(_field('Soldar piezas'), findsOneWidget);
+      await openSection(tester, 'Indicadores y conformidades');
       expect(_field('Piezas sin retrabajo'), findsOneWidget);
       // Sin cambios no hay nada que guardar.
       expect(_onPressed(tester, 'Guardar borrador'), isNull);
@@ -385,6 +389,7 @@ void main() {
         repository: repository,
         height: 3200,
       );
+      await openSection(tester, 'Propósito y funciones');
       await _edit(
         tester,
         _field('Soldar piezas según el plano.'),
@@ -393,6 +398,7 @@ void main() {
       expect(find.text('Tienes cambios sin guardar.'), findsOneWidget);
       expect(_onPressed(tester, 'Guardar borrador'), isNotNull);
 
+      await openSection(tester, 'Competencias y recursos');
       await tester.ensureVisible(find.text('Trabajo en equipo'));
       await tester.tap(find.text('Trabajo en equipo'));
       await tester.pump();
@@ -412,6 +418,7 @@ void main() {
       expect(find.text('Borrador guardado.'), findsOneWidget);
       // Ya no hay nada pendiente y el editor sigue en pantalla con lo escrito.
       expect(find.text('Tienes cambios sin guardar.'), findsNothing);
+      await openSection(tester, 'Propósito y funciones');
       expect(_field('Soldar y ensamblar piezas.'), findsOneWidget);
       expect(_onPressed(tester, 'Guardar borrador'), isNull);
     });
@@ -426,10 +433,10 @@ void main() {
           repository: repository,
           height: 3600,
         );
+        await openSection(tester, 'Propósito y funciones');
         // 1 capturada + 4 vacías (el formulario oficial trae 5), y 3 indicadores.
         expect(find.text('Responsabilidad 5'), findsOneWidget);
         expect(find.text('Responsabilidad 6'), findsNothing);
-        expect(find.text('Indicador 3'), findsOneWidget);
 
         await _tapText(tester, 'Agregar responsabilidad');
         expect(find.text('Responsabilidad 6'), findsOneWidget);
@@ -453,6 +460,8 @@ void main() {
         expect(saved.funciones.first.texto, 'Soldar piezas');
         expect(saved.funciones[1].texto, 'Revisar planos');
         expect(saved.funciones.map((f) => f.orden), [1, 2, 3, 4, 5]);
+        await openSection(tester, 'Indicadores y conformidades');
+        expect(find.text('Indicador 3'), findsOneWidget);
       },
     );
 
@@ -703,6 +712,7 @@ void main() {
       expect(find.text('Descargar Word oficial'), findsOneWidget);
       expect(find.text('Copiar a un borrador nuevo'), findsOneWidget);
       // Los campos se ven pero son de solo lectura.
+      await openSection(tester, 'Propósito y funciones');
       final field = tester.widget<TextField>(
         find.descendant(
           of: _field('Dar servicio técnico.'),
@@ -763,6 +773,7 @@ void main() {
         repository: FakeRecruitmentRepository(),
         height: 3200,
       );
+      await openSection(tester, 'Indicadores y conformidades');
       expect(find.text('Conformidades'), findsOneWidget);
       expect(
         find.text('Conforme el ${shownDate('2026-09-26')}'),
@@ -783,6 +794,7 @@ void main() {
           repository: repository,
           height: 3200,
         );
+        await openSection(tester, 'Indicadores y conformidades');
         // Jefe inmediato ya firmó (rol de una sola firma): solo quedan dos botones.
         expect(find.text('Registrar conformidad'), findsNWidgets(2));
         await tester.ensureVisible(find.text('Registrar conformidad').last);
@@ -818,6 +830,7 @@ void main() {
           employment: employment,
           height: 3200,
         );
+        await openSection(tester, 'Indicadores y conformidades');
         await tester.ensureVisible(find.text('Registrar conformidad').first);
         await tester.tap(find.text('Registrar conformidad').first);
         await tester.pumpAndSettle();
@@ -856,6 +869,7 @@ void main() {
         repository: repository,
         height: 3200,
       );
+      await openSection(tester, 'Indicadores y conformidades');
       await tapTooltip(tester, 'Eliminar conformidad de Jefe inmediato');
       expect(find.text('Quitar conformidad'), findsOneWidget);
       await tester.tap(find.text('Quitar'));
@@ -885,6 +899,8 @@ void main() {
         findsOneWidget,
       );
       // Sin renglones vacíos de relleno: solo lo que hay capturado.
+      await openSection(tester, 'Propósito y funciones');
+      expect(find.text('Agregar responsabilidad'), findsNothing);
       expect(find.text('Responsabilidad 2'), findsNothing);
       expect(find.text('Responsabilidad 1'), findsOneWidget);
 
@@ -905,6 +921,8 @@ void main() {
         user: testColaborador,
         height: 3200,
       );
+      await openSection(tester, 'Indicadores y conformidades');
+      expect(find.text('Indicadores de desempeño'), findsOneWidget);
       expect(find.text('Conformidades'), findsNothing);
       expect(find.text('Copiar a un borrador nuevo'), findsNothing);
       expect(find.text('Descargar Word oficial'), findsOneWidget);

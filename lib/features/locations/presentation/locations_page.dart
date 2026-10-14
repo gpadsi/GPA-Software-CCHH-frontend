@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_badge.dart';
+import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/feature_page.dart';
@@ -207,23 +208,19 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
                           ),
                           if (canManage)
                             DataCell(
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    tooltip: 'Editar ${record.code}',
-                                    onPressed: () => _edit(record),
-                                    icon: const Icon(Icons.edit_outlined),
-                                  ),
-                                  const SizedBox(width: AppSpacing.xs),
-                                  IconButton(
-                                    tooltip: 'Eliminar ${record.code}',
-                                    onPressed: () =>
-                                        _delete(record, data.results.length),
-                                    icon: const Icon(Icons.delete_outline),
-                                  ),
-                                ],
-                              ),
+                              AppRowActions.list([
+                                AppRowAction(
+                                  icon: Icons.edit_outlined,
+                                  tooltip: 'Editar ${record.code}',
+                                  onPressed: () => _edit(record),
+                                ),
+                                AppRowAction(
+                                  icon: Icons.delete_outline,
+                                  tooltip: 'Eliminar ${record.code}',
+                                  onPressed: () =>
+                                      _delete(record, data.results.length),
+                                ),
+                              ]),
                             ),
                         ],
                       ),

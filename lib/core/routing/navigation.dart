@@ -28,8 +28,7 @@ const appDestinations = <AppDestination>[
     path: '/organizacion/organigrama',
     label: 'Organigrama',
     group: 'Estructura',
-    description:
-        'Estructura organizacional de Grupo GPA, desde las empresas hasta sus áreas.',
+    description: 'Estructura organizacional de Grupo GPA, desde las empresas hasta sus áreas.',
     icon: Icons.account_tree_outlined,
   ),
   AppDestination(
@@ -43,7 +42,8 @@ const appDestinations = <AppDestination>[
     path: '/ubicaciones',
     label: 'Ubicaciones',
     group: 'Estructura',
-    description: 'Plantas, oficinas y demás ubicaciones físicas de la organización.',
+    description:
+        'Plantas, oficinas y demás ubicaciones físicas de la organización.',
     icon: Icons.place_outlined,
   ),
   AppDestination(
@@ -64,7 +64,8 @@ const appDestinations = <AppDestination>[
     path: '/personas',
     label: 'Personas',
     group: 'Personal',
-    description: 'Datos personales, de contacto y médicos de cada persona registrada.',
+    description:
+        'Datos personales, de contacto y médicos de cada persona registrada.',
     icon: Icons.people_outline,
   ),
   AppDestination(
@@ -134,7 +135,8 @@ const appDestinations = <AppDestination>[
     path: '/tiempo',
     label: 'Tiempo',
     group: 'Jornada',
-    description: 'Registro y control de asistencia, horas trabajadas e incidencias.',
+    description:
+        'Registro y control de asistencia, horas trabajadas e incidencias.',
     icon: Icons.timelapse_outlined,
   ),
   AppDestination(
@@ -152,6 +154,21 @@ const appDestinations = <AppDestination>[
     icon: Icons.forum_outlined,
   ),
 ];
+
+/// ¿Se puede volver a [location] al iniciar o recuperar la sesión? Solo a
+/// rutas internas conocidas: un destino del menú o uno de sus detalles (ej.
+/// `/reclutamiento/descriptivos/:id`), con su consulta. Cualquier otra cosa
+/// (otra dirección, rutas de sesión, rutas que no existen) cae en el Inicio.
+bool canReturnTo(String location) {
+  final uri = Uri.tryParse(location);
+  if (uri == null || uri.hasScheme || uri.hasAuthority) return false;
+  final path = uri.path;
+  if (!path.startsWith('/') || path.startsWith('//')) return false;
+  return appDestinations.any(
+    (destination) =>
+        path == destination.path || path.startsWith('${destination.path}/'),
+  );
+}
 
 AppDestination destinationFor(String location) {
   final path = Uri.parse(location).path;

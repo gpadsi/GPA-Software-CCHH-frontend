@@ -7,6 +7,7 @@ import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_page.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/loading_skeleton.dart';
@@ -168,23 +169,19 @@ class _AsignacionesUbicacionPageState
             ),
             if (canManage)
               DataCell(
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: 'Editar asignación',
-                      onPressed: () => _addOrEdit(asignacion),
-                      icon: const Icon(Icons.edit_outlined),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    IconButton(
-                      tooltip: 'Eliminar asignación',
-                      onPressed: () =>
-                          _delete(asignacion.id, page.results.length),
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  ],
-                ),
+                AppRowActions.list([
+                  AppRowAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Editar asignación',
+                    onPressed: () => _addOrEdit(asignacion),
+                  ),
+                  AppRowAction(
+                    icon: Icons.delete_outline,
+                    tooltip: 'Eliminar asignación',
+                    onPressed: () =>
+                        _delete(asignacion.id, page.results.length),
+                  ),
+                ]),
               ),
           ],
         ),

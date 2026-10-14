@@ -8,18 +8,22 @@ class AppCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.lg),
+    this.color = AppColors.surface,
+    this.borderColor = AppColors.border,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
+  final Color color;
+  final Color borderColor;
 
   @override
   Widget build(BuildContext context) => Material(
-    color: AppColors.surface,
+    color: color,
     clipBehavior: Clip.antiAlias,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
-      side: const BorderSide(color: AppColors.border),
+      side: BorderSide(color: borderColor),
     ),
     child: Padding(padding: padding, child: child),
   );

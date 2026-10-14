@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
@@ -132,32 +133,27 @@ class _PersonsPageState extends ConsumerState<PersonsPage> {
                         DataCell(tableText(persona.personalEmail)),
                         DataCell(tableText(persona.phone)),
                         DataCell(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                tooltip: 'Ver a ${persona.fullName}',
-                                onPressed: () =>
-                                    context.go('/personas/${persona.id}'),
-                                icon: const Icon(Icons.visibility_outlined),
+                          AppRowActions.list([
+                            AppRowAction(
+                              icon: Icons.visibility_outlined,
+                              tooltip: 'Ver a ${persona.fullName}',
+                              onPressed: () =>
+                                  context.go('/personas/${persona.id}'),
+                            ),
+                            if (canManage) ...[
+                              AppRowAction(
+                                icon: Icons.edit_outlined,
+                                tooltip: 'Editar a ${persona.fullName}',
+                                onPressed: () => _addOrEdit(persona),
                               ),
-                              if (canManage) ...[
-                                const SizedBox(width: AppSpacing.xs),
-                                IconButton(
-                                  tooltip: 'Editar a ${persona.fullName}',
-                                  onPressed: () => _addOrEdit(persona),
-                                  icon: const Icon(Icons.edit_outlined),
-                                ),
-                                const SizedBox(width: AppSpacing.xs),
-                                IconButton(
-                                  tooltip: 'Eliminar a ${persona.fullName}',
-                                  onPressed: () =>
-                                      _delete(persona, data.results.length),
-                                  icon: const Icon(Icons.delete_outline),
-                                ),
-                              ],
+                              AppRowAction(
+                                icon: Icons.delete_outline,
+                                tooltip: 'Eliminar a ${persona.fullName}',
+                                onPressed: () =>
+                                    _delete(persona, data.results.length),
+                              ),
                             ],
-                          ),
+                          ]),
                         ),
                       ],
                     ),

@@ -269,6 +269,10 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
   // borradores para los que se pidió esa comparación.
   List<CambioPosicion> cambiosPosicionData = [];
   Object? cambiosFailure;
+
+  /// Si se pone, la comparación espera a que se complete (para probar qué se
+  /// reconstruye cuando llega después de que la página ya se armó).
+  Future<List<CambioPosicion>>? cambiosGate;
   final cambiosRequests = <String>[];
   final calls = <String>[];
   String? createdDraftFor;
@@ -280,63 +284,80 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     if (failure != null) throw failure!;
   }
 
+  /// Cuántas veces se pidió cada catálogo (los catálogos se comparten entre
+  /// pantallas: una visita más no debe volver a pedirlos).
+  final catalogCalls = <String, int>{};
+  void _count(String name) =>
+      catalogCalls[name] = (catalogCalls[name] ?? 0) + 1;
+  int get catalogRequests => catalogCalls.values.fold(0, (a, b) => a + b);
+
   @override
   Future<List<RecruitmentCatalogEntry>> estados() async {
     _check();
+    _count('estados');
     return [estadoBorrador, estadoPendiente, estadoAutorizada, estadoCubierta];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> etapasAprobacion() async {
     _check();
+    _count('etapasAprobacion');
     return [etapaJefe, etapaGerencia, etapaDireccion, etapaCh];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> tiposContrato() async {
     _check();
+    _count('tiposContrato');
     return [contratoPlanta, entry(21, 'temporal', 'Temporal')];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> horariosACubrir() async {
     _check();
+    _count('horariosACubrir');
     return [horario8, horarioOtro];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> tiposRequisicion() async {
     _check();
+    _count('tiposRequisicion');
     return [tipoReemplazo, tipoNueva];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> rangosEdad() async {
     _check();
+    _count('rangosEdad');
     return [edad1825, edadOtro];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> diasPorLaborar() async {
     _check();
+    _count('diasPorLaborar');
     return [diasLv, diasOtro];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> competencias() async {
     _check();
+    _count('competencias');
     return [compLiderazgo, compEquipo];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> recursos() async {
     _check();
+    _count('recursos');
     return [recursoLaptop, recursoEpp];
   }
 
   @override
   Future<List<RecruitmentCatalogEntry>> rolesConformidad() async {
     _check();
+    _count('rolesConformidad');
     return [rolColaborador, rolJefe, rolCh];
   }
 
@@ -524,6 +545,7 @@ class FakeRecruitmentRepository extends RecruitmentRepository {
     cambiosRequests.add(id);
     _check();
     if (cambiosFailure != null) throw cambiosFailure!;
+    if (cambiosGate != null) return cambiosGate!;
     return [...cambiosPosicionData];
   }
 

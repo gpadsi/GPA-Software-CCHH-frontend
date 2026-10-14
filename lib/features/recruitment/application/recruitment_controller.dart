@@ -24,7 +24,11 @@ RecruitmentRepository recruitmentRepository(Ref ref) {
   return RecruitmentRepository(ref.watch(sessionServiceProvider).api);
 }
 
-@Riverpod(retry: manualRetryOnly)
+// Los catálogos son datos casi fijos: se piden una vez por sesión y se
+// comparten entre pantallas (antes cada visita a la lista pedía los 5 de
+// nuevo). Se refrescan con «Actualizar» o al cambiar de cuenta, porque el
+// repositorio del que dependen se reconstruye con la sesión.
+@Riverpod(keepAlive: true, retry: manualRetryOnly)
 Future<RequisicionCatalogs> requisicionCatalogs(Ref ref) async {
   final repository = ref.watch(recruitmentRepositoryProvider);
   final results = await Future.wait([
@@ -43,7 +47,7 @@ Future<RequisicionCatalogs> requisicionCatalogs(Ref ref) async {
   );
 }
 
-@Riverpod(retry: manualRetryOnly)
+@Riverpod(keepAlive: true, retry: manualRetryOnly)
 Future<DescriptivoCatalogs> descriptivoCatalogs(Ref ref) async {
   final repository = ref.watch(recruitmentRepositoryProvider);
   final results = await Future.wait([

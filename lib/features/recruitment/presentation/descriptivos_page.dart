@@ -18,6 +18,7 @@ import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_creation.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_design.dart';
 
 /// Lo más reciente primero: por fecha de elaboración y, a igual fecha, la
 /// versión más alta.
@@ -69,13 +70,10 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
     final page = ref.watch(descriptivosPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
     final filter = _query.filters['congelado'] ?? '';
-    return FeaturePage(
+    return RecruitmentPage(
       title: 'Descriptivos de puesto',
       description: 'Lo que hace cada posición: sus funciones, condiciones y perfil. Cada versión aprobada queda como historial.',
-      tabs: const FeatureTabs(
-        current: '/reclutamiento/descriptivos',
-        destinations: recruitmentTabs,
-      ),
+      tabs: const RecruitmentModuleTabs(current: '/reclutamiento/descriptivos'),
       actions: [
         if (canManage)
           AppButton(
@@ -133,11 +131,26 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
                   FeatureError(error: error, onRetry: _refresh),
               data: (data) => AppDataTable(
                 columns: const [
-                  DataColumn(label: Text('Puesto')),
-                  DataColumn(label: Text('Posición')),
-                  DataColumn(label: Text('Versión')),
-                  DataColumn(label: Text('Estado')),
-                  DataColumn(label: Text('Elaborado')),
+                  DataColumn(
+                    label: Text('Puesto'),
+                    columnWidth: FlexColumnWidth(1.3),
+                  ),
+                  DataColumn(
+                    label: Text('Posición'),
+                    columnWidth: FlexColumnWidth(2),
+                  ),
+                  DataColumn(
+                    label: Text('Versión'),
+                    columnWidth: FixedColumnWidth(80),
+                  ),
+                  DataColumn(
+                    label: Text('Estado'),
+                    columnWidth: FixedColumnWidth(120),
+                  ),
+                  DataColumn(
+                    label: Text('Elaborado'),
+                    columnWidth: FixedColumnWidth(120),
+                  ),
                   DataColumn(label: Text('Acciones')),
                 ],
                 rows: [

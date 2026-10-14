@@ -76,7 +76,7 @@ final class RequisicionCatalogsProvider
         argument: null,
         retry: manualRetryOnly,
         name: r'requisicionCatalogsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -97,7 +97,7 @@ final class RequisicionCatalogsProvider
 }
 
 String _$requisicionCatalogsHash() =>
-    r'848fa90cfbad16c75b3ce885b364318c0aebc1c6';
+    r'c30ef7e739db91d166fe893786b4c16894467f96';
 
 @ProviderFor(descriptivoCatalogs)
 final descriptivoCatalogsProvider = DescriptivoCatalogsProvider._();
@@ -118,7 +118,7 @@ final class DescriptivoCatalogsProvider
         argument: null,
         retry: manualRetryOnly,
         name: r'descriptivoCatalogsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -139,7 +139,7 @@ final class DescriptivoCatalogsProvider
 }
 
 String _$descriptivoCatalogsHash() =>
-    r'3d4e5a6b083842871268762a703c08d027572585';
+    r'2441da7e31d6ba25956b67f3494866ae1c2173f1';
 
 @ProviderFor(requisicionesPage)
 final requisicionesPageProvider = RequisicionesPageFamily._();

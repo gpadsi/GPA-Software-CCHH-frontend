@@ -100,22 +100,59 @@ void main() {
 
       await _goTo(tester, 'Perfil');
       expect(_inView(tester, find.text('Escolaridad mínima')), isTrue);
+      // Solo la sección abierta está armada.
+      expect(find.text('Indicador 1'), findsNothing);
+      expect(find.text('Datos del puesto'), findsNothing);
+    });
+
+    testWidgets('«Siguiente» y «Anterior» recorren las secciones en orden', (
+      tester,
+    ) async {
+      await _openDraft(tester, FakeRecruitmentRepository(), height: 3200);
+      expect(find.textContaining('Anterior:'), findsNothing);
+      await _tapText(tester, 'Siguiente: Propósito y funciones');
+      expect(find.text('Propósito del puesto'), findsOneWidget);
+      expect(
+        tester.widget<ChoiceChip>(_chip('Propósito y funciones')).selected,
+        isTrue,
+      );
+      await _tapText(tester, 'Siguiente: Perfil');
+      await _tapText(tester, 'Siguiente: Competencias y recursos');
+      await _tapText(tester, 'Siguiente: Indicadores y conformidades');
+      expect(find.text('Indicadores de desempeño'), findsOneWidget);
+      expect(find.textContaining('Siguiente:'), findsNothing);
+      await _tapText(tester, 'Anterior: Competencias y recursos');
+      expect(find.text('Recursos necesarios'), findsOneWidget);
     });
 
     testWidgets('navegar entre secciones no borra lo capturado', (
       tester,
     ) async {
       await _openDraft(tester, FakeRecruitmentRepository());
+      await _edit(tester, _field('Operador de Soldadura'), 'Operador B');
+      await _goTo(tester, 'Propósito y funciones');
       await _edit(
         tester,
         _field('Soldar piezas según el plano.'),
         'Nuevo propósito',
       );
-      await _goTo(tester, 'Indicadores y conformidades');
       await _goTo(tester, 'Competencias y recursos');
+      await tester.tap(find.text('Trabajo en equipo'));
+      await tester.pumpAndSettle();
+      await _goTo(tester, 'Indicadores y conformidades');
       await _goTo(tester, 'Identificación');
-
+      expect(_field('Operador B'), findsOneWidget);
+      await _goTo(tester, 'Propósito y funciones');
       expect(_field('Nuevo propósito'), findsOneWidget);
+      await _goTo(tester, 'Competencias y recursos');
+      expect(
+        tester
+            .widget<CheckboxListTile>(
+              find.widgetWithText(CheckboxListTile, 'Trabajo en equipo'),
+            )
+            .value,
+        isTrue,
+      );
       expect(find.text('Tienes cambios sin guardar.'), findsOneWidget);
     });
 
@@ -136,11 +173,18 @@ void main() {
     ) async {
       final repository = FakeRecruitmentRepository();
       await _openDraft(tester, repository);
+      await _goTo(tester, 'Competencias y recursos');
       await _edit(tester, _field('Otras competencias'), 'x' * 256);
       await _goTo(tester, 'Identificación');
+      expect(find.text('Otras competencias'), findsNothing);
       await tester.tap(find.text('Guardar borrador'));
       await tester.pumpAndSettle();
 
+      // Abre la sección del error aunque no estuviera abierta.
+      expect(
+        tester.widget<ChoiceChip>(_chip('Competencias y recursos')).selected,
+        isTrue,
+      );
       expect(find.text('Revisa los campos marcados en rojo.'), findsOneWidget);
       expect(
         find.text('Usa como máximo 255 caracteres.').hitTestable(),
@@ -396,7 +440,7 @@ void main() {
         findsOneWidget,
       );
       // El resto de la página sigue disponible.
-      expect(_field('Soldar piezas según el plano.'), findsOneWidget);
+      expect(_field('Operador de Soldadura'), findsOneWidget);
 
       repository
         ..cambiosFailure = null
@@ -411,6 +455,7 @@ void main() {
     testWidgets('se reordenan sin perder lo escrito', (tester) async {
       final repository = FakeRecruitmentRepository();
       await _openDraft(tester, repository, height: 3200);
+      await _goTo(tester, 'Propósito y funciones');
       await _edit(
         tester,
         find.widgetWithText(TextFormField, 'Responsabilidad 2'),
@@ -445,6 +490,7 @@ void main() {
     ) async {
       final repository = FakeRecruitmentRepository();
       await _openDraft(tester, repository, height: 3200);
+      await _goTo(tester, 'Propósito y funciones');
       await _tapText(tester, 'Agregar responsabilidad');
       await _edit(
         tester,
@@ -474,6 +520,8 @@ void main() {
         repository: FakeRecruitmentRepository(),
         height: 3200,
       );
+      await _goTo(tester, 'Propósito y funciones');
+      expect(find.text('Responsabilidad 1'), findsOneWidget);
       expect(find.byTooltip('Subir responsabilidad 1'), findsNothing);
       expect(find.byTooltip('Bajar responsabilidad 1'), findsNothing);
     });

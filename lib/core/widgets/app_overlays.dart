@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../design_system/breakpoints.dart';
 import '../design_system/colors.dart';
 import '../design_system/motion.dart';
 
@@ -39,33 +38,22 @@ Future<T?> showAppDialog<T>({
 
 /// Abre un formulario en un panel lateral: entra desde la derecha en
 /// pantallas anchas y desde abajo en móvil. Reemplaza a los formularios en
-/// diálogo centrado — un formulario largo necesita altura completa y su
-/// botón de guardar siempre a la vista, no una ventana flotante con scroll.
+/// diálogo genérico: `AppFormPanel` mantiene las acciones a la vista y permite
+/// elegir la presentación lateral o centrada según la extensión del formulario.
 ///
-/// El widget que devuelve [builder] debe ser un `AppFormPanel` (él mismo se
-/// ancla al borde correcto).
+/// El widget que devuelve [builder] debe ser un `AppFormPanel`: él mismo se
+/// ancla al borde correcto y se desliza con la animación de esta ruta. Aquí
+/// solo se oscurece el fondo; antes se deslizaba la capa de pantalla completa
+/// (1440 px para un panel de 520) y el panel tardaba en asomar.
 Future<T?> showAppPanel<T>({
   required BuildContext context,
   required WidgetBuilder builder,
+  bool barrierDismissible = false,
 }) => showGeneralDialog<T>(
   context: context,
-  barrierDismissible: false,
+  barrierDismissible: barrierDismissible,
   barrierLabel: 'Cerrar',
   barrierColor: _scrim,
   transitionDuration: AppMotion.duration(context, AppMotion.page),
   pageBuilder: (context, _, _) => builder(context),
-  transitionBuilder: (context, animation, _, child) {
-    final wide = MediaQuery.sizeOf(context).width >= AppBreakpoints.mobile;
-    return SlideTransition(
-      position: animation
-          .drive(CurveTween(curve: AppMotion.curve))
-          .drive(
-            Tween<Offset>(
-              begin: wide ? const Offset(1, 0) : const Offset(0, 1),
-              end: Offset.zero,
-            ),
-          ),
-      child: child,
-    );
-  },
 );

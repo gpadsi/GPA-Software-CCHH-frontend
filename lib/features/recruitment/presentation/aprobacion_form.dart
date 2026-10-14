@@ -87,6 +87,8 @@ class _AprobacionFormState extends ConsumerState<AprobacionForm> {
 
   @override
   Widget build(BuildContext context) => AppFormPanel(
+    centered: true,
+    width: 600,
     title: 'Aprobación: ${widget.etapa.name}',
     busy: _busy,
     error: _error,

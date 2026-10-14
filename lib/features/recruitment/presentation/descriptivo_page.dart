@@ -22,6 +22,7 @@ import '../data/recruitment_repository.dart';
 import 'conformidades_card.dart';
 import 'discard_changes_dialog.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_design.dart';
 import 'requisicion_before_unload.dart';
 
 /// Cuántos renglones vacíos trae un borrador sin funciones ni indicadores:
@@ -29,9 +30,6 @@ import 'requisicion_before_unload.dart';
 /// más.
 const _defaultFunciones = 5;
 const _defaultIndicadores = 3;
-
-/// Ancho de la columna de contenido (y de la barra de acciones).
-const _contentMaxWidth = 900.0;
 
 /// Las secciones de la página, en el orden en que se recorren.
 const _sectionNames = [
@@ -74,13 +72,10 @@ class DescriptivoPage extends ConsumerWidget {
         catalogs: options,
       );
     }
-    return FeaturePage(
+    return RecruitmentPage(
       title: 'Descriptivo de puesto',
       description: 'Detalle del descriptivo de puesto.',
-      tabs: const FeatureTabs(
-        current: '/reclutamiento/descriptivos',
-        destinations: recruitmentTabs,
-      ),
+      tabs: const RecruitmentModuleTabs(current: '/reclutamiento/descriptivos'),
       child: error != null
           ? FeatureError(error: error, onRetry: () => _reload(ref))
           : const FeatureLoading(),
@@ -92,8 +87,10 @@ class DescriptivoPage extends ConsumerWidget {
 /// borrador y la cuenta pueda escribir; en una versión aprobada o histórica, o
 /// para cualquier otra cuenta, muestra lo mismo sin dejar cambiarlo.
 ///
-/// Todo lo capturado vive en este estado (controladores y selecciones), no en
-/// los widgets de cada sección: navegar entre secciones, recibir un error o
+/// Solo se arma la sección abierta: el formulario tiene más de 50 campos y
+/// armarlos todos juntos congelaba la página al abrirla (R5: ~370 ms con la CPU
+/// a 4x). Todo lo capturado vive en este estado (controladores y selecciones),
+/// no en los widgets de cada sección: cambiar de sección, recibir un error o
 /// recargar un catálogo no borra nada.
 class DescriptivoEditor extends ConsumerStatefulWidget {
   const DescriptivoEditor({
@@ -168,10 +165,21 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   bool _leaving = false;
   String? _error;
 
-  // Navegación entre secciones.
-  final _sections = List.generate(_sectionNames.length, (_) => GlobalKey());
+  // La sección abierta: es la única que se arma.
   final _scroll = ScrollController();
   int _active = 0;
+
+  // Límites de los campos de una línea, con la sección en la que viven. Una sola
+  // fuente: el campo los usa para marcar su error y la validación los revisa
+  // aunque su sección no esté abierta (sus campos no existen hasta abrirla).
+  late final Map<TextEditingController, ({int section, int limit})> _limits = {
+    _nombrePuesto: (section: 0, limit: 150),
+    _edadOtro: (section: 0, limit: 100),
+    _diasOtro: (section: 0, limit: 100),
+    _horarioOtro: (section: 0, limit: 100),
+    _compOtras: (section: 3, limit: 255),
+    _recursosOtro: (section: 3, limit: 255),
+  };
 
   // Protección de salida (la misma de la requisición).
   late final RequisicionExitGuard _guard;
@@ -203,7 +211,6 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(_updateSection);
     _guard = ref.read(requisicionExitGuardProvider);
     _exitCallback = _confirmExit;
     _guard.confirm = _exitCallback;
@@ -250,32 +257,38 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     }
   }
 
-  void _updateSection() {
-    final viewport = _sections[0].currentContext
-        ?.findAncestorStateOfType<ScrollableState>()
-        ?.context
-        .findRenderObject();
-    if (viewport is! RenderBox) return;
-    final top = viewport.localToGlobal(Offset.zero).dy;
-    var active = 0;
-    for (var i = 0; i < _sections.length; i++) {
-      final box = _sections[i].currentContext?.findRenderObject();
-      if (box is RenderBox && box.localToGlobal(Offset.zero).dy <= top + 100) {
-        active = i;
-      }
-    }
-    if (active != _active && mounted) setState(() => _active = active);
-  }
-
   Duration get _jumpDuration => MediaQuery.disableAnimationsOf(context)
       ? Duration.zero
       : const Duration(milliseconds: 180);
 
-  Future<void> _jump(int section) async {
-    final target = _sections[section].currentContext;
-    if (target == null) return;
-    await Scrollable.ensureVisible(target, duration: _jumpDuration);
-    if (mounted) setState(() => _active = section);
+  /// Abre una sección (y solo entonces se arma), empezando desde arriba.
+  Future<void> _show(int section) async {
+    if (section == _active || !mounted) return;
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+    setState(() => _active = section);
+    await WidgetsBinding.instance.endOfFrame;
+  }
+
+  bool _applies(TextEditingController controller) {
+    final c = widget.catalogs;
+    if (controller == _edadOtro) return isOtro(entryIn(c.rangosEdad, _edad));
+    if (controller == _diasOtro) return isOtro(entryIn(c.dias, _dias));
+    if (controller == _horarioOtro) {
+      return isOtro(entryIn(c.horarios, _horario));
+    }
+    return true;
+  }
+
+  /// La sección del primer dato que no se puede guardar, o null. Revisa los
+  /// datos y no los campos, que solo existen en la sección abierta.
+  int? _sectionWithProblem() {
+    if (_fecha == null) return 0;
+    for (final MapEntry(key: controller, value: rule) in _limits.entries) {
+      if (_applies(controller) && controller.text.trim().length > rule.limit) {
+        return rule.section;
+      }
+    }
+    return null;
   }
 
   Descriptivo _snapshot() => _saved.copyWith(
@@ -331,7 +344,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     ref.invalidate(descriptivosPageProvider);
   }
 
-  // Lleva al primer campo con error aunque esté en otra sección.
+  // Lleva al primer campo con error de la sección abierta.
   void _revealFirstError() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final root = _form.currentContext;
@@ -360,8 +373,13 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     });
   }
 
-  bool _validate() {
-    final ok = _form.currentState?.validate() ?? false;
+  Future<bool> _validate() async {
+    // Si el problema está en otra sección, se abre para que se vea marcado.
+    final problem = _sectionWithProblem();
+    if (problem != null) await _show(problem);
+    if (!mounted) return false;
+    final valid = _form.currentState?.validate() ?? false;
+    final ok = valid && problem == null;
     if (!ok) {
       _say('Revisa los campos marcados en rojo.');
       _revealFirstError();
@@ -370,7 +388,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   }
 
   Future<bool> _save({bool quiet = false}) async {
-    if (_saving || !_validate()) return false;
+    if (_saving || !await _validate() || _saving || !mounted) return false;
     setState(() {
       _saving = true;
       _error = null;
@@ -402,7 +420,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   }
 
   Future<void> _approve() async {
-    if (!_validate()) return;
+    if (!await _validate() || !mounted) return;
     // Todo lo que necesita la confirmación se toma antes de abrir el diálogo:
     // si la página se cierra mientras está abierto, no hay estado que consultar
     // y se aprueba exactamente lo que se estaba viendo.
@@ -490,7 +508,6 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   Widget _text(
     String label,
     TextEditingController controller, {
-    int? limit,
     bool multiline = false,
     String? hint,
   }) => AppTextField(
@@ -503,7 +520,9 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     },
     maxLines: multiline ? null : 1,
     minLines: multiline ? 3 : null,
-    validator: limit == null ? null : (value) => _limit(value, limit),
+    validator: _limits[controller] == null
+        ? null
+        : (value) => _limit(value, _limits[controller]!.limit),
   );
 
   Widget _pair(Widget a, Widget b) => LayoutBuilder(
@@ -554,6 +573,8 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   Widget _card(String title, List<Widget> children, {String? note}) => Padding(
     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
     child: AppCard(
+      color: RecruitmentDesign.surface,
+      borderColor: RecruitmentDesign.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -728,9 +749,24 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
 
   // Si la posición cambió después de crear el borrador, se muestra qué cambió
   // y la persona elige qué incorporar. Lo demás que escribió se conserva.
+  //
+  // Vive en su propio `Consumer`: la comparación llega después de que el editor
+  // ya se armó y, si el `ref.watch` estuviera en el `build` del editor, su
+  // llegada lo reconstruiría completo (R5: ~170 ms con la CPU a 4x).
   Widget _cambiosDeLaPosicion() {
     if (!_editable) return const SizedBox.shrink();
-    final cambios = ref.watch(descriptivoCambiosProvider(_saved.id));
+    return Consumer(
+      builder: (context, ref, _) => _avisoDeCambios(
+        context,
+        ref.watch(descriptivoCambiosProvider(_saved.id)),
+      ),
+    );
+  }
+
+  Widget _avisoDeCambios(
+    BuildContext context,
+    AsyncValue<List<CambioPosicion>> cambios,
+  ) {
     final type = Theme.of(context).textTheme;
     return cambios.when(
       loading: () => const SizedBox.shrink(),
@@ -832,51 +868,14 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
 
   // Lo que siempre se ve arriba: de dónde se vuelve, qué documento es y en qué
   // versión está. Compacto a propósito: el resto se desplaza.
-  Widget _header() {
-    final type = Theme.of(context).textTheme;
-    final title = _saved.nombrePuesto.trim().isNotEmpty
+  Widget _header() => RecruitmentEditorHeader(
+    title: _saved.nombrePuesto.trim().isNotEmpty
         ? _saved.nombrePuesto
-        : _saved.posicionEtiqueta;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.sm,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextButton(
-            onPressed: _saving ? null : _back,
-            child: const Text('Volver'),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: type.titleLarge,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '${_saved.posicionEtiqueta} · versión ${_saved.version}',
-                  style: type.bodyMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                AppBadge(label: _versionLabel, tone: _versionTone),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        : _saved.posicionEtiqueta,
+    subtitle: 'Descriptivo de puesto · versión ${_saved.version}',
+    onBack: _saving ? null : _back,
+    status: AppBadge(label: _versionLabel, tone: _versionTone),
+  );
 
   // Descargar, copiar y eliminar: se usan poco, así que viven al inicio del
   // contenido y no ocupan el alto que siempre se ve.
@@ -927,27 +926,34 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     );
   }
 
-  Widget _sectionChips() => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-    child: Row(
+  Widget _sectionChips() => RecruitmentSectionTabs(
+    labels: _sectionNames,
+    selected: _active,
+    onSelected: _show,
+  );
+
+  // Al terminar una sección, la anterior y la siguiente a un toque.
+  Widget _sectionNav() => Padding(
+    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+    child: Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
       children: [
-        for (var i = 0; i < _sectionNames.length; i++)
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
-            child: ChoiceChip(
-              label: Text(_sectionNames[i]),
-              chipAnimationStyle: MediaQuery.disableAnimationsOf(context)
-                  ? ChipAnimationStyle(
-                      enableAnimation: AnimationStyle.noAnimation,
-                      selectAnimation: AnimationStyle.noAnimation,
-                      avatarDrawerAnimation: AnimationStyle.noAnimation,
-                      deleteDrawerAnimation: AnimationStyle.noAnimation,
-                    )
-                  : null,
-              selected: i == _active,
-              onSelected: (_) => _jump(i),
-            ),
+        if (_active > 0)
+          TextButton.icon(
+            onPressed: () => _show(_active - 1),
+            icon: const Icon(Icons.arrow_back),
+            label: Text('Anterior: ${_sectionNames[_active - 1]}'),
+          )
+        else
+          const SizedBox.shrink(),
+        if (_active < _sectionNames.length - 1)
+          TextButton.icon(
+            onPressed: () => _show(_active + 1),
+            iconAlignment: IconAlignment.end,
+            icon: const Icon(Icons.arrow_forward),
+            label: Text('Siguiente: ${_sectionNames[_active + 1]}'),
           ),
       ],
     ),
@@ -955,46 +961,28 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
 
   // Guardar y aprobar siempre a la vista, sin importar la sección. La barra
   // ocupa todo el ancho y sus botones se alinean con la columna del contenido.
-  Widget _actionBar() {
-    final type = Theme.of(context).textTheme;
-    return Material(
-      color: AppColors.surface,
-      elevation: 3,
-      child: SafeArea(
-        top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                alignment: WrapAlignment.end,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  if (_dirty)
-                    Text('Tienes cambios sin guardar.', style: type.bodySmall),
-                  AppButton(
-                    label: 'Guardar borrador',
-                    icon: Icons.save_outlined,
-                    isLoading: _saving,
-                    onPressed: _dirty ? _save : null,
-                  ),
-                  AppButton(
-                    label: 'Aprobar versión',
-                    icon: Icons.verified_outlined,
-                    variant: AppButtonVariant.secondary,
-                    onPressed: _saving ? null : _approve,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  Widget _actionBar() => RecruitmentActionBar(
+    status: _saving
+        ? 'Guardando…'
+        : _dirty
+        ? 'Tienes cambios sin guardar.'
+        : 'Sin cambios pendientes',
+    dirty: _dirty,
+    actions: [
+      AppButton(
+        label: 'Guardar borrador',
+        icon: Icons.save_outlined,
+        isLoading: _saving,
+        onPressed: _dirty ? _save : null,
       ),
-    );
-  }
+      AppButton(
+        label: 'Aprobar versión',
+        icon: Icons.verified_outlined,
+        variant: AppButtonVariant.secondary,
+        onPressed: _saving ? null : _approve,
+      ),
+    ],
+  );
 
   Widget _errorBanner() {
     final type = Theme.of(context).textTheme;
@@ -1025,6 +1013,12 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     final edad = entryIn(c.rangosEdad, _edad);
     final dias = entryIn(c.dias, _dias);
     final horario = entryIn(c.horarios, _horario);
+    // La comparación con la posición se escucha (sin reconstruir el editor) para
+    // que no se descarte y se vuelva a pedir cada vez que se cierra
+    // «Identificación», que es donde se muestra.
+    if (_editable) {
+      ref.listen(descriptivoCambiosProvider(_saved.id), (_, _) {});
+    }
 
     return PopScope(
       canPop: !_editable || (!_dirty && !_saving) || _leaving,
@@ -1033,56 +1027,40 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
       },
       child: FocusTraversalGroup(
         policy: WidgetOrderTraversalPolicy(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
-                  child: Column(
-                    children: [
-                      _header(),
-                      _sectionChips(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _scroll,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: Form(
-                            key: _form,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                _acciones(),
-                                if (_error != null) _errorBanner(),
-                                if (!canManage)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: AppSpacing.lg,
-                                    ),
-                                    child: Text(
-                                      'Solo Capital Humano edita los descriptivos. Aquí puedes consultarlo y descargarlo.',
-                                      style: type.bodySmall,
-                                    ),
-                                  ),
-                                ..._identificacion(c, edad, dias, horario),
-                                ..._propositoYFunciones(),
-                                ..._perfil(),
-                                ..._competenciasYRecursos(c),
-                                ..._indicadoresYConformidades(c, canManage),
-                              ],
-                            ),
-                          ),
-                        ),
+        child: RecruitmentEditorLayout(
+          header: _header(),
+          tabs: _sectionChips(),
+          footer: _editable ? _actionBar() : null,
+          child: SingleChildScrollView(
+            controller: _scroll,
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+            child: Form(
+              key: _form,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _acciones(),
+                  if (_error != null) _errorBanner(),
+                  if (!canManage)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      child: Text(
+                        'Solo Capital Humano edita los descriptivos. Aquí puedes consultarlo y descargarlo.',
+                        style: type.bodySmall,
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  ...switch (_active) {
+                    0 => _identificacion(c, edad, dias, horario),
+                    1 => _propositoYFunciones(),
+                    2 => _perfil(),
+                    3 => _competenciasYRecursos(c),
+                    _ => _indicadoresYConformidades(c, canManage),
+                  },
+                  _sectionNav(),
+                ],
               ),
             ),
-            if (_editable) _actionBar(),
-          ],
+          ),
         ),
       ),
     );
@@ -1094,12 +1072,12 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     RecruitmentCatalogEntry? dias,
     RecruitmentCatalogEntry? horario,
   ) => [
-    SectionTitle(_sectionNames[0], key: _sections[0], padTop: false),
+    SectionTitle(_sectionNames[0], padTop: false),
     _card('Datos del puesto', [
       _vinculados(),
       _cambiosDeLaPosicion(),
       _pair(
-        _text('Nombre del puesto', _nombrePuesto, limit: 150),
+        _text('Nombre del puesto', _nombrePuesto),
         AppDateField(
           label: 'Fecha de elaboración / actualización',
           value: _fecha,
@@ -1121,7 +1099,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     ]),
     _card('Condiciones del puesto', [
       _choice('Edad', _edad, c.rangosEdad, (v) => _edad = v),
-      if (isOtro(edad)) ...[_gap, _text('Edad (otro)', _edadOtro, limit: 100)],
+      if (isOtro(edad)) ...[_gap, _text('Edad (otro)', _edadOtro)],
       _gap,
       DropdownButtonFormField<bool?>(
         key: ValueKey('viajar:$_viajar'),
@@ -1149,10 +1127,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
         c.dias,
         (v) => setState(() => _dias = v),
       ),
-      if (isOtro(dias)) ...[
-        _gap,
-        _text('Días por laborar (otro)', _diasOtro, limit: 100),
-      ],
+      if (isOtro(dias)) ...[_gap, _text('Días por laborar (otro)', _diasOtro)],
       _gap,
       _choice(
         'Horario por cubrir',
@@ -1160,15 +1135,12 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
         c.horarios,
         (v) => setState(() => _horario = v),
       ),
-      if (isOtro(horario)) ...[
-        _gap,
-        _text('Horario (otro)', _horarioOtro, limit: 100),
-      ],
+      if (isOtro(horario)) ...[_gap, _text('Horario (otro)', _horarioOtro)],
     ]),
   ];
 
   List<Widget> _propositoYFunciones() => [
-    SectionTitle(_sectionNames[1], key: _sections[1]),
+    SectionTitle(_sectionNames[1], padTop: false),
     _card('Propósito del puesto', [
       _text('Propósito', _proposito, multiline: true),
     ]),
@@ -1190,7 +1162,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   ];
 
   List<Widget> _perfil() => [
-    SectionTitle(_sectionNames[2], key: _sections[2]),
+    SectionTitle(_sectionNames[2], padTop: false),
     _card('Perfil del puesto', [
       _text('Escolaridad mínima', _escolaridad, multiline: true),
       _gap,
@@ -1207,16 +1179,16 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   ];
 
   List<Widget> _competenciasYRecursos(DescriptivoCatalogs c) => [
-    SectionTitle(_sectionNames[3], key: _sections[3]),
+    SectionTitle(_sectionNames[3], padTop: false),
     _card('Competencias conductuales', [
       _checks(c.competencias, _competencias),
       _gap,
-      _text('Otras competencias', _compOtras, limit: 255),
+      _text('Otras competencias', _compOtras),
     ]),
     _card('Recursos necesarios', [
       _checks(c.recursos, _recursos),
       _gap,
-      _text('Otros recursos', _recursosOtro, limit: 255),
+      _text('Otros recursos', _recursosOtro),
     ]),
   ];
 
@@ -1224,7 +1196,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     DescriptivoCatalogs c,
     bool canManage,
   ) => [
-    SectionTitle(_sectionNames[4], key: _sections[4]),
+    SectionTitle(_sectionNames[4], padTop: false),
     _card('Indicadores de desempeño', [_numbered(_indicadores, 'indicador')]),
     if (canManage && _saved.estaCongelado)
       Padding(

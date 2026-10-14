@@ -21,6 +21,7 @@ import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'aprobacion_form.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_design.dart';
 import 'requisicion_suspension_dialog.dart';
 import 'requisiciones_page.dart';
 
@@ -231,7 +232,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
     final canManage = ref.watch(canManageHrProvider);
     final me = ref.watch(sessionControllerProvider).user?.id;
     final loaded = requisicion.value;
-    return FeaturePage(
+    return RecruitmentPage(
       title: loaded?.posicionEtiqueta.isNotEmpty ?? false
           ? loaded!.posicionEtiqueta
           : 'Requisición',
@@ -240,10 +241,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
           'Requisición de ${nameIn(c.tipos, r.tipo)?.toLowerCase() ?? 'personal'}, solicitada el ${shownDate(r.fechaSolicitud) ?? 'sin fecha'}.',
         _ => 'Detalle de la requisición.',
       },
-      tabs: const FeatureTabs(
-        current: '/reclutamiento',
-        destinations: recruitmentTabs,
-      ),
+      tabs: const RecruitmentModuleTabs(current: '/reclutamiento'),
       actions: [
         if (loaded != null &&
             canEditRequisicion(loaded, canManage: canManage, me: me))
@@ -517,6 +515,8 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
     child: AppCard(
+      color: RecruitmentDesign.surface,
+      borderColor: RecruitmentDesign.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

@@ -83,6 +83,8 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
       );
     }
     return AppFormPanel(
+      centered: true,
+      width: 640,
       title: 'Nuevo descriptivo de puesto',
       saveLabel: _posicion?.tramiteAbierto == null
           ? 'Crear borrador'

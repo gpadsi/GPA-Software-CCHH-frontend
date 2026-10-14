@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
@@ -154,23 +155,19 @@ class _CatorcenasPageState extends ConsumerState<CatorcenasPage> {
                         ),
                         if (canManage)
                           DataCell(
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  tooltip: 'Editar catorcena',
-                                  onPressed: () => _addOrEdit(catorcena),
-                                  icon: const Icon(Icons.edit_outlined),
-                                ),
-                                const SizedBox(width: AppSpacing.xs),
-                                IconButton(
-                                  tooltip: 'Eliminar catorcena',
-                                  onPressed: () =>
-                                      _delete(catorcena, data.results.length),
-                                  icon: const Icon(Icons.delete_outline),
-                                ),
-                              ],
-                            ),
+                            AppRowActions.list([
+                              AppRowAction(
+                                icon: Icons.edit_outlined,
+                                tooltip: 'Editar catorcena',
+                                onPressed: () => _addOrEdit(catorcena),
+                              ),
+                              AppRowAction(
+                                icon: Icons.delete_outline,
+                                tooltip: 'Eliminar catorcena',
+                                onPressed: () =>
+                                    _delete(catorcena, data.results.length),
+                              ),
+                            ]),
                           ),
                       ],
                     ),

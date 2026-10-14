@@ -21,6 +21,7 @@ import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_design.dart';
 import 'recruitment_creation.dart';
 
 /// Quién puede editar una requisición: Capital Humano y Admin las de todos, y
@@ -114,13 +115,10 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
     return PrimaryScrollController(
       controller: _scroll,
       automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
-      child: FeaturePage(
+      child: RecruitmentPage(
         title: 'Reclutamiento',
         description: 'Las requisiciones para cubrir una posición, ya sea por reemplazo o por una posición nueva.',
-        tabs: const FeatureTabs(
-          current: '/reclutamiento',
-          destinations: recruitmentTabs,
-        ),
+        tabs: const RecruitmentModuleTabs(current: '/reclutamiento'),
         actions: [
           AppButton(
             label: 'Nueva requisición',
@@ -217,10 +215,21 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
     final me = ref.watch(sessionControllerProvider).user?.id;
     final filtered = _query.filters.values.any((value) => value.isNotEmpty);
     return AppDataTable(
+      // La posición lleva dos renglones y el tipo debajo: más ancho y más alto.
+      rowHeight: 76,
       columns: [
-        const DataColumn(label: Text('Posición')),
-        const DataColumn(label: Text('Estado')),
-        const DataColumn(label: Text('Fecha de solicitud')),
+        const DataColumn(
+          label: Text('Posición'),
+          columnWidth: FlexColumnWidth(2.2),
+        ),
+        const DataColumn(
+          label: Text('Estado'),
+          columnWidth: FixedColumnWidth(200),
+        ),
+        const DataColumn(
+          label: Text('Fecha de solicitud'),
+          columnWidth: FixedColumnWidth(130),
+        ),
         if (canManage) const DataColumn(label: Text('Solicitante')),
         const DataColumn(label: Text('Acciones')),
       ],

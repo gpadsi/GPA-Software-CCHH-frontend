@@ -197,7 +197,8 @@ void main() {
 
     expect(find.text('1–2 de 100 resultados'), findsOneWidget);
     expect(find.text('Página 1 de 10'), findsOneWidget);
-    expect(tester.widget<DataTable>(find.byType(DataTable)).rows, hasLength(2));
+    expect(find.text('Registro recibido A'), findsOneWidget);
+    expect(find.text('Registro recibido B'), findsOneWidget);
     expect(
       tester
           .widget<IconButton>(

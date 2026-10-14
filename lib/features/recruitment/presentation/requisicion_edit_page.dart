@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_badge.dart';
 import '../../../core/widgets/app_date_field.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
@@ -19,6 +20,7 @@ import '../data/recruitment_repository.dart';
 import 'discard_changes_dialog.dart';
 import 'posicion_contexto_card.dart';
 import 'recruitment_ui.dart';
+import 'recruitment_design.dart';
 import 'requisiciones_page.dart';
 import 'requisicion_before_unload.dart';
 
@@ -564,144 +566,117 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
       },
       child: FocusTraversalGroup(
         policy: WidgetOrderTraversalPolicy(),
-        child: Column(
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 820),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed: _busy ? null : _back,
-                              child: const Text('Volver'),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Text(
-                                _current == null
-                                    ? 'Nueva requisición'
-                                    : 'Editar requisición',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                            ),
-                          ],
+        child: RecruitmentEditorLayout(
+          header: RecruitmentEditorHeader(
+            title: _current == null
+                ? 'Nueva requisición'
+                : 'Editar requisición',
+            subtitle: 'Define la solicitud y las condiciones para cubrir la posición.',
+            onBack: _busy ? null : _back,
+            status: AppBadge(
+              label: draft
+                  ? 'Borrador'
+                  : entryIn(
+                          catalogs.value?.estados ?? [],
+                          _current?.estado,
+                        )?.name ??
+                        'Requisición',
+              tone: draft
+                  ? AppBadgeTone.neutral
+                  : estadoTone(
+                      entryIn(
+                        catalogs.value?.estados ?? [],
+                        _current?.estado,
+                      )?.code,
+                    ),
+            ),
+          ),
+          tabs: RecruitmentSectionTabs(
+            labels: _sectionNames,
+            selected: _active,
+            onSelected: _jump,
+          ),
+          footer: RecruitmentActionBar(
+            status: _busy
+                ? 'Guardando…'
+                : _dirty
+                ? 'Tienes cambios sin guardar.'
+                : _current == null
+                ? 'Nuevo borrador'
+                : 'Sin cambios pendientes',
+            dirty: _dirty,
+            actions: [
+              AppButton(
+                label: draft ? 'Guardar borrador' : 'Guardar cambios',
+                variant: draft
+                    ? AppButtonVariant.secondary
+                    : AppButtonVariant.primary,
+                isLoading: _busy && !_sending,
+                onPressed: !canSave || _busy
+                    ? null
+                    : () => _save(catalogs.requireValue, send: false),
+              ),
+              if (draft)
+                AppButton(
+                  label: 'Enviar a autorización',
+                  icon: Icons.arrow_forward_rounded,
+                  isLoading: _busy && _sending,
+                  onPressed: !canSave || _busy
+                      ? null
+                      : () => _save(catalogs.requireValue, send: true),
+                ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            controller: _scroll,
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_posicionContextoId != null) ...[
+                  PosicionContextoCard(
+                    posicionId: _posicionContextoId!,
+                    para: 'requisicion',
+                    action: _current == null
+                        ? TextButton(
+                            onPressed: _busy
+                                ? null
+                                : () => setState(() {
+                                    _posicionElegida = null;
+                                    _posicionContextoId = null;
+                                    _selectorVisible = true;
+                                    _posicionError = null;
+                                  }),
+                            child: const Text('Cambiar posición'),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
                         ),
                       ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                        ),
-                        child: Row(
-                          children: [
-                            for (var i = 0; i < _sectionNames.length; i++)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  right: AppSpacing.sm,
-                                ),
-                                child: ChoiceChip(
-                                  label: Text(_sectionNames[i]),
-                                  chipAnimationStyle:
-                                      MediaQuery.disableAnimationsOf(context)
-                                      ? ChipAnimationStyle(
-                                          enableAnimation:
-                                              AnimationStyle.noAnimation,
-                                          selectAnimation:
-                                              AnimationStyle.noAnimation,
-                                          avatarDrawerAnimation:
-                                              AnimationStyle.noAnimation,
-                                          deleteDrawerAnimation:
-                                              AnimationStyle.noAnimation,
-                                        )
-                                      : null,
-                                  selected: i == _active,
-                                  onSelected: (_) => _jump(i),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _scroll,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (_posicionContextoId != null)
-                                PosicionContextoCard(
-                                  posicionId: _posicionContextoId!,
-                                  para: 'requisicion',
-                                ),
-                              if (_error != null)
-                                Semantics(
-                                  liveRegion: true,
-                                  child: Text(
-                                    _error!,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .error,
-                                    ),
-                                  ),
-                                ),
-                              catalogs.when(
-                                data: _fields,
-                                loading: () => const FeatureLoading(),
-                                error: (error, _) => FeatureError(
-                                  error: error,
-                                  onRetry: () => ref.invalidate(
-                                    requisicionCatalogsProvider,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
+                  ),
+                catalogs.when(
+                  data: _fields,
+                  loading: () => const FeatureLoading(),
+                  error: (error, _) => FeatureError(
+                    error: error,
+                    onRetry: () => ref.invalidate(requisicionCatalogsProvider),
                   ),
                 ),
-              ),
+              ],
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  alignment: WrapAlignment.end,
-                  children: [
-                    AppButton(
-                      label: draft ? 'Guardar borrador' : 'Guardar cambios',
-                      variant: draft
-                          ? AppButtonVariant.secondary
-                          : AppButtonVariant.primary,
-                      isLoading: _busy && !_sending,
-                      onPressed: !canSave || _busy
-                          ? null
-                          : () => _save(catalogs.requireValue, send: false),
-                    ),
-                    if (draft)
-                      AppButton(
-                        label: 'Enviar a autorización',
-                        isLoading: _busy && _sending,
-                        onPressed: !canSave || _busy
-                            ? null
-                            : () => _save(catalogs.requireValue, send: true),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -717,363 +692,398 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SectionTitle('Solicitud', key: _sections[0], padTop: false),
-          if (creating && _selectorVisible)
-            _field(
-              'posicion',
-              SearchPickerField<PosicionElegible>(
-                label: 'Posición',
-                hint: 'Escribe puesto, unidad o área',
-                enabled: !_busy,
-                suggestOnFocus: true,
-                errorText: _fieldErrors['posicion'] ?? _posicionError,
-                attention: _posicionAttention,
-                search: (text) => ref
-                    .read(recruitmentRepositoryProvider)
-                    .posicionesElegibles(para: 'requisicion', search: text),
-                labelOf: (posicion) => posicion.etiqueta,
-                detailOf: (posicion) => [
-                  posicion.estatus,
-                  if (posicion.area != null) posicion.area!,
-                ].join(' · '),
-                badgeOf: (posicion) => posicion.tramiteAbierto == null
-                    ? null
-                    : 'Requisición abierta',
-                onChanged: (posicion) => setState(() {
-                  _posicionElegida = posicion;
-                  _posicionContextoId = posicion?.id;
-                  if (posicion != null && widget.posicionId != null) {
-                    _selectorVisible = false;
-                  }
-                  _posicionError = null;
-                }),
-              ),
-            )
-          else if (!creating)
-            _field(
-              'posicion',
-              InputDecorator(
-                decoration: InputDecoration(
-                  labelText: 'Posición',
-                  errorText: _fieldErrors['posicion'],
-                ),
-                child: Text(_current!.posicionEtiqueta),
-              ),
-            ),
-          if (creating && _posicionContextoId != null)
-            TextButton(
-              onPressed: _busy
-                  ? null
-                  : () => setState(() {
-                      _posicionElegida = null;
-                      _posicionContextoId = null;
-                      _selectorVisible = true;
+          RecruitmentFormSection(
+            key: _sections[0],
+            title: 'Solicitud',
+            description: 'Identifica la posición, el motivo y las fechas de la solicitud.',
+            children: [
+              if (creating && _selectorVisible)
+                _field(
+                  'posicion',
+                  SearchPickerField<PosicionElegible>(
+                    label: 'Posición',
+                    hint: 'Escribe puesto, unidad o área',
+                    enabled: !_busy,
+                    suggestOnFocus: true,
+                    errorText: _fieldErrors['posicion'] ?? _posicionError,
+                    attention: _posicionAttention,
+                    search: (text) => ref
+                        .read(recruitmentRepositoryProvider)
+                        .posicionesElegibles(para: 'requisicion', search: text),
+                    labelOf: (posicion) => posicion.etiqueta,
+                    detailOf: (posicion) => [
+                      posicion.estatus,
+                      if (posicion.area != null) posicion.area!,
+                    ].join(' · '),
+                    badgeOf: (posicion) => posicion.tramiteAbierto == null
+                        ? null
+                        : 'Requisición abierta',
+                    onChanged: (posicion) => setState(() {
+                      _posicionElegida = posicion;
+                      _posicionContextoId = posicion?.id;
+                      if (posicion != null && widget.posicionId != null) {
+                        _selectorVisible = false;
+                      }
                       _posicionError = null;
                     }),
-              child: const Text('Cambiar posición'),
-            ),
-          if (creating && _posicion?.tramiteAbierto != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            const Text('Esta posición ya tiene una requisición abierta'),
-            if (_posicion!.tramiteAbierto!.id == null)
-              const Text('Pídela a Capital Humano')
-            else
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: () {
-                    final id = _posicion!.tramiteAbierto!.id!;
-                    context.go('/reclutamiento/requisiciones/$id');
-                  },
-                  child: const Text('Abrir'),
+                  ),
+                )
+              else if (!creating)
+                _field(
+                  'posicion',
+                  InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Posición',
+                      errorText: _fieldErrors['posicion'],
+                    ),
+                    child: Text(_current!.posicionEtiqueta),
+                  ),
                 ),
-              ),
-          ],
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'tipo',
-            DropdownButtonFormField<int>(
-              initialValue: _tipo,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Tipo de requisición',
-              ),
-              items: [
-                for (final item in catalogs.tipos)
-                  DropdownMenuItem(value: item.id, child: Text(item.name)),
-              ],
-              onChanged: _busy
-                  ? null
-                  : (value) => setState(() => _tipo = value),
-              validator: (value) =>
-                  _fieldErrors['tipo'] ??
-                  (value == null ? 'Elige el tipo.' : null),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'fecha_solicitud',
-            AppDateField(
-              label: 'Fecha de solicitud',
-              value: _fechaSolicitud,
-              isRequired: true,
-              enabled: !_busy,
-              onChanged: (value) => setState(() => _fechaSolicitud = value),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'fecha_a_cubrir_vacante',
-            AppDateField(
-              label: 'Fecha a cubrir la vacante',
-              value: _fechaACubrir,
-              enabled: !_busy,
-              onChanged: (value) => setState(() => _fechaACubrir = value),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'fecha_entrega_a_capital_humano',
-            AppDateField(
-              label: 'Fecha de entrega a Capital Humano',
-              value: _fechaEntrega,
-              enabled: !_busy,
-              onChanged: (value) => setState(() => _fechaEntrega = value),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'area_solicitante',
-            SearchPickerField<AreaSolicitante>(
-              key: ValueKey(_areaRevision),
-              label: 'Área solicitante',
-              errorText: _fieldErrors['area_solicitante'],
-              minChars: 1,
-              hint: 'Escribe el departamento',
-              initialValue: _area,
-              enabled: !_busy,
-              suggestOnFocus: true,
-              helpText: _areaSuggested
-                  ? 'Sugerida a partir del área de la posición.'
-                  : 'Elige un área de la lista o escribe su nombre.',
-              emptyText: canManage ? null : 'No está en la lista. Pídele a Capital Humano que la agregue.',
-              emptyQueryText: canManage
-                  ? 'Todavía no hay áreas. Escribe un nombre para agregar la primera.'
-                  : 'Todavía no hay áreas registradas. Pídele a Capital Humano que las agregue.',
-              search: (text) => ref
-                  .read(recruitmentRepositoryProvider)
-                  .areasSolicitantes(search: text),
-              labelOf: (area) => area.name,
-              onCreate: canManage
-                  ? ref.read(recruitmentRepositoryProvider).crearAreaSolicitante
-                  : null,
-              onChanged: (area) => setState(() {
-                _area = area;
-                _areaTouched = true;
-                _areaSuggested = false;
-              }),
-            ),
-          ),
-          if (_area != null)
-            TextButton(
-              onPressed: _busy
-                  ? null
-                  : () => setState(() {
-                      _area = null;
-                      _areaTouched = true;
-                      _areaSuggested = false;
-                      _areaRevision++;
-                    }),
-              child: const Text('Quitar área'),
-            ),
-          const SectionTitle('Justificación'),
-          _field(
-            'justificacion',
-            AppTextField(
-              label: tipo?.requiereJustificacion ?? false
-                  ? 'Justificación de la requisición (obligatoria para este tipo)'
-                  : 'Justificación de la requisición (opcional)',
-              controller: _justificacion,
-              enabled: !_busy,
-              maxLines: null,
-              minLines: 3,
-              validator: (value) => _fieldErrors['justificacion'],
-            ),
-          ),
-          SectionTitle('Condiciones', key: _sections[1]),
-          _field(
-            'horario_a_cubrir',
-            DropdownButtonFormField<int?>(
-              initialValue: _horario,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Horario a cubrir'),
-              items: [
-                const DropdownMenuItem<int?>(
-                  value: null,
-                  child: Text('Sin definir'),
-                ),
-                for (final item in catalogs.horarios)
-                  DropdownMenuItem<int?>(
-                    value: item.id,
-                    child: Text(item.name),
+              if (creating && _posicion?.tramiteAbierto != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                const Text('Esta posición ya tiene una requisición abierta'),
+                if (_posicion!.tramiteAbierto!.id == null)
+                  const Text('Pídela a Capital Humano')
+                else
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        final id = _posicion!.tramiteAbierto!.id!;
+                        context.go('/reclutamiento/requisiciones/$id');
+                      },
+                      child: const Text('Abrir'),
+                    ),
                   ),
               ],
-              onChanged: _busy
-                  ? null
-                  : (value) => setState(() => _horario = value),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'idiomas_requeridos',
-            AppTextField(
-              label: 'Idiomas requeridos',
-              controller: _idiomas,
-              enabled: !_busy,
-              validator: (value) => _limit(value, 150),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _field(
-            'disposicion_viajar',
-            DropdownButtonFormField<bool?>(
-              initialValue: _viajar,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Disposición para viajar',
-              ),
-              items: const [
-                DropdownMenuItem<bool?>(
-                  value: null,
-                  child: Text('Sin definir'),
-                ),
-                DropdownMenuItem<bool?>(value: true, child: Text('Sí')),
-                DropdownMenuItem<bool?>(value: false, child: Text('No')),
-              ],
-              onChanged: _busy
-                  ? null
-                  : (value) => setState(() => _viajar = value),
-            ),
-          ),
-          SectionTitle('Compensación', key: _sections[2]),
-          _field(
-            'nivel_tabulador',
-            AppTextField(
-              label: 'Nivel de tabulador',
-              controller: _nivel,
-              enabled: !_busy,
-              validator: (value) => _limit(value, 50),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          for (final (label, controller, field) in [
-            (
-              'Sueldo mensual compuesto',
-              _compuesto,
-              'sueldo_mensual_compuesto',
-            ),
-            ('Sueldo mensual bruto', _bruto, 'sueldo_mensual_bruto'),
-            ('Sueldo mensual neto', _neto, 'sueldo_mensual_neto'),
-          ]) ...[
-            _field(
-              field,
-              AppTextField(
-                label: label,
-                controller: controller,
-                enabled: !_busy,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.,$\s]')),
+              const SizedBox(height: AppSpacing.lg),
+              RecruitmentFieldGrid(
+                children: [
+                  _field(
+                    'tipo',
+                    DropdownButtonFormField<int>(
+                      initialValue: _tipo,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo de requisición',
+                      ),
+                      items: [
+                        for (final item in catalogs.tipos)
+                          DropdownMenuItem(
+                            value: item.id,
+                            child: Text(item.name),
+                          ),
+                      ],
+                      onChanged: _busy
+                          ? null
+                          : (value) => setState(() => _tipo = value),
+                      validator: (value) =>
+                          _fieldErrors['tipo'] ??
+                          (value == null ? 'Elige el tipo.' : null),
+                    ),
+                  ),
+                  _field(
+                    'fecha_solicitud',
+                    AppDateField(
+                      label: 'Fecha de solicitud',
+                      value: _fechaSolicitud,
+                      isRequired: true,
+                      enabled: !_busy,
+                      onChanged: (value) =>
+                          setState(() => _fechaSolicitud = value),
+                    ),
+                  ),
+                  _field(
+                    'fecha_a_cubrir_vacante',
+                    AppDateField(
+                      label: 'Fecha a cubrir la vacante',
+                      value: _fechaACubrir,
+                      enabled: !_busy,
+                      onChanged: (value) =>
+                          setState(() => _fechaACubrir = value),
+                    ),
+                  ),
+                  _field(
+                    'fecha_entrega_a_capital_humano',
+                    AppDateField(
+                      label: 'Fecha de entrega a Capital Humano',
+                      value: _fechaEntrega,
+                      enabled: !_busy,
+                      onChanged: (value) =>
+                          setState(() => _fechaEntrega = value),
+                    ),
+                  ),
                 ],
-                validator: _amount,
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-          ],
-          _field(
-            'tipo_contrato_ofrecido',
-            DropdownButtonFormField<int?>(
-              initialValue: _contrato,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Tipo de contrato ofrecido',
-              ),
-              items: [
-                const DropdownMenuItem<int?>(
-                  value: null,
-                  child: Text('Sin definir'),
+              const SizedBox(height: AppSpacing.lg),
+              _field(
+                'area_solicitante',
+                SearchPickerField<AreaSolicitante>(
+                  key: ValueKey(_areaRevision),
+                  label: 'Área solicitante',
+                  errorText: _fieldErrors['area_solicitante'],
+                  minChars: 1,
+                  hint: 'Escribe el departamento',
+                  initialValue: _area,
+                  enabled: !_busy,
+                  suggestOnFocus: true,
+                  helpText: _areaSuggested
+                      ? 'Sugerida a partir del área de la posición.'
+                      : 'Elige un área de la lista o escribe su nombre.',
+                  emptyText: canManage ? null : 'No está en la lista. Pídele a Capital Humano que la agregue.',
+                  emptyQueryText: canManage
+                      ? 'Todavía no hay áreas. Escribe un nombre para agregar la primera.'
+                      : 'Todavía no hay áreas registradas. Pídele a Capital Humano que las agregue.',
+                  search: (text) => ref
+                      .read(recruitmentRepositoryProvider)
+                      .areasSolicitantes(search: text),
+                  labelOf: (area) => area.name,
+                  onCreate: canManage
+                      ? ref
+                            .read(recruitmentRepositoryProvider)
+                            .crearAreaSolicitante
+                      : null,
+                  onChanged: (area) => setState(() {
+                    _area = area;
+                    _areaTouched = true;
+                    _areaSuggested = false;
+                  }),
                 ),
-                for (final item in catalogs.tiposContrato)
-                  DropdownMenuItem<int?>(
-                    value: item.id,
-                    child: Text(item.name),
-                  ),
-              ],
-              onChanged: _busy
-                  ? null
-                  : (value) => setState(() => _contrato = value),
-            ),
-          ),
-
-          SectionTitle('Revisión', key: _sections[3]),
-          for (final (label, value) in [
-            ('Posición', _current?.posicionEtiqueta ?? _posicion?.etiqueta),
-            ('Tipo de requisición', tipo?.name),
-            ('Justificación', _justificacion.text),
-            (
-              'Fecha de solicitud',
-              _fechaSolicitud == null
-                  ? null
-                  : shownDate(toIsoDate(_fechaSolicitud!)),
-            ),
-            (
-              'Fecha a cubrir la vacante',
-              _fechaACubrir == null
-                  ? null
-                  : shownDate(toIsoDate(_fechaACubrir!)),
-            ),
-            (
-              'Fecha de entrega a Capital Humano',
-              _fechaEntrega == null
-                  ? null
-                  : shownDate(toIsoDate(_fechaEntrega!)),
-            ),
-            ('Área solicitante', _area?.name),
-            ('Horario a cubrir', nameIn(catalogs.horarios, _horario)),
-            ('Idiomas requeridos', _idiomas.text),
-            (
-              'Disposición para viajar',
-              _viajar == null
-                  ? null
-                  : _viajar!
-                  ? 'Sí'
-                  : 'No',
-            ),
-            ('Nivel de tabulador', _nivel.text),
-            ('Sueldo mensual compuesto', _compuesto.text),
-            ('Sueldo mensual bruto', _bruto.text),
-            ('Sueldo mensual neto', _neto.text),
-            (
-              'Tipo de contrato ofrecido',
-              nameIn(catalogs.tiposContrato, _contrato),
-            ),
-          ])
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-              child: Text(
-                '$label: ${value == null || value.isEmpty ? 'Sin definir' : value}',
               ),
-            ),
-          if ((tipo?.requiereJustificacion ?? false) &&
-              _justificacion.text.trim().isEmpty) ...[
-            const Text('Falta la justificación para enviar a autorización.'),
-            TextButton(
-              onPressed: () => _jump(0),
-              child: const Text('Ir a Solicitud'),
-            ),
-          ],
+              if (_area != null)
+                TextButton(
+                  onPressed: _busy
+                      ? null
+                      : () => setState(() {
+                          _area = null;
+                          _areaTouched = true;
+                          _areaSuggested = false;
+                          _areaRevision++;
+                        }),
+                  child: const Text('Quitar área'),
+                ),
+              const SectionTitle('Justificación'),
+              _field(
+                'justificacion',
+                AppTextField(
+                  label: tipo?.requiereJustificacion ?? false
+                      ? 'Justificación de la requisición (obligatoria para este tipo)'
+                      : 'Justificación de la requisición (opcional)',
+                  controller: _justificacion,
+                  enabled: !_busy,
+                  maxLines: null,
+                  minLines: 3,
+                  validator: (value) => _fieldErrors['justificacion'],
+                ),
+              ),
+            ],
+          ),
+          RecruitmentFormSection(
+            key: _sections[1],
+            title: 'Condiciones',
+            description: 'Define el horario y los requisitos de la vacante.',
+            children: [
+              RecruitmentFieldGrid(
+                children: [
+                  _field(
+                    'horario_a_cubrir',
+                    DropdownButtonFormField<int?>(
+                      initialValue: _horario,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Horario a cubrir',
+                      ),
+                      items: [
+                        const DropdownMenuItem<int?>(
+                          value: null,
+                          child: Text('Sin definir'),
+                        ),
+                        for (final item in catalogs.horarios)
+                          DropdownMenuItem<int?>(
+                            value: item.id,
+                            child: Text(item.name),
+                          ),
+                      ],
+                      onChanged: _busy
+                          ? null
+                          : (value) => setState(() => _horario = value),
+                    ),
+                  ),
+                  _field(
+                    'idiomas_requeridos',
+                    AppTextField(
+                      label: 'Idiomas requeridos',
+                      controller: _idiomas,
+                      enabled: !_busy,
+                      validator: (value) => _limit(value, 150),
+                    ),
+                  ),
+                  _field(
+                    'disposicion_viajar',
+                    DropdownButtonFormField<bool?>(
+                      initialValue: _viajar,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Disposición para viajar',
+                      ),
+                      items: const [
+                        DropdownMenuItem<bool?>(
+                          value: null,
+                          child: Text('Sin definir'),
+                        ),
+                        DropdownMenuItem<bool?>(value: true, child: Text('Sí')),
+                        DropdownMenuItem<bool?>(
+                          value: false,
+                          child: Text('No'),
+                        ),
+                      ],
+                      onChanged: _busy
+                          ? null
+                          : (value) => setState(() => _viajar = value),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          RecruitmentFormSection(
+            key: _sections[2],
+            title: 'Compensación',
+            description:
+                'Registra la propuesta salarial y el contrato ofrecido.',
+            children: [
+              RecruitmentFieldGrid(
+                children: [
+                  _field(
+                    'nivel_tabulador',
+                    AppTextField(
+                      label: 'Nivel de tabulador',
+                      controller: _nivel,
+                      enabled: !_busy,
+                      validator: (value) => _limit(value, 50),
+                    ),
+                  ),
+                  for (final (label, controller, field) in [
+                    (
+                      'Sueldo mensual compuesto',
+                      _compuesto,
+                      'sueldo_mensual_compuesto',
+                    ),
+                    ('Sueldo mensual bruto', _bruto, 'sueldo_mensual_bruto'),
+                    ('Sueldo mensual neto', _neto, 'sueldo_mensual_neto'),
+                  ]) ...[
+                    _field(
+                      field,
+                      AppTextField(
+                        label: label,
+                        controller: controller,
+                        enabled: !_busy,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9.,$\s]'),
+                          ),
+                        ],
+                        validator: _amount,
+                      ),
+                    ),
+                  ],
+                  _field(
+                    'tipo_contrato_ofrecido',
+                    DropdownButtonFormField<int?>(
+                      initialValue: _contrato,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo de contrato ofrecido',
+                      ),
+                      items: [
+                        const DropdownMenuItem<int?>(
+                          value: null,
+                          child: Text('Sin definir'),
+                        ),
+                        for (final item in catalogs.tiposContrato)
+                          DropdownMenuItem<int?>(
+                            value: item.id,
+                            child: Text(item.name),
+                          ),
+                      ],
+                      onChanged: _busy
+                          ? null
+                          : (value) => setState(() => _contrato = value),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          RecruitmentFormSection(
+            key: _sections[3],
+            title: 'Revisión',
+            description:
+                'Comprueba la información antes de enviarla a autorización.',
+            children: [
+              for (final (label, value) in [
+                ('Posición', _current?.posicionEtiqueta ?? _posicion?.etiqueta),
+                ('Tipo de requisición', tipo?.name),
+                ('Justificación', _justificacion.text),
+                (
+                  'Fecha de solicitud',
+                  _fechaSolicitud == null
+                      ? null
+                      : shownDate(toIsoDate(_fechaSolicitud!)),
+                ),
+                (
+                  'Fecha a cubrir la vacante',
+                  _fechaACubrir == null
+                      ? null
+                      : shownDate(toIsoDate(_fechaACubrir!)),
+                ),
+                (
+                  'Fecha de entrega a Capital Humano',
+                  _fechaEntrega == null
+                      ? null
+                      : shownDate(toIsoDate(_fechaEntrega!)),
+                ),
+                ('Área solicitante', _area?.name),
+                ('Horario a cubrir', nameIn(catalogs.horarios, _horario)),
+                ('Idiomas requeridos', _idiomas.text),
+                (
+                  'Disposición para viajar',
+                  _viajar == null
+                      ? null
+                      : _viajar!
+                      ? 'Sí'
+                      : 'No',
+                ),
+                ('Nivel de tabulador', _nivel.text),
+                ('Sueldo mensual compuesto', _compuesto.text),
+                ('Sueldo mensual bruto', _bruto.text),
+                ('Sueldo mensual neto', _neto.text),
+                (
+                  'Tipo de contrato ofrecido',
+                  nameIn(catalogs.tiposContrato, _contrato),
+                ),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Text(
+                    '$label: ${value == null || value.isEmpty ? 'Sin definir' : value}',
+                  ),
+                ),
+              if ((tipo?.requiereJustificacion ?? false) &&
+                  _justificacion.text.trim().isEmpty) ...[
+                const Text(
+                  'Falta la justificación para enviar a autorización.',
+                ),
+                TextButton(
+                  onPressed: () => _jump(0),
+                  child: const Text('Ir a Solicitud'),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );

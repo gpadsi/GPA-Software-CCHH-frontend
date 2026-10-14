@@ -5,6 +5,7 @@ import '../../../core/auth/session_controller.dart';
 import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_page.dart';
 import '../../../core/widgets/app_badge.dart';
+import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/feature_page.dart';
@@ -181,50 +182,44 @@ class _PositionsPageState extends ConsumerState<PositionsPage> {
             ),
             if (canManage)
               DataCell(
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: 'Crear requisición',
-                      onPressed: () => abrirNuevaRequisicion(
-                        context,
-                        ref,
-                        posicionId: posicion.id,
-                      ),
-                      icon: const Icon(Icons.post_add_outlined),
+                AppRowActions.list([
+                  AppRowAction(
+                    icon: Icons.post_add_outlined,
+                    tooltip: 'Crear requisición',
+                    onPressed: () => abrirNuevaRequisicion(
+                      context,
+                      ref,
+                      posicionId: posicion.id,
                     ),
-                    const SizedBox(width: AppSpacing.xs),
-                    IconButton(
-                      tooltip: 'Crear descriptivo',
-                      onPressed: () => abrirNuevoDescriptivo(
-                        context,
-                        ref,
-                        posicionId: posicion.id,
-                      ),
-                      icon: const Icon(Icons.description_outlined),
+                  ),
+                  AppRowAction(
+                    icon: Icons.description_outlined,
+                    tooltip: 'Crear descriptivo',
+                    onPressed: () => abrirNuevoDescriptivo(
+                      context,
+                      ref,
+                      posicionId: posicion.id,
                     ),
-                    const SizedBox(width: AppSpacing.xs),
-                    IconButton(
-                      tooltip: 'Editar posición',
-                      onPressed: () => _addOrEdit(posicion),
-                      icon: const Icon(Icons.edit_outlined),
+                  ),
+                  AppRowAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Editar posición',
+                    onPressed: () => _addOrEdit(posicion),
+                  ),
+                  AppRowAction(
+                    icon: Icons.delete_outline,
+                    tooltip: 'Eliminar posición',
+                    onPressed: () => _delete(
+                      posicion,
+                      PositionCatalogs.nameIn(
+                            catalogs.puestos,
+                            posicion.puesto,
+                          ) ??
+                          'esta posición',
+                      page.results.length,
                     ),
-                    const SizedBox(width: AppSpacing.xs),
-                    IconButton(
-                      tooltip: 'Eliminar posición',
-                      onPressed: () => _delete(
-                        posicion,
-                        PositionCatalogs.nameIn(
-                              catalogs.puestos,
-                              posicion.puesto,
-                            ) ??
-                            'esta posición',
-                        page.results.length,
-                      ),
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  ],
-                ),
+                  ),
+                ]),
               ),
           ],
         ),
