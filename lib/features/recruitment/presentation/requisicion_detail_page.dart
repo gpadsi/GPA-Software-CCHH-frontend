@@ -13,6 +13,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
 import '../application/requisicion_transiciones.dart';
@@ -21,7 +22,6 @@ import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'aprobacion_form.dart';
 import 'recruitment_ui.dart';
-import 'recruitment_design.dart';
 import 'requisicion_suspension_dialog.dart';
 import 'requisiciones_page.dart';
 
@@ -126,25 +126,17 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
           data is Map &&
           data.keys.any((key) => key != 'detail' && key != 'non_field_errors');
       if (action.destino == 'pendiente-de-autorizacion' && fieldErrors) {
-        final complete = await showAppDialog<bool>(
-          context: context,
-          builder: (dialogContext) => AlertDialog(
-            title: const Text('Completa la requisición'),
-            content: Text(recruitmentMutationError(error)),
-            actions: [
-              AppButton(
-                label: 'Cerrar',
-                variant: AppButtonVariant.secondary,
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-              ),
-              AppButton(
-                label: 'Completar',
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-              ),
-            ],
-          ),
+        final complete = await showConfirmDialog(
+          context,
+          title: 'Completa la requisición',
+          message: recruitmentMutationError(error),
+          confirmLabel: 'Completar',
+          cancelLabel: 'Cerrar',
+          destructive: false,
+          icon: Icons.assignment_late_outlined,
+          onConfirm: () async {},
         );
-        if (complete == true && mounted) {
+        if (complete && mounted) {
           context.go(
             '/reclutamiento/requisiciones/${widget.requisicionId}/editar',
           );
@@ -189,7 +181,7 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
     RecruitmentCatalogEntry etapa,
     Aprobacion? current,
   ) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => AprobacionForm(
         requisicionId: widget.requisicionId,
@@ -232,7 +224,8 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
     final canManage = ref.watch(canManageHrProvider);
     final me = ref.watch(sessionControllerProvider).user?.id;
     final loaded = requisicion.value;
-    return RecruitmentPage(
+    return AppPage(
+      section: 'Reclutamiento',
       title: loaded?.posicionEtiqueta.isNotEmpty ?? false
           ? loaded!.posicionEtiqueta
           : 'Requisición',
@@ -241,7 +234,10 @@ class _RequisicionDetailPageState extends ConsumerState<RequisicionDetailPage> {
           'Requisición de ${nameIn(c.tipos, r.tipo)?.toLowerCase() ?? 'personal'}, solicitada el ${shownDate(r.fechaSolicitud) ?? 'sin fecha'}.',
         _ => 'Detalle de la requisición.',
       },
-      tabs: const RecruitmentModuleTabs(current: '/reclutamiento'),
+      tabs: const AppRouteTabs(
+        current: '/reclutamiento',
+        destinations: recruitmentTabs,
+      ),
       actions: [
         if (loaded != null &&
             canEditRequisicion(loaded, canManage: canManage, me: me))
@@ -515,8 +511,6 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
     child: AppCard(
-      color: RecruitmentDesign.surface,
-      borderColor: RecruitmentDesign.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

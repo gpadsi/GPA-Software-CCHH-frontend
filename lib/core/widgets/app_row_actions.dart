@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../design_system/spacing.dart';
@@ -77,9 +79,14 @@ class AppRowActions extends StatelessWidget {
       ];
 
   /// Ancho que ocupan [count] acciones, para que la tabla no tenga que medirlo.
+  /// Nunca menos que el título «Acciones» de la columna: con una sola acción
+  /// el título se partía en dos renglones.
   static double width(int count) => count <= 0
       ? 0
-      : count * AppSpacing.touchTarget + (count - 1) * AppSpacing.xs;
+      : math.max(
+          80,
+          count * AppSpacing.touchTarget + (count - 1) * AppSpacing.xs,
+        );
 
   @override
   Widget build(BuildContext context) {

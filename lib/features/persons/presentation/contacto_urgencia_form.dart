@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/persons_controller.dart';
 import '../data/person_models.dart';
 
@@ -21,7 +21,8 @@ class ContactoUrgenciaForm extends ConsumerStatefulWidget {
       _ContactoUrgenciaFormState();
 }
 
-class _ContactoUrgenciaFormState extends ConsumerState<ContactoUrgenciaForm> {
+class _ContactoUrgenciaFormState extends ConsumerState<ContactoUrgenciaForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _name = TextEditingController(text: widget.contacto?.name);
   late final _relationship = TextEditingController(
@@ -30,6 +31,20 @@ class _ContactoUrgenciaFormState extends ConsumerState<ContactoUrgenciaForm> {
   late final _phone = TextEditingController(text: widget.contacto?.phone);
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_name, _relationship, _phone]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.contacto;
+    return _name.text != (current?.name ?? '') ||
+        _relationship.text != (current?.relationship ?? '') ||
+        _phone.text != (current?.phone ?? '');
+  }
 
   @override
   void dispose() {
@@ -74,37 +89,46 @@ class _ContactoUrgenciaFormState extends ConsumerState<ContactoUrgenciaForm> {
   }
 
   @override
-  Widget build(BuildContext context) => AppFormPanel(
+  Widget build(BuildContext context) => AppFormDialog(
     title: widget.contacto == null
         ? 'Agregar contacto de urgencia'
         : 'Editar contacto de urgencia',
+    subtitle: 'A quién llamar si le pasa algo a esta persona.',
+    size: AppDialogSize.small,
+    dirty: hasChanges,
     busy: _busy,
     error: _error,
     onSave: _save,
     child: Form(
       key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: AppFormSection(
+        first: true,
         children: [
           AppTextField(
             label: 'Nombre',
             controller: _name,
             enabled: !_busy,
+            autofocus: widget.contacto == null,
             validator: _required,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            label: 'Parentesco',
-            controller: _relationship,
-            enabled: !_busy,
-            validator: _required,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            label: 'Teléfono',
-            controller: _phone,
-            enabled: !_busy,
-            validator: _required,
+          AppFieldGrid(
+            minTwoColumnWidth: 400,
+            children: [
+              AppTextField(
+                label: 'Parentesco',
+                hint: 'Ej. Madre',
+                controller: _relationship,
+                enabled: !_busy,
+                validator: _required,
+              ),
+              AppTextField(
+                label: 'Teléfono',
+                controller: _phone,
+                enabled: !_busy,
+                keyboardType: TextInputType.phone,
+                validator: _required,
+              ),
+            ],
           ),
         ],
       ),

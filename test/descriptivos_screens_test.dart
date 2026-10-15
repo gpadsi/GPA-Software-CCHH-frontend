@@ -2,7 +2,7 @@
 // lista, alta de borrador, editor, congelar, copiar, descarga del Word oficial
 // y conformidades.
 import 'package:capital_humano_front/core/widgets/app_button.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/recruitment_ui.dart';
 import 'package:dio/dio.dart';
@@ -301,7 +301,7 @@ void main() {
         repository: repository,
       );
       await openPanel(tester);
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
 
       // Sin elegir la posición no hace nada.
       await saveForm(tester, label: 'Crear borrador');
@@ -348,7 +348,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
     });
   });
 
@@ -844,7 +844,7 @@ void main() {
         await tester.enterText(
           find
               .descendant(
-                of: find.byType(AppFormPanel),
+                of: find.byType(AppFormDialog),
                 matching: find.byType(TextFormField),
               )
               .first,

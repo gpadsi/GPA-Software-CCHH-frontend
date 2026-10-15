@@ -63,7 +63,7 @@ class DetailField extends StatelessWidget {
         final stacked = constraints.maxWidth < 420;
         final labelText = Text(
           label,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.colors.textSecondary),
         );
         final content =
             child ??

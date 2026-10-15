@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:capital_humano_front/core/auth/auth_models.dart';
 import 'package:capital_humano_front/core/widgets/app_button.dart';
 import 'package:capital_humano_front/core/widgets/app_date_field.dart';
+import 'package:capital_humano_front/core/widgets/app_dialog.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/recruitment_ui.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/requisicion_suspension_dialog.dart';
@@ -204,7 +205,10 @@ void main() {
       expect(repository.cambios, isEmpty);
       await tester.tap(
         find
-            .descendant(of: find.byType(Dialog), matching: _button('Cancelar'))
+            .descendant(
+              of: find.byType(AppDialogSurface),
+              matching: _button('Cancelar'),
+            )
             .first,
       );
       await tester.pumpAndSettle();
@@ -295,7 +299,7 @@ void main() {
         }
         await tester.pumpAndSettle();
         expect(find.byType(RequisicionSuspensionDialog), findsNothing);
-        expect(find.text('Descartar cambios'), findsNothing);
+        expect(find.text('¿Descartar cambios?'), findsNothing);
         expect(Focus.of(tester.element(_button('Suspender'))).hasFocus, isTrue);
         expect(repository.cambios, isEmpty);
       },
@@ -311,14 +315,16 @@ void main() {
           find.widgetWithText(TextFormField, 'Motivo'),
           'Falta material',
         );
+        // La ventana sabe que hay cambios desde el siguiente fotograma.
+        await tester.pump();
         if (escape) {
           await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         } else {
           await tester.tapAt(const Offset(10, 10));
         }
         await tester.pumpAndSettle();
-        expect(find.text('Descartar cambios'), findsOneWidget);
-        await _tap(tester, 'Cancelar');
+        expect(find.text('¿Descartar cambios?'), findsOneWidget);
+        await _tap(tester, 'Seguir editando');
         expect(find.text('Falta material'), findsOneWidget);
         await _tap(tester, 'Cancelar');
         await _tap(tester, 'Descartar');
@@ -344,8 +350,8 @@ void main() {
     await tester.tap(find.text(ok).last);
     await tester.pumpAndSettle();
     await _tap(tester, 'Cancelar');
-    expect(find.text('Descartar cambios'), findsOneWidget);
-    await _tap(tester, 'Cancelar');
+    expect(find.text('¿Descartar cambios?'), findsOneWidget);
+    await _tap(tester, 'Seguir editando');
     await tester.tap(find.byType(AppDateField));
     await tester.pumpAndSettle();
     await tester.tap(find.text('${hoy.day}').last);
@@ -357,7 +363,7 @@ void main() {
     );
     await _tap(tester, 'Cancelar');
     await tester.pumpAndSettle();
-    expect(find.text('Descartar cambios'), findsNothing);
+    expect(find.text('¿Descartar cambios?'), findsNothing);
     expect(find.byType(RequisicionSuspensionDialog), findsNothing);
   });
 

@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:capital_humano_front/core/widgets/app_card.dart';
 import 'package:capital_humano_front/core/widgets/app_data_table.dart';
+import 'package:capital_humano_front/core/widgets/app_dialog.dart';
 import 'package:capital_humano_front/core/widgets/app_row_actions.dart';
 import 'package:capital_humano_front/core/widgets/app_text_field.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
@@ -478,7 +479,7 @@ void main() {
             )
             .first;
         expect(tester.getRect(surface).center.dx, closeTo(720, 1));
-        expect(tester.getRect(surface).width, 640);
+        expect(tester.getRect(surface).width, AppDialogSize.medium.width);
         await tester.tapAt(const Offset(20, 500));
         await tester.pumpAndSettle();
         expect(find.text('Nuevo descriptivo de puesto'), findsNothing);

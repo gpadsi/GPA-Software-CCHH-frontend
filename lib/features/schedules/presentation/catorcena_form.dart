@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_date_field.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
 
 final _isoDate = DateFormat('yyyy-MM-dd');
-final _displayDate = DateFormat.yMMMd('es_MX');
 
 class CatorcenaForm extends ConsumerStatefulWidget {
   const CatorcenaForm({super.key, this.catorcena});
@@ -20,7 +20,8 @@ class CatorcenaForm extends ConsumerStatefulWidget {
   ConsumerState<CatorcenaForm> createState() => _CatorcenaFormState();
 }
 
-class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
+class _CatorcenaFormState extends ConsumerState<CatorcenaForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _numero = TextEditingController(
     text: widget.catorcena?.numero.toString(),
@@ -37,6 +38,21 @@ class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
       value == null ? null : DateTime.tryParse(value);
 
   @override
+  void initState() {
+    super.initState();
+    watchChanges([_numero, _anio]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.catorcena;
+    return _numero.text != (current?.numero.toString() ?? '') ||
+        _anio.text != (current?.anio.toString() ?? '') ||
+        dateChanged(_fechaInicio, _parse(current?.fechaInicio)) ||
+        dateChanged(_fechaFin, _parse(current?.fechaFin));
+  }
+
+  @override
   void dispose() {
     _numero.dispose();
     _anio.dispose();
@@ -50,25 +66,8 @@ class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
     return int.tryParse(value.trim()) == null ? 'Debe ser un número.' : null;
   }
 
-  Future<void> _pickDate(
-    DateTime? current,
-    ValueChanged<DateTime?> onPicked,
-  ) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: current ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) setState(() => onPicked(picked));
-  }
-
   Future<void> _save() async {
     if (_busy || !_form.currentState!.validate()) return;
-    if (_fechaInicio == null || _fechaFin == null) {
-      setState(() => _error = 'Elige la fecha de inicio y la fecha de fin.');
-      return;
-    }
     setState(() {
       _busy = true;
       _error = null;
@@ -103,65 +102,51 @@ class _CatorcenaFormState extends ConsumerState<CatorcenaForm> {
   }
 
   @override
-  Widget build(BuildContext context) => AppFormPanel(
+  Widget build(BuildContext context) => AppFormDialog(
     title: widget.catorcena == null ? 'Agregar catorcena' : 'Editar catorcena',
+    subtitle: 'Un periodo de catorce días del calendario de nómina.',
+    dirty: hasChanges,
     busy: _busy,
     error: _error,
     onSave: _save,
     child: Form(
       key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: AppFormSection(
+        first: true,
         children: [
-          AppTextField(
-            label: 'Número de catorcena',
-            controller: _numero,
-            enabled: !_busy,
-            validator: _requiredInt,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          AppTextField(
-            label: 'Año',
-            controller: _anio,
-            enabled: !_busy,
-            validator: _requiredInt,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
+          AppFieldGrid(
+            minTwoColumnWidth: 480,
             children: [
-              Expanded(
-                child: Text(
-                  _fechaInicio == null
-                      ? 'Fecha de inicio: sin capturar'
-                      : 'Fecha de inicio: ${_displayDate.format(_fechaInicio!)}',
-                ),
+              AppTextField(
+                label: 'Número de catorcena',
+                hint: 'Ej. 21',
+                controller: _numero,
+                enabled: !_busy,
+                autofocus: widget.catorcena == null,
+                keyboardType: TextInputType.number,
+                validator: _requiredInt,
               ),
-              TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => _pickDate(
-                        _fechaInicio,
-                        (value) => _fechaInicio = value,
-                      ),
-                child: const Text('Elegir'),
+              AppTextField(
+                label: 'Año',
+                hint: 'Ej. 2026',
+                controller: _anio,
+                enabled: !_busy,
+                keyboardType: TextInputType.number,
+                validator: _requiredInt,
               ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _fechaFin == null
-                      ? 'Fecha de fin: sin capturar'
-                      : 'Fecha de fin: ${_displayDate.format(_fechaFin!)}',
-                ),
+              AppDateField(
+                label: 'Fecha de inicio',
+                value: _fechaInicio,
+                isRequired: true,
+                enabled: !_busy,
+                onChanged: (value) => setState(() => _fechaInicio = value),
               ),
-              TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => _pickDate(_fechaFin, (value) => _fechaFin = value),
-                child: const Text('Elegir'),
+              AppDateField(
+                label: 'Fecha de fin',
+                value: _fechaFin,
+                isRequired: true,
+                enabled: !_busy,
+                onChanged: (value) => setState(() => _fechaFin = value),
               ),
             ],
           ),

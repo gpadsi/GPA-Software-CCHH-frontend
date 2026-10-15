@@ -9,6 +9,7 @@ import '../../../core/network/api_page.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/app_overlays.dart';
@@ -52,7 +53,7 @@ class _AsignacionesUbicacionPageState
   }
 
   Future<void> _addOrEdit([AsignacionUbicacion? asignacion]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => AsignacionUbicacionForm(asignacion: asignacion),
     );
@@ -86,10 +87,11 @@ class _AsignacionesUbicacionPageState
       asignacionesUbicacionPageProvider(_page, query: _query),
     );
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Horarios',
       title: 'Asignaciones de ubicación',
       description: 'La ubicación asignada a cada integrante del equipo.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/horarios/asignaciones-ubicacion',
         destinations: schedulesTabs,
       ),

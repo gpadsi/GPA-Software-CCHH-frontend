@@ -27,8 +27,8 @@ class AppAvatar extends StatelessWidget {
         width: size,
         height: size,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: AppColors.primarySurface,
+        decoration: BoxDecoration(
+          color: context.colors.primarySurface,
           shape: BoxShape.circle,
         ),
         child: Padding(
@@ -38,7 +38,7 @@ class AppAvatar extends StatelessWidget {
             child: Text(
               _initials,
               style: Theme.of(context).textTheme.labelLarge
-                  ?.copyWith(color: AppColors.primary),
+                  ?.copyWith(color: context.colors.onPrimarySurface),
             ),
           ),
         ),

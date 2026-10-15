@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/core/network/table_query.dart';
 import 'package:capital_humano_front/core/widgets/app_button.dart';
+import 'package:capital_humano_front/core/widgets/app_scaffold.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_field.dart';
 import 'package:capital_humano_front/features/recruitment/application/recruitment_controller.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/posicion_contexto_card.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/requisicion_edit_page.dart';
+import 'package:capital_humano_front/features/recruitment/presentation/requisicion_review.dart';
 import 'package:capital_humano_front/features/recruitment/presentation/requisiciones_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -119,9 +121,15 @@ void main() {
       await _section(tester, 'Compensación');
       await _enter(tester, _textField('Nivel de tabulador'), 'N2');
       await _section(tester, 'Revisión');
-      expect(find.text('Idiomas requeridos: Inglés'), findsOneWidget);
-      expect(find.text('Nivel de tabulador: N2'), findsOneWidget);
-      expect(find.text('Tipo de requisición: Nueva Posición'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Idiomas requeridos: Inglés'),
+        findsOneWidget,
+      );
+      expect(find.bySemanticsLabel('Nivel de tabulador: N2'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Tipo de requisición: Nueva Posición'),
+        findsOneWidget,
+      );
       expect(
         find.text('Falta la justificación para enviar a autorización.'),
         findsOneWidget,
@@ -134,10 +142,109 @@ void main() {
       expect(tester.widget<ChoiceChip>(_chip('Solicitud')).selected, isTrue);
       await _enter(tester, _textField(_justification), 'Necesaria');
       await _section(tester, 'Revisión');
-      expect(find.text('Justificación: Necesaria'), findsOneWidget);
+      expect(find.bySemanticsLabel('Justificación: Necesaria'), findsOneWidget);
       expect(find.text('Ir a Solicitud'), findsNothing);
+      final editConditions = find.bySemanticsLabel('Editar Condiciones');
+      await tester.ensureVisible(editConditions);
+      await tester.tap(editConditions);
+      await tester.pumpAndSettle();
+      expect(tester.widget<ChoiceChip>(_chip('Condiciones')).selected, isTrue);
+      expect(
+        tester
+            .widget<TextFormField>(_textField('Idiomas requeridos'))
+            .controller!
+            .text,
+        'Inglés',
+      );
     },
   );
+
+  testWidgets('cabecera única libera altura y conserva el menú de cuenta', (
+    tester,
+  ) async {
+    final router = await pumpRecruitment(
+      tester,
+      path: '/reclutamiento/requisiciones/nueva',
+      repository: _Repository(),
+      height: 768,
+    );
+    final workspace = tester.getRect(
+      find.byKey(const ValueKey('requisicion-workspace')),
+    );
+    expect(workspace.top, lessThan(180));
+    expect(workspace.height, greaterThan(600));
+    expect(
+      tester.widget<AppScaffold>(find.byType(AppScaffold)).showHeader,
+      isFalse,
+    );
+    for (final label in ['Guardar borrador', 'Enviar a autorización']) {
+      expect(
+        tester.getRect(find.widgetWithText(AppButton, label)).bottom,
+        lessThan(workspace.top),
+      );
+    }
+    expect(find.byTooltip('Menú de usuario'), findsOneWidget);
+    await tester.tap(find.byTooltip('Menú de usuario'));
+    await tester.pumpAndSettle();
+    expect(find.text('Apariencia'), findsOneWidget);
+    await tester.tapAt(const Offset(500, 300));
+    await tester.pumpAndSettle();
+    router.go('/reclutamiento');
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AppScaffold>(find.byType(AppScaffold)).showHeader,
+      isTrue,
+    );
+    expect(find.byTooltip('Menú de usuario'), findsOneWidget);
+  });
+
+  testWidgets(
+    'revisión distingue importes y faltantes sin cambiar el borrador',
+    (tester) async {
+      await pumpRecruitment(
+        tester,
+        path: '/reclutamiento/requisiciones/r1/editar',
+        repository: _Repository(),
+      );
+      await _section(tester, 'Revisión');
+      final review = find.byType(RequisicionReview);
+      expect(
+        find.descendant(of: review, matching: find.text(r'$12,500.00')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: review, matching: find.text('No especificado')),
+        findsWidgets,
+      );
+      expect(find.text('Sin cambios pendientes'), findsOneWidget);
+    },
+  );
+
+  testWidgets('teclado y texto ampliado dejan espacio para editar en móvil', (
+    tester,
+  ) async {
+    tester.binding.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(
+      tester.binding.platformDispatcher.clearTextScaleFactorTestValue,
+    );
+    await pumpRecruitment(
+      tester,
+      path: '/reclutamiento/requisiciones/nueva',
+      repository: _Repository(),
+      width: 320,
+      height: 800,
+    );
+    tester.view.viewInsets = const FakeViewPadding(bottom: 260);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    final workspace = tester.getRect(
+      find.byKey(const ValueKey('requisicion-workspace')),
+    );
+    expect(workspace.height, greaterThan(120));
+    await _section(tester, 'Condiciones');
+    await _enter(tester, _textField('Idiomas requeridos'), 'Inglés');
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'borrador parcial sin justificación pasa a editar y queda limpio',

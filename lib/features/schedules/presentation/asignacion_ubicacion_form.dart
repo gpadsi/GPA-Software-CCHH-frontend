@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_date_field.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
 import 'empleado_picker_field.dart';
 
 final _isoDate = DateFormat('yyyy-MM-dd');
-final _displayDate = DateFormat.yMMMd('es_MX');
 
 class AsignacionUbicacionForm extends ConsumerStatefulWidget {
   const AsignacionUbicacionForm({super.key, this.asignacion});
@@ -23,33 +23,30 @@ class AsignacionUbicacionForm extends ConsumerStatefulWidget {
 }
 
 class _AsignacionUbicacionFormState
-    extends ConsumerState<AsignacionUbicacionForm> {
+    extends ConsumerState<AsignacionUbicacionForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late String? _empleado = widget.asignacion?.empleado;
   late String? _catorcena = widget.asignacion?.catorcena;
   late String? _area = widget.asignacion?.area;
-  late DateTime? _fechaReferencia = widget.asignacion?.fechaReferencia == null
-      ? null
-      : DateTime.tryParse(widget.asignacion!.fechaReferencia);
+  late DateTime? _fechaReferencia = _parse(widget.asignacion?.fechaReferencia);
   bool _busy = false;
   String? _error;
 
-  Future<void> _pickFecha() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _fechaReferencia ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) setState(() => _fechaReferencia = picked);
+  static DateTime? _parse(String? value) =>
+      value == null ? null : DateTime.tryParse(value);
+
+  @override
+  bool get hasChanges {
+    final current = widget.asignacion;
+    return _empleado != current?.empleado ||
+        _catorcena != current?.catorcena ||
+        _area != current?.area ||
+        dateChanged(_fechaReferencia, _parse(current?.fechaReferencia));
   }
 
   Future<void> _save() async {
     if (_busy || !_form.currentState!.validate()) return;
-    if (_fechaReferencia == null) {
-      setState(() => _error = 'Elige la fecha de referencia.');
-      return;
-    }
     setState(() {
       _busy = true;
       _error = null;
@@ -90,10 +87,11 @@ class _AsignacionUbicacionFormState
   Widget build(BuildContext context) {
     final areas = ref.watch(areasCatalogProvider);
     final catorcenas = ref.watch(allCatorcenasProvider);
-    return AppFormPanel(
+    return AppFormDialog(
       title: widget.asignacion == null
           ? 'Agregar asignación de ubicación'
           : 'Editar asignación de ubicación',
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       canSave: areas.hasValue && catorcenas.hasValue,
@@ -119,60 +117,61 @@ class _AsignacionUbicacionFormState
 
   Widget _fields(List<AreaRef> areas, List<Catorcena> catorcenas) => Form(
     key: _form,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    child: AppFormSection(
+      first: true,
       children: [
         EmpleadoPickerField(
           selected: _empleado,
           enabled: !_busy,
           onChanged: (value) => setState(() => _empleado = value),
         ),
-        const SizedBox(height: AppSpacing.md),
-        DropdownButtonFormField<String>(
-          key: ValueKey('area:$_area'),
-          initialValue: _area,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Área'),
-          items: [
-            for (final area in areas)
-              DropdownMenuItem(value: area.id, child: Text(area.name)),
-          ],
-          validator: (value) => value == null ? 'Elige un área.' : null,
-          onChanged: _busy ? null : (value) => setState(() => _area = value),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        DropdownButtonFormField<String?>(
-          key: ValueKey('catorcena:$_catorcena'),
-          initialValue: _catorcena,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Catorcena (opcional)'),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('Sin capturar')),
-            for (final catorcena in catorcenas)
-              DropdownMenuItem(
-                value: catorcena.id,
-                child: Text('${catorcena.numero}/${catorcena.anio}'),
-              ),
-          ],
-          onChanged: _busy
-              ? null
-              : (value) => setState(() => _catorcena = value),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Row(
+        AppFieldGrid(
+          minTwoColumnWidth: 480,
           children: [
-            Expanded(
-              child: Text(
-                _fechaReferencia == null
-                    ? 'Fecha de referencia: sin capturar'
-                    : 'Fecha de referencia: ${_displayDate.format(_fechaReferencia!)}',
-              ),
+            DropdownButtonFormField<String>(
+              key: ValueKey('area:$_area'),
+              initialValue: _area,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Área'),
+              items: [
+                for (final area in areas)
+                  DropdownMenuItem(value: area.id, child: Text(area.name)),
+              ],
+              validator: (value) => value == null ? 'Elige un área.' : null,
+              onChanged: _busy
+                  ? null
+                  : (value) => setState(() => _area = value),
             ),
-            TextButton(
-              onPressed: _busy ? null : _pickFecha,
-              child: const Text('Elegir'),
+            DropdownButtonFormField<String?>(
+              key: ValueKey('catorcena:$_catorcena'),
+              initialValue: _catorcena,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Catorcena (opcional)',
+              ),
+              items: [
+                const DropdownMenuItem(
+                  value: null,
+                  child: Text('Sin capturar'),
+                ),
+                for (final catorcena in catorcenas)
+                  DropdownMenuItem(
+                    value: catorcena.id,
+                    child: Text('${catorcena.numero}/${catorcena.anio}'),
+                  ),
+              ],
+              onChanged: _busy
+                  ? null
+                  : (value) => setState(() => _catorcena = value),
             ),
           ],
+        ),
+        AppDateField(
+          label: 'Fecha de referencia',
+          value: _fechaReferencia,
+          isRequired: true,
+          enabled: !_busy,
+          onChanged: (value) => setState(() => _fechaReferencia = value),
         ),
       ],
     ),

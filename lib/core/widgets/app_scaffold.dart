@@ -11,13 +11,19 @@ import '../design_system/motion.dart';
 import '../design_system/spacing.dart';
 import '../routing/navigation.dart';
 import '../routing/sidebar_controller.dart';
-import 'app_avatar.dart';
+import 'app_user_menu.dart';
 
 class AppScaffold extends ConsumerStatefulWidget {
-  const AppScaffold({required this.child, required this.location, super.key});
+  const AppScaffold({
+    required this.child,
+    required this.location,
+    this.showHeader = true,
+    super.key,
+  });
 
   final Widget child;
   final String location;
+  final bool showHeader;
 
   @override
   ConsumerState<AppScaffold> createState() => _AppScaffoldState();
@@ -52,12 +58,12 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
 
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: AppColors.background,
+          backgroundColor: context.colors.background,
           drawer: desktop
               ? null
               : Drawer(
                   width: 280,
-                  backgroundColor: AppColors.surface,
+                  backgroundColor: context.colors.sidebar,
                   child: SafeArea(
                     child: _Sidebar(
                       collapsed: false,
@@ -80,10 +86,10 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
                     curve: AppMotion.curve,
                     width: collapsed ? 80 : 264,
                     clipBehavior: Clip.hardEdge,
-                    decoration: const BoxDecoration(
-                      color: AppColors.surface,
+                    decoration: BoxDecoration(
+                      color: context.colors.sidebar,
                       border: Border(
-                        right: BorderSide(color: AppColors.border),
+                        right: BorderSide(color: context.colors.sidebarBorder),
                       ),
                     ),
                     // RepaintBoundary: al animar el ancho, el contenido de la barra
@@ -104,17 +110,18 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
                 Expanded(
                   child: Column(
                     children: [
-                      _Topbar(
-                        user: ref.watch(sessionControllerProvider).user,
-                        onLogout: () => ref
-                            .read(sessionControllerProvider.notifier)
-                            .logout(),
-                        destination: destination,
-                        mobile: mobile,
-                        showMenu: !desktop,
-                        onOpenMenu: () =>
-                            _scaffoldKey.currentState?.openDrawer(),
-                      ),
+                      if (widget.showHeader)
+                        _Topbar(
+                          user: ref.watch(sessionControllerProvider).user,
+                          onLogout: () => ref
+                              .read(sessionControllerProvider.notifier)
+                              .logout(),
+                          destination: destination,
+                          mobile: mobile,
+                          showMenu: !desktop,
+                          onOpenMenu: () =>
+                              _scaffoldKey.currentState?.openDrawer(),
+                        ),
                       // La página en su propia capa: sus animaciones (carga,
                       // fundidos) no repintan la barra lateral ni el encabezado.
                       Expanded(child: RepaintBoundary(child: widget.child)),
@@ -160,12 +167,7 @@ class _Sidebar extends StatelessWidget {
               alignment: Alignment.centerLeft,
               minWidth: collapsed ? 80 : 264,
               maxWidth: collapsed ? 80 : 264,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: collapsed ? AppSpacing.md : AppSpacing.xl,
-                ),
-                child: BrandWordmark(compact: collapsed),
-              ),
+              child: _BrandHeader(collapsed: collapsed),
             ),
           ),
         ),
@@ -184,7 +186,7 @@ class _Sidebar extends StatelessWidget {
                             child: Container(
                               height: 1,
                               width: 20,
-                              color: AppColors.border,
+                              color: context.colors.sidebarDivider,
                             ),
                           )
                         : ClipRect(
@@ -200,7 +202,7 @@ class _Sidebar extends StatelessWidget {
                                   group.toUpperCase(),
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
-                                        color: AppColors.textSecondary,
+                                        color: context.colors.sidebarMuted,
                                         letterSpacing: 1.4,
                                       ),
                                 ),
@@ -229,8 +231,10 @@ class _Sidebar extends StatelessWidget {
         Container(
           height: 72,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.border)),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: context.colors.sidebarDivider),
+            ),
           ),
           child: Stack(
             alignment: Alignment.centerLeft,
@@ -242,7 +246,7 @@ class _Sidebar extends StatelessWidget {
                   child: Text(
                     'Grupo GPA',
                     style: Theme.of(context).textTheme.labelMedium
-                        ?.copyWith(color: AppColors.textSecondary),
+                        ?.copyWith(color: context.colors.sidebarMuted),
                   ),
                 ),
               Align(
@@ -254,6 +258,7 @@ class _Sidebar extends StatelessWidget {
                       ? 'Expandir barra lateral'
                       : 'Contraer barra lateral',
                   onPressed: onToggle,
+                  color: context.colors.sidebarText,
                   icon: Icon(
                     drawer
                         ? Icons.close_rounded
@@ -287,6 +292,11 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final indicator = colors.sidebarIndicator;
+    final foreground = selected
+        ? colors.sidebarSelectedText
+        : colors.sidebarText;
     return Semantics(
       button: true,
       selected: selected,
@@ -296,25 +306,30 @@ class _SidebarItem extends StatelessWidget {
         message: collapsed ? destination.label : '',
         excludeFromSemantics: true,
         child: Material(
-          color: selected ? AppColors.primarySurface : AppColors.transparent,
+          color: selected ? colors.sidebarSelected : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
             excludeFromSemantics: true,
+            // El resaltado sale del texto de la barra: se ve igual sobre una
+            // barra clara que sobre una oscura.
+            hoverColor: colors.sidebarText.withValues(alpha: 0.08),
+            highlightColor: colors.sidebarText.withValues(alpha: 0.1),
+            splashColor: colors.sidebarText.withValues(alpha: 0.12),
             child: SizedBox(
               height: 46,
               child: Stack(
                 clipBehavior: Clip.hardEdge,
                 children: [
-                  if (selected)
-                    const Positioned(
+                  if (selected && indicator != null)
+                    Positioned(
                       left: 0,
                       top: 14,
                       bottom: 14,
                       child: SizedBox(
                         width: 3,
-                        child: ColoredBox(color: AppColors.accent),
+                        child: ColoredBox(color: indicator),
                       ),
                     ),
                   Positioned(
@@ -324,9 +339,7 @@ class _SidebarItem extends StatelessWidget {
                       child: Icon(
                         destination.icon,
                         size: 22,
-                        color: selected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        color: foreground,
                       ),
                     ),
                   ),
@@ -351,9 +364,7 @@ class _SidebarItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(
-                                  color: selected
-                                      ? AppColors.primary
-                                      : AppColors.text,
+                                  color: foreground,
                                   fontWeight: selected
                                       ? FontWeight.w600
                                       : FontWeight.w400,
@@ -399,9 +410,9 @@ class _Topbar extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: mobile ? AppSpacing.sm : AppSpacing.xl,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.colors.header,
+        border: Border(bottom: BorderSide(color: context.colors.headerBorder)),
       ),
       child: Row(
         children: [
@@ -425,7 +436,7 @@ class _Topbar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
@@ -439,68 +450,24 @@ class _Topbar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.md),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: mobile ? 56 : 230),
-            child: PopupMenuButton<String>(
-              tooltip: 'Menú de usuario',
-              position: PopupMenuPosition.under,
-              onSelected: (value) {
-                if (value == 'logout') onLogout();
-              },
-              itemBuilder: (context) => const [
-                PopupMenuItem<String>(
-                  value: 'logout',
-                  child: Text('Cerrar sesión'),
-                ),
-              ],
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppAvatar(name: user?.displayName ?? '', size: 40),
-                    if (!mobile) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      // Flexible + ellipsis: sin esto, a escala de texto 1.5x
-                      // este bloque puede pedir más ancho del que el topbar
-                      // tiene disponible y desbordar (visto en pruebas).
-                      Flexible(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user?.displayName ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.labelLarge,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              user?.username ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.labelSmall?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textSecondary,
-                        size: 18,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
+          AppUserMenu(user: user, onLogout: onLogout, compact: mobile),
         ],
       ),
+    );
+  }
+}
+
+/// La marca se integra directamente sobre el color de la barra lateral.
+class _BrandHeader extends StatelessWidget {
+  const _BrandHeader({required this.collapsed});
+
+  final bool collapsed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: collapsed ? 18 : AppSpacing.lg),
+      child: BrandWordmark(compact: collapsed, onSidebar: true),
     );
   }
 }

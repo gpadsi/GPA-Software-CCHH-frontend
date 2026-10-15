@@ -12,13 +12,13 @@ import '../../../core/widgets/app_fade_switcher.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
 import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_creation.dart';
 import 'recruitment_ui.dart';
-import 'recruitment_design.dart';
 
 /// Lo más reciente primero: por fecha de elaboración y, a igual fecha, la
 /// versión más alta.
@@ -70,10 +70,14 @@ class _DescriptivosPageState extends ConsumerState<DescriptivosPage> {
     final page = ref.watch(descriptivosPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
     final filter = _query.filters['congelado'] ?? '';
-    return RecruitmentPage(
+    return AppPage(
+      section: 'Reclutamiento',
       title: 'Descriptivos de puesto',
       description: 'Lo que hace cada posición: sus funciones, condiciones y perfil. Cada versión aprobada queda como historial.',
-      tabs: const RecruitmentModuleTabs(current: '/reclutamiento/descriptivos'),
+      tabs: const AppRouteTabs(
+        current: '/reclutamiento/descriptivos',
+        destinations: recruitmentTabs,
+      ),
       actions: [
         if (canManage)
           AppButton(

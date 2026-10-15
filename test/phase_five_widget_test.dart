@@ -28,6 +28,8 @@ void main() {
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
     expect(find.text('Este dato es obligatorio.'), findsNWidgets(2));
+    // Las fechas son campos como los demás y también se exigen.
+    expect(find.text('Elige una fecha.'), findsNWidgets(2));
     expect(repository.saved, isNull);
   });
 
@@ -93,6 +95,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Elige un empleado.'), findsOneWidget);
     expect(find.text('Elige un tipo de horario.'), findsOneWidget);
+    expect(find.text('Elige una fecha.'), findsOneWidget);
     expect(repository.savedHorario, isNull);
   });
 

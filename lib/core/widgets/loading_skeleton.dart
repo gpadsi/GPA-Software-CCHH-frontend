@@ -10,17 +10,10 @@ class LoadingSkeleton extends StatelessWidget {
   final double? width;
   final double height;
 
-  // El brillo es el mismo borde mezclado hacia la tarjeta: un destello
-  // sutil de la propia paleta, no un blanco ajeno.
-  static final _highlight = Color.lerp(
-    AppColors.border,
-    AppColors.surface,
-    0.6,
-  )!;
-
   @override
   Widget build(BuildContext context) {
     final phase = AppShimmer.maybeOf(context);
+    final base = context.colors.border;
     final radius = BorderRadius.circular(6);
     return Semantics(
       label: 'Cargando contenido',
@@ -29,10 +22,7 @@ class LoadingSkeleton extends StatelessWidget {
             ? Container(
                 width: width,
                 height: height,
-                decoration: BoxDecoration(
-                  color: AppColors.border,
-                  borderRadius: radius,
-                ),
+                decoration: BoxDecoration(color: base, borderRadius: radius),
               )
             // Sin AnimatedBuilder: AppShimmer.maybeOf ya registra a este
             // widget como dependiente del reloj, así que se reconstruye solo
@@ -47,7 +37,14 @@ class LoadingSkeleton extends StatelessWidget {
                     // otro lado antes de repetirse.
                     begin: Alignment(-2 + 4 * phase.value, 0),
                     end: Alignment(-1 + 4 * phase.value, 0),
-                    colors: [AppColors.border, _highlight, AppColors.border],
+                    // El brillo es el mismo borde mezclado hacia la
+                    // tarjeta: un destello sutil del propio tema, no un
+                    // blanco ajeno.
+                    colors: [
+                      base,
+                      Color.lerp(base, context.colors.surface, 0.6)!,
+                      base,
+                    ],
                   ),
                 ),
               ),

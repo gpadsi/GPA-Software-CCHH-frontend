@@ -8,7 +8,7 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/positions_controller.dart';
 import '../data/position_models.dart';
 
@@ -135,7 +135,7 @@ class _PositionFormState extends ConsumerState<PositionForm> {
   @override
   Widget build(BuildContext context) {
     final catalogs = ref.watch(positionCatalogsProvider);
-    return AppFormPanel(
+    return AppFormDialog(
       title: widget.posicion == null ? 'Agregar posición' : 'Editar posición',
       busy: _busy,
       error: _error,
@@ -399,7 +399,7 @@ class _ReportsToField extends ConsumerWidget {
             Expanded(
               child: Text(
                 'No se pudo cargar la lista de posiciones para elegir a quién reporta.',
-                style: const TextStyle(color: AppColors.error),
+                style: TextStyle(color: context.colors.error),
               ),
             ),
             TextButton(

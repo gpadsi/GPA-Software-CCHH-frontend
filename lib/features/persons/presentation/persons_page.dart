@@ -7,6 +7,7 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -44,7 +45,7 @@ class _PersonsPageState extends ConsumerState<PersonsPage> {
   }
 
   Future<void> _addOrEdit([Persona? persona]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => PersonForm(persona: persona),
     );
@@ -74,7 +75,8 @@ class _PersonsPageState extends ConsumerState<PersonsPage> {
   Widget build(BuildContext context) {
     final page = ref.watch(personsPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Personas',
       title: 'Personas',
       description:
           'Datos personales, de contacto y médicos de cada persona registrada.',

@@ -1,6 +1,7 @@
 // Búsqueda y orden en tablas (2026-10-02): TableQuery, el ayudante del
 // cliente, la barra de búsqueda, los encabezados ordenables y su conexión en
 // cada pantalla.
+import 'package:capital_humano_front/core/design_system/app_themes.dart';
 import 'package:capital_humano_front/core/design_system/theme.dart';
 import 'package:capital_humano_front/core/network/api_page.dart';
 import 'package:capital_humano_front/core/network/client_table.dart';
@@ -24,7 +25,7 @@ import 'phase_two_fixtures.dart';
 import 'phase_two_widget_test.dart' show pumpPhaseTwo;
 
 Widget _app(Widget child) => MaterialApp(
-  theme: AppTheme.light,
+  theme: AppTheme.of(AppThemeId.fallback),
   home: Scaffold(body: SingleChildScrollView(child: child)),
 );
 

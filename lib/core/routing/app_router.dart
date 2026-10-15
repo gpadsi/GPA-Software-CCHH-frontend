@@ -79,8 +79,14 @@ GoRouter createAppRouter({
     ),
     GoRoute(path: '/', redirect: (context, state) => '/dashboard'),
     ShellRoute(
-      builder: (context, state, child) =>
-          AppScaffold(location: state.uri.path, child: child),
+      builder: (context, state, child) => AppScaffold(
+        location: state.uri.path,
+        showHeader: !const {
+          'requisicion-new',
+          'requisicion-edit',
+        }.contains(state.topRoute?.name),
+        child: child,
+      ),
       routes: [
         for (final destination in appDestinations)
           GoRoute(
@@ -144,6 +150,7 @@ GoRouter createAppRouter({
         ),
         GoRoute(
           path: '/reclutamiento/requisiciones/nueva',
+          name: 'requisicion-new',
           onExit: (context, state) =>
               ProviderScope.containerOf(context)
                   .read(requisicionExitGuardProvider)
@@ -158,6 +165,7 @@ GoRouter createAppRouter({
         ),
         GoRoute(
           path: '/reclutamiento/requisiciones/:id/editar',
+          name: 'requisicion-edit',
           onExit: (context, state) =>
               ProviderScope.containerOf(context)
                   .read(requisicionExitGuardProvider)
@@ -229,7 +237,7 @@ CustomTransitionPage<void> _page(
       : FadeThroughTransition(
           animation: animation,
           secondaryAnimation: secondaryAnimation,
-          fillColor: AppColors.background,
+          fillColor: context.colors.background,
           child: child,
         ),
 );

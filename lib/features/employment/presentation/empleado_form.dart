@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/employment_controller.dart';
 import '../data/employment_models.dart';
 import '../data/employment_repository.dart';
@@ -20,7 +19,8 @@ class EmpleadoForm extends ConsumerStatefulWidget {
   ConsumerState<EmpleadoForm> createState() => _EmpleadoFormState();
 }
 
-class _EmpleadoFormState extends ConsumerState<EmpleadoForm> {
+class _EmpleadoFormState extends ConsumerState<EmpleadoForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _workNumber = TextEditingController(
     text: widget.empleado?.workNumber,
@@ -29,6 +29,17 @@ class _EmpleadoFormState extends ConsumerState<EmpleadoForm> {
   String? _personaError;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_workNumber]);
+  }
+
+  @override
+  bool get hasChanges =>
+      _persona != null ||
+      _workNumber.text != (widget.empleado?.workNumber ?? '');
 
   @override
   void dispose() {
@@ -75,15 +86,21 @@ class _EmpleadoFormState extends ConsumerState<EmpleadoForm> {
   @override
   Widget build(BuildContext context) {
     final current = widget.empleado;
-    return AppFormPanel(
+    return AppFormDialog(
       title: current == null ? 'Agregar empleado' : 'Editar empleado',
+      subtitle: current == null
+          ? 'Elige a la persona que entra a trabajar; su expediente ya debe existir en Personas.'
+          : null,
+      dirty: hasChanges,
+      // La lista de personas se abre bajo el campo: que quepa en la ventana.
+      minBodyHeight: current == null ? 400 : null,
       busy: _busy,
       error: _error,
       onSave: _save,
       child: Form(
         key: _form,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: AppFormSection(
+          first: true,
           children: [
             if (current == null)
               PersonaPickerField(
@@ -109,21 +126,16 @@ class _EmpleadoFormState extends ConsumerState<EmpleadoForm> {
                       error: (_, _) => const Text('Nombre no disponible'),
                     ),
               ),
-            const SizedBox(height: AppSpacing.lg),
             AppTextField(
               label: 'Número de nómina (opcional)',
               controller: _workNumber,
               enabled: !_busy,
+              helper: current == null
+                  ? 'Si todavía no tiene número de nómina, déjalo vacío y captúralo después.'
+                  : 'Cambiar el número de nómina no afecta su contrato ni su posición.',
               validator: (value) => (value?.trim().length ?? 0) > 30
                   ? 'Usa como máximo 30 caracteres.'
                   : null,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              current == null
-                  ? 'Si todavía no tiene número de nómina, déjalo vacío y captúralo después.'
-                  : 'Cambiar el número de nómina no afecta su contrato ni su posición.',
-              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),

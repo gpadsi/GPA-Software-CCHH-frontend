@@ -12,6 +12,7 @@ import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_fade_switcher.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/positions_controller.dart';
 import '../data/position_models.dart';
@@ -52,7 +53,7 @@ class _PuestosPageState extends ConsumerState<PuestosPage> {
   });
 
   Future<void> _edit([PositionCatalogEntry? puesto]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => PuestoForm(puesto: puesto),
     );
@@ -67,10 +68,11 @@ class _PuestosPageState extends ConsumerState<PuestosPage> {
   Widget build(BuildContext context) {
     final catalogs = ref.watch(positionCatalogsProvider);
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Posiciones',
       title: 'Puestos',
       description: 'El catálogo de puestos de Grupo GPA.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/posiciones/puestos',
         destinations: positionsTabs,
       ),

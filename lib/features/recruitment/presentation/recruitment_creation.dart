@@ -25,9 +25,8 @@ Future<void> abrirNuevoDescriptivo(
   WidgetRef ref, {
   String? posicionId,
 }) async {
-  final creado = await showAppPanel<Descriptivo>(
+  final creado = await showAppDialog<Descriptivo>(
     context: context,
-    barrierDismissible: true,
     builder: (_) => NuevoDescriptivoForm(posicionId: posicionId),
   );
   if (creado != null && context.mounted) {

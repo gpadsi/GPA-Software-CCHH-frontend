@@ -6,6 +6,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/network/table_query.dart';
@@ -45,7 +46,7 @@ class _CompaniesPageState extends ConsumerState<CompaniesPage> {
   }
 
   Future<void> _edit([Company? company]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => CompanyForm(company: company),
     );
@@ -60,10 +61,11 @@ class _CompaniesPageState extends ConsumerState<CompaniesPage> {
   Widget build(BuildContext context) {
     final companies = ref.watch(companiesPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Organización',
       title: 'Empresas',
       description: 'Datos corporativos de las empresas de Grupo GPA. Los datos aún no confirmados aparecen como Pendiente.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/organizacion/empresas',
         destinations: organizationTabs,
       ),

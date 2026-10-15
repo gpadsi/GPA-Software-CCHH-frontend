@@ -75,7 +75,7 @@ class AppPageTransitionsBuilder extends PageTransitionsBuilder {
     return FadeThroughTransition(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
-      fillColor: AppColors.background,
+      fillColor: context.colors.background,
       child: child,
     );
   }

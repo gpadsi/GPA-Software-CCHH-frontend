@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/organizations_controller.dart';
 import '../data/organization_models.dart';
 import '../data/organizations_repository.dart';
@@ -23,7 +23,8 @@ class CompanyForm extends ConsumerStatefulWidget {
   ConsumerState<CompanyForm> createState() => _CompanyFormState();
 }
 
-class _CompanyFormState extends ConsumerState<CompanyForm> {
+class _CompanyFormState extends ConsumerState<CompanyForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _code = TextEditingController();
@@ -36,8 +37,25 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
   );
   // El nombre se precarga una sola vez, cuando llega el nodo.
   bool _nameLoaded = false;
+  String _initialName = '';
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_name, _code, _legalName, _rfc, _registration]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.company;
+    return _name.text != _initialName ||
+        _code.text.isNotEmpty ||
+        _legalName.text != (current?.legalName ?? '') ||
+        _rfc.text != (current?.rfc ?? '') ||
+        _registration.text != (current?.employerRegistration ?? '');
+  }
 
   @override
   void dispose() {
@@ -112,13 +130,18 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
               .watch(companyNodeProvider(widget.company!.organizationNode))
               .whenData((node) {
                 if (!_nameLoaded) {
+                  _initialName = node.name;
                   _name.text = node.name;
                   _nameLoaded = true;
                 }
                 return null;
               });
-    return AppFormPanel(
+    return AppFormDialog(
       title: creating ? 'Agregar empresa' : 'Editar empresa',
+      subtitle: creating
+          ? 'Se agrega como empresa de Grupo GPA en el organigrama.'
+          : null,
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       canSave: ready.hasValue,
@@ -146,51 +169,69 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppTextField(
-          label: 'Nombre de la empresa',
-          controller: _name,
-          enabled: !_busy,
-          validator: (value) => _validate(value, 200),
+        AppFormSection(
+          first: true,
+          title: 'Empresa',
+          description:
+              'El nombre con el que aparece en listas y en el organigrama.',
+          children: [
+            // Al editar el código ya no cambia: el nombre ocupa todo el ancho.
+            if (creating)
+              AppFieldGrid(
+                minTwoColumnWidth: 480,
+                children: [
+                  _nameField(creating),
+                  AppTextField(
+                    label: 'Código',
+                    hint: 'Ej. GPA-AZM',
+                    controller: _code,
+                    enabled: !_busy,
+                    validator: (value) => _validate(value, 50),
+                  ),
+                ],
+              )
+            else
+              _nameField(creating),
+          ],
         ),
-        if (creating) ...[
-          const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            label: 'Código',
-            hint: 'Ej. GPA-AZM',
-            controller: _code,
-            enabled: !_busy,
-            validator: (value) => _validate(value, 50),
-          ),
-        ],
-        const SizedBox(height: AppSpacing.xl),
-        Text('Datos legales', style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Los que GPA aún no confirme pueden quedar vacíos; se muestran como pendientes.',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        AppTextField(
-          label: 'Razón social (opcional)',
-          controller: _legalName,
-          enabled: !_busy,
-          validator: (value) => _validate(value, 255, required: false),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        AppTextField(
-          label: 'RFC (opcional)',
-          controller: _rfc,
-          enabled: !_busy,
-          validator: (value) => _validate(value, 20, required: false),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        AppTextField(
-          label: 'Registro patronal (opcional)',
-          controller: _registration,
-          enabled: !_busy,
-          validator: (value) => _validate(value, 100, required: false),
+        AppFormSection(
+          title: 'Datos legales',
+          description: 'Los que GPA aún no confirme pueden quedar vacíos; se muestran como pendientes.',
+          children: [
+            AppTextField(
+              label: 'Razón social (opcional)',
+              controller: _legalName,
+              enabled: !_busy,
+              validator: (value) => _validate(value, 255, required: false),
+            ),
+            AppFieldGrid(
+              minTwoColumnWidth: 480,
+              children: [
+                AppTextField(
+                  label: 'RFC (opcional)',
+                  controller: _rfc,
+                  enabled: !_busy,
+                  validator: (value) => _validate(value, 20, required: false),
+                ),
+                AppTextField(
+                  label: 'Registro patronal (opcional)',
+                  controller: _registration,
+                  enabled: !_busy,
+                  validator: (value) => _validate(value, 100, required: false),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     ),
+  );
+
+  Widget _nameField(bool creating) => AppTextField(
+    label: 'Nombre de la empresa',
+    controller: _name,
+    enabled: !_busy,
+    autofocus: creating,
+    validator: (value) => _validate(value, 200),
   );
 }

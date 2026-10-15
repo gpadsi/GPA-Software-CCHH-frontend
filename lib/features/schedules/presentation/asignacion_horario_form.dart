@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_date_field.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
 import 'empleado_picker_field.dart';
 
 final _isoDate = DateFormat('yyyy-MM-dd');
-final _displayDate = DateFormat.yMMMd('es_MX');
 
 class AsignacionHorarioForm extends ConsumerStatefulWidget {
   const AsignacionHorarioForm({super.key, this.asignacion});
@@ -22,33 +22,30 @@ class AsignacionHorarioForm extends ConsumerStatefulWidget {
       _AsignacionHorarioFormState();
 }
 
-class _AsignacionHorarioFormState extends ConsumerState<AsignacionHorarioForm> {
+class _AsignacionHorarioFormState extends ConsumerState<AsignacionHorarioForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late String? _empleado = widget.asignacion?.empleado;
   late String? _catorcena = widget.asignacion?.catorcena;
   late int? _tipoHorario = widget.asignacion?.tipoHorario;
-  late DateTime? _fechaReferencia = widget.asignacion?.fechaReferencia == null
-      ? null
-      : DateTime.tryParse(widget.asignacion!.fechaReferencia);
+  late DateTime? _fechaReferencia = _parse(widget.asignacion?.fechaReferencia);
   bool _busy = false;
   String? _error;
 
-  Future<void> _pickFecha() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _fechaReferencia ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) setState(() => _fechaReferencia = picked);
+  static DateTime? _parse(String? value) =>
+      value == null ? null : DateTime.tryParse(value);
+
+  @override
+  bool get hasChanges {
+    final current = widget.asignacion;
+    return _empleado != current?.empleado ||
+        _catorcena != current?.catorcena ||
+        _tipoHorario != current?.tipoHorario ||
+        dateChanged(_fechaReferencia, _parse(current?.fechaReferencia));
   }
 
   Future<void> _save() async {
     if (_busy || !_form.currentState!.validate()) return;
-    if (_fechaReferencia == null) {
-      setState(() => _error = 'Elige la fecha de referencia.');
-      return;
-    }
     setState(() {
       _busy = true;
       _error = null;
@@ -89,10 +86,11 @@ class _AsignacionHorarioFormState extends ConsumerState<AsignacionHorarioForm> {
   Widget build(BuildContext context) {
     final tiposHorario = ref.watch(tiposHorarioCatalogProvider);
     final catorcenas = ref.watch(allCatorcenasProvider);
-    return AppFormPanel(
+    return AppFormDialog(
       title: widget.asignacion == null
           ? 'Agregar asignación de horario'
           : 'Editar asignación de horario',
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       canSave: tiposHorario.hasValue && catorcenas.hasValue,
@@ -116,70 +114,69 @@ class _AsignacionHorarioFormState extends ConsumerState<AsignacionHorarioForm> {
     );
   }
 
-  Widget _fields(
-    List<TipoHorarioRef> tipos,
-    List<Catorcena> catorcenas,
-  ) => Form(
-    key: _form,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        EmpleadoPickerField(
-          selected: _empleado,
-          enabled: !_busy,
-          onChanged: (value) => setState(() => _empleado = value),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        DropdownButtonFormField<int>(
-          key: ValueKey('tipo:$_tipoHorario'),
-          initialValue: _tipoHorario,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Tipo de horario'),
-          items: [
-            for (final tipo in tipos)
-              DropdownMenuItem(value: tipo.id, child: Text(tipo.name)),
-          ],
-          validator: (value) =>
-              value == null ? 'Elige un tipo de horario.' : null,
-          onChanged: _busy
-              ? null
-              : (value) => setState(() => _tipoHorario = value),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        DropdownButtonFormField<String?>(
-          key: ValueKey('catorcena:$_catorcena'),
-          initialValue: _catorcena,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Catorcena (opcional)'),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('Sin capturar')),
-            for (final catorcena in catorcenas)
-              DropdownMenuItem(
-                value: catorcena.id,
-                child: Text('${catorcena.numero}/${catorcena.anio}'),
-              ),
-          ],
-          onChanged: _busy
-              ? null
-              : (value) => setState(() => _catorcena = value),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Row(
+  Widget _fields(List<TipoHorarioRef> tipos, List<Catorcena> catorcenas) =>
+      Form(
+        key: _form,
+        child: AppFormSection(
+          first: true,
           children: [
-            Expanded(
-              child: Text(
-                _fechaReferencia == null
-                    ? 'Fecha de referencia: sin capturar'
-                    : 'Fecha de referencia: ${_displayDate.format(_fechaReferencia!)}',
-              ),
+            EmpleadoPickerField(
+              selected: _empleado,
+              enabled: !_busy,
+              onChanged: (value) => setState(() => _empleado = value),
             ),
-            TextButton(
-              onPressed: _busy ? null : _pickFecha,
-              child: const Text('Elegir'),
+            AppFieldGrid(
+              minTwoColumnWidth: 480,
+              children: [
+                DropdownButtonFormField<int>(
+                  key: ValueKey('tipo:$_tipoHorario'),
+                  initialValue: _tipoHorario,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Tipo de horario',
+                  ),
+                  items: [
+                    for (final tipo in tipos)
+                      DropdownMenuItem(value: tipo.id, child: Text(tipo.name)),
+                  ],
+                  validator: (value) =>
+                      value == null ? 'Elige un tipo de horario.' : null,
+                  onChanged: _busy
+                      ? null
+                      : (value) => setState(() => _tipoHorario = value),
+                ),
+                DropdownButtonFormField<String?>(
+                  key: ValueKey('catorcena:$_catorcena'),
+                  initialValue: _catorcena,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Catorcena (opcional)',
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Sin capturar'),
+                    ),
+                    for (final catorcena in catorcenas)
+                      DropdownMenuItem(
+                        value: catorcena.id,
+                        child: Text('${catorcena.numero}/${catorcena.anio}'),
+                      ),
+                  ],
+                  onChanged: _busy
+                      ? null
+                      : (value) => setState(() => _catorcena = value),
+                ),
+              ],
+            ),
+            AppDateField(
+              label: 'Fecha de referencia',
+              value: _fechaReferencia,
+              isRequired: true,
+              enabled: !_busy,
+              onChanged: (value) => setState(() => _fechaReferencia = value),
             ),
           ],
         ),
-      ],
-    ),
-  );
+      );
 }

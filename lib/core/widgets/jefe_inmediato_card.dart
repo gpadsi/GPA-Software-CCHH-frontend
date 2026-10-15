@@ -41,8 +41,7 @@ class JefeInmediatoCard extends ConsumerWidget {
                 const EmptyState(
                   icon: Icons.supervisor_account_outlined,
                   title: 'Sin jefe asignado todavía',
-                  message:
-                      'No hay una posición superior o está vacante en este momento.',
+                  message: 'No hay una posición superior o está vacante en este momento.',
                 )
               else
                 Wrap(
@@ -62,7 +61,7 @@ class JefeInmediatoCard extends ConsumerWidget {
                         Text(
                           jefe.puesto ?? 'Puesto no capturado',
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),

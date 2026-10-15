@@ -5,6 +5,7 @@ import '../design_system/colors.dart';
 import '../design_system/spacing.dart';
 import '../network/api_failure.dart';
 import 'app_button.dart';
+import 'app_dialog.dart';
 import 'app_overlays.dart';
 
 /// Nota que acompaña a todo borrado: el sistema puede negarse si el registro
@@ -46,7 +47,9 @@ Future<bool> showConfirmDialog(
   required Future<void> Function() onConfirm,
   String? details,
   String confirmLabel = 'Eliminar',
+  String cancelLabel = 'Cancelar',
   bool destructive = true,
+  IconData? icon,
   String Function(Object error)? errorMessage,
 }) async {
   final confirmed = await showAppDialog<bool>(
@@ -56,7 +59,9 @@ Future<bool> showConfirmDialog(
       message: message,
       details: details,
       confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
       destructive: destructive,
+      icon: icon,
       onConfirm: onConfirm,
       errorMessage:
           errorMessage ?? (destructive ? deleteErrorMessage : apiErrorMessage),
@@ -65,13 +70,32 @@ Future<bool> showConfirmDialog(
   return confirmed == true;
 }
 
+/// La pregunta única de «¿descartar cambios?»: al cerrar un formulario con
+/// algo capturado y al salir de una página de trabajo con cambios. Devuelve
+/// true solo si la persona elige descartar.
+Future<bool> confirmDiscardChanges(
+  BuildContext context, {
+  required String message,
+}) => showConfirmDialog(
+  context,
+  title: '¿Descartar cambios?',
+  message: message,
+  confirmLabel: 'Descartar',
+  cancelLabel: 'Seguir editando',
+  destructive: false,
+  icon: Icons.edit_off_outlined,
+  onConfirm: () async {},
+);
+
 class _ConfirmDialog extends StatefulWidget {
   const _ConfirmDialog({
     required this.title,
     required this.message,
     required this.details,
     required this.confirmLabel,
+    required this.cancelLabel,
     required this.destructive,
+    required this.icon,
     required this.onConfirm,
     required this.errorMessage,
   });
@@ -80,7 +104,9 @@ class _ConfirmDialog extends StatefulWidget {
   final String message;
   final String? details;
   final String confirmLabel;
+  final String cancelLabel;
   final bool destructive;
+  final IconData? icon;
   final Future<void> Function() onConfirm;
   final String Function(Object error) errorMessage;
 
@@ -116,84 +142,67 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
   @override
   Widget build(BuildContext context) {
     final type = Theme.of(context).textTheme;
-    final tint = widget.destructive ? AppColors.error : AppColors.primary;
+    final tint = widget.destructive
+        ? context.colors.error
+        : context.colors.onPrimarySurface;
     final tintSurface = widget.destructive
-        ? AppColors.errorSurface
-        : AppColors.primarySurface;
+        ? context.colors.errorSurface
+        : context.colors.primarySurface;
     return PopScope(
       canPop: !_busy,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(AppSpacing.md),
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radius),
-          side: const BorderSide(color: AppColors.border),
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: tintSurface,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.controlRadius,
-                    ),
-                  ),
-                  child: Icon(
-                    widget.destructive
-                        ? Icons.delete_outline_rounded
-                        : Icons.help_outline_rounded,
-                    color: tint,
-                  ),
+      child: AppDialogSurface(
+        width: AppDialogSize.small.width,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: tintSurface,
+                  borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(widget.title, style: type.titleLarge),
+                child: Icon(
+                  widget.icon ??
+                      (widget.destructive
+                          ? Icons.delete_outline_rounded
+                          : Icons.help_outline_rounded),
+                  color: tint,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Semantics(
+                header: true,
+                child: Text(widget.title, style: type.titleLarge),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                widget.message,
+                style: type.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+              if (widget.details != null) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  widget.message,
-                  style: type.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                if (widget.details != null) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(widget.details!, style: type.bodySmall),
-                ],
-                if (_error != null) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  Semantics(
-                    liveRegion: true,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.sm + 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorSurface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.controlRadius,
-                        ),
-                      ),
-                      child: Text(
-                        _error!,
-                        style: type.bodySmall?.copyWith(color: AppColors.error),
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.lg),
-                Wrap(
+                Text(widget.details!, style: type.bodySmall),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                AppDialogError(_error!),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
                   alignment: WrapAlignment.end,
                   spacing: AppSpacing.sm,
                   runSpacing: AppSpacing.sm,
                   children: [
                     AppButton(
-                      label: 'Cancelar',
+                      label: widget.cancelLabel,
                       variant: AppButtonVariant.secondary,
                       onPressed: _busy
                           ? null
@@ -209,8 +218,8 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

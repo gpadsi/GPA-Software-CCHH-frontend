@@ -7,7 +7,6 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
-import 'recruitment_design.dart';
 
 /// Contexto de consulta con espacio reservado durante la carga y dos columnas
 /// cuando hay espacio. Crece con el texto; cada relación conserva su tooltip.
@@ -31,8 +30,6 @@ class PosicionContextoCard extends ConsumerWidget {
     final posicion = ref.watch(provider);
     final scaler = MediaQuery.textScalerOf(context);
     return AppCard(
-      color: RecruitmentDesign.surface,
-      borderColor: RecruitmentDesign.border,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -107,7 +104,9 @@ class PosicionContextoCard extends ConsumerWidget {
             width: 84,
             child: Text(
               label,
-              style: type.labelMedium?.copyWith(color: AppColors.textSecondary),
+              style: type.labelMedium?.copyWith(
+                color: context.colors.textSecondary,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -135,7 +134,7 @@ class PosicionContextoCard extends ConsumerWidget {
               child: Text(
                 'POSICIÓN VINCULADA',
                 style: type.labelSmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   letterSpacing: 1,
                 ),
               ),

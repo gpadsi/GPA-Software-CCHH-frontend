@@ -11,6 +11,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/organizations_controller.dart';
 import '../data/organization_models.dart';
@@ -50,7 +51,7 @@ class _OrganizationTreePageState extends ConsumerState<OrganizationTreePage> {
           .showSnackBar(SnackBar(content: Text(message)));
 
   Future<void> _addChild(OrganizationTree tree, OrganizationNode parent) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => NodeForm(tree: tree, parent: parent),
     );
@@ -63,7 +64,7 @@ class _OrganizationTreePageState extends ConsumerState<OrganizationTreePage> {
   }
 
   Future<void> _edit(OrganizationTree tree, OrganizationNode node) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => NodeForm(tree: tree, node: node),
     );
@@ -93,10 +94,11 @@ class _OrganizationTreePageState extends ConsumerState<OrganizationTreePage> {
   Widget build(BuildContext context) {
     final tree = ref.watch(organizationTreeProvider);
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Organización',
       title: 'Organigrama',
       description: 'Explora la estructura de la organización, desde cada empresa hasta sus unidades.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/organizacion/organigrama',
         destinations: organizationTabs,
       ),
@@ -212,6 +214,7 @@ class OrganizationTreeView extends StatelessWidget {
                     painter: _TreeConnectorPainter(
                       ancestorContinues: ancestorContinues,
                       continuesBelow: !isLast,
+                      color: context.colors.accent,
                     ),
                   ),
                 ),
@@ -335,14 +338,16 @@ class _TreeConnectorPainter extends CustomPainter {
   const _TreeConnectorPainter({
     required this.ancestorContinues,
     required this.continuesBelow,
+    required this.color,
   });
   final List<bool> ancestorContinues;
   final bool continuesBelow;
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.accent
+      ..color = color
       ..strokeWidth = 1.6
       ..style = PaintingStyle.stroke;
     final midY = size.height / 2;
@@ -382,16 +387,10 @@ class _OrgNodeCard extends StatelessWidget {
       vertical: AppSpacing.sm,
     ),
     decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
-      border: Border.all(color: AppColors.border),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x14000000),
-          blurRadius: 6,
-          offset: Offset(0, 2),
-        ),
-      ],
+      color: context.colors.surface,
+      borderRadius: BorderRadius.circular(context.shape.control),
+      border: Border.all(color: context.colors.border),
+      boxShadow: context.shape.cardShadow,
     ),
     child: Row(
       children: [
@@ -406,7 +405,7 @@ class _OrgNodeCard extends StatelessWidget {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
+                      color: context.colors.primarySurface,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Padding(
@@ -417,7 +416,7 @@ class _OrgNodeCard extends StatelessWidget {
                       child: Text(
                         node.code,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.primary,
+                          color: context.colors.onPrimarySurface,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -434,7 +433,7 @@ class _OrgNodeCard extends StatelessWidget {
               Text(
                 levelLabel,
                 style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: AppColors.textSecondary),
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
               if (parentMissing)
                 const Padding(

@@ -13,6 +13,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_date_field.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
 import '../application/requisicion_exit_guard.dart';
@@ -20,7 +21,6 @@ import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'conformidades_card.dart';
-import 'discard_changes_dialog.dart';
 import 'recruitment_ui.dart';
 import 'recruitment_design.dart';
 import 'requisicion_before_unload.dart';
@@ -72,10 +72,14 @@ class DescriptivoPage extends ConsumerWidget {
         catalogs: options,
       );
     }
-    return RecruitmentPage(
+    return AppPage(
+      section: 'Reclutamiento',
       title: 'Descriptivo de puesto',
       description: 'Detalle del descriptivo de puesto.',
-      tabs: const RecruitmentModuleTabs(current: '/reclutamiento/descriptivos'),
+      tabs: const AppRouteTabs(
+        current: '/reclutamiento/descriptivos',
+        destinations: recruitmentTabs,
+      ),
       child: error != null
           ? FeatureError(error: error, onRetry: () => _reload(ref))
           : const FeatureLoading(),
@@ -573,8 +577,6 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
   Widget _card(String title, List<Widget> children, {String? note}) => Padding(
     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
     child: AppCard(
-      color: RecruitmentDesign.surface,
-      borderColor: RecruitmentDesign.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -726,7 +728,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
       children: [
         Row(
           children: [
-            const Icon(Icons.link, size: 18, color: AppColors.textSecondary),
+            Icon(Icons.link, size: 18, color: context.colors.textSecondary),
             const SizedBox(width: AppSpacing.xs),
             Text('Vinculado a la posición', style: type.labelLarge),
           ],
@@ -799,7 +801,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
             container: true,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.warningSurface,
+                color: context.colors.warningSurface,
                 borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
               ),
               child: Padding(
@@ -926,7 +928,7 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
     );
   }
 
-  Widget _sectionChips() => RecruitmentSectionTabs(
+  Widget _sectionChips() => AppSectionTabs(
     labels: _sectionNames,
     selected: _active,
     onSelected: _show,
@@ -993,12 +995,12 @@ class _DescriptivoEditorState extends ConsumerState<DescriptivoEditor> {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: AppColors.errorSurface,
+            color: context.colors.errorSurface,
             borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
           ),
           child: Text(
             _error!,
-            style: type.bodyMedium?.copyWith(color: AppColors.error),
+            style: type.bodyMedium?.copyWith(color: context.colors.error),
           ),
         ),
       ),

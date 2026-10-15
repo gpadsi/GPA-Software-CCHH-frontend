@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/locations_controller.dart';
 import '../data/location_models.dart';
 import '../data/locations_repository.dart';
@@ -17,7 +17,8 @@ class LocationForm extends ConsumerStatefulWidget {
   ConsumerState<LocationForm> createState() => _LocationFormState();
 }
 
-class _LocationFormState extends ConsumerState<LocationForm> {
+class _LocationFormState extends ConsumerState<LocationForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _code = TextEditingController(text: widget.record?.code);
   late final _name = TextEditingController(text: widget.record?.name);
@@ -28,8 +29,26 @@ class _LocationFormState extends ConsumerState<LocationForm> {
   String? _ubicacion;
   late String? _nave = widget.record?.nave;
   bool _initialized = false;
+  String? _initialUbicacion;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_code, _name, _registration]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.record;
+    return _code.text != (current?.code ?? '') ||
+        _name.text != (current?.name ?? '') ||
+        _registration.text != (current?.employerRegistration ?? '') ||
+        _active != (current?.isActive ?? true) ||
+        _ubicacion != _initialUbicacion ||
+        _nave != current?.nave;
+  }
 
   @override
   void dispose() {
@@ -87,9 +106,10 @@ class _LocationFormState extends ConsumerState<LocationForm> {
     final catalog = widget.kind == LocationKind.ubicaciones
         ? const AsyncData(LocationCatalog(ubicaciones: [], naves: []))
         : ref.watch(locationCatalogProvider);
-    return AppFormPanel(
+    return AppFormDialog(
       title:
           '${widget.record == null ? 'Agregar' : 'Editar'} ${widget.kind.singular}',
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       canSave: catalog.hasValue,
@@ -110,56 +130,21 @@ class _LocationFormState extends ConsumerState<LocationForm> {
       _ubicacion = widget.kind == LocationKind.naves
           ? widget.record?.ubicacion
           : catalog.naveById(_nave)?.ubicacion;
+      _initialUbicacion = _ubicacion;
       _initialized = true;
     }
-    return Form(
-      key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    final placed = widget.kind != LocationKind.ubicaciones;
+    final identity = [
+      AppFieldGrid(
+        minTwoColumnWidth: 480,
         children: [
-          if (widget.kind != LocationKind.ubicaciones) ...[
-            _select(
-              'Ubicación',
-              _ubicacion,
-              {
-                for (final item in catalog.ubicaciones)
-                  item.id: item.displayName,
-              },
-              (value) => setState(() {
-                _ubicacion = value;
-                _nave = null;
-              }),
-              optional: widget.kind == LocationKind.areas,
-              emptyLabel: 'Sin ubicación confirmada',
-            ),
-            const SizedBox(height: AppSpacing.lg),
-          ],
-          if (widget.kind == LocationKind.areas) ...[
-            _select(
-              'Nave',
-              _nave,
-              {
-                for (final item in catalog.navesAt(_ubicacion))
-                  item.id: item.displayName,
-              },
-              (value) => setState(() => _nave = value),
-              optional: true,
-              emptyLabel: 'Sin nave confirmada',
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'La ubicación filtra las naves. Si la nave no se ha confirmado, puedes dejarla pendiente.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-          ],
           AppTextField(
             label: 'Código',
             controller: _code,
             enabled: !_busy,
+            autofocus: widget.record == null && !placed,
             validator: (value) => _validate(value, 30),
           ),
-          const SizedBox(height: AppSpacing.lg),
           AppTextField(
             label: widget.kind == LocationKind.naves
                 ? 'Nombre (opcional)'
@@ -172,23 +157,67 @@ class _LocationFormState extends ConsumerState<LocationForm> {
               required: widget.kind != LocationKind.naves,
             ),
           ),
-          if (widget.kind == LocationKind.ubicaciones) ...[
-            const SizedBox(height: AppSpacing.lg),
-            AppTextField(
-              label: 'Registro patronal (opcional)',
-              controller: _registration,
-              enabled: !_busy,
-              validator: (value) => _validate(value, 100, required: false),
+        ],
+      ),
+      if (widget.kind == LocationKind.ubicaciones)
+        AppTextField(
+          label: 'Registro patronal (opcional)',
+          controller: _registration,
+          enabled: !_busy,
+          validator: (value) => _validate(value, 100, required: false),
+        ),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: const Text('Activo'),
+        value: _active,
+        onChanged: _busy ? null : (value) => setState(() => _active = value),
+      ),
+    ];
+    return Form(
+      key: _form,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (placed)
+            AppFormSection(
+              first: true,
+              title: 'Dónde está',
+              description: widget.kind == LocationKind.areas
+                  ? 'La ubicación filtra las naves. Si la nave no se ha confirmado, puedes dejarla pendiente.'
+                  : null,
+              children: [
+                _select(
+                  'Ubicación',
+                  _ubicacion,
+                  {
+                    for (final item in catalog.ubicaciones)
+                      item.id: item.displayName,
+                  },
+                  (value) => setState(() {
+                    _ubicacion = value;
+                    _nave = null;
+                  }),
+                  optional: widget.kind == LocationKind.areas,
+                  emptyLabel: 'Sin ubicación confirmada',
+                ),
+                if (widget.kind == LocationKind.areas)
+                  _select(
+                    'Nave',
+                    _nave,
+                    {
+                      for (final item in catalog.navesAt(_ubicacion))
+                        item.id: item.displayName,
+                    },
+                    (value) => setState(() => _nave = value),
+                    optional: true,
+                    emptyLabel: 'Sin nave confirmada',
+                  ),
+              ],
             ),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Activo'),
-            value: _active,
-            onChanged: _busy
-                ? null
-                : (value) => setState(() => _active = value),
+          AppFormSection(
+            first: !placed,
+            title: placed ? 'Datos' : null,
+            children: identity,
           ),
         ],
       ),

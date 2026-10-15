@@ -72,7 +72,7 @@ Future<void> _openForm(
     repository: repository,
   );
   unawaited(
-    showAppPanel<void>(
+    showAppDialog<void>(
       context: tester.element(find.byType(DescriptivosPage)),
       builder: (_) => form,
     ),

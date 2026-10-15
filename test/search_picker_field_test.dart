@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:capital_humano_front/core/design_system/colors.dart';
+import 'package:capital_humano_front/core/design_system/app_themes.dart';
 import 'package:capital_humano_front/core/widgets/app_overlays.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_field.dart';
 import 'package:capital_humano_front/features/employment/application/employment_controller.dart';
 import 'package:capital_humano_front/features/employment/data/employment_models.dart';
@@ -54,6 +54,7 @@ Future<void> openOverlay(
   WidgetTester tester,
   Widget child, {
   bool dialog = false,
+  bool? dirty,
 }) async {
   await mount(
     tester,
@@ -74,10 +75,11 @@ Future<void> openOverlay(
               ),
             );
           } else {
-            showAppPanel<void>(
+            showAppDialog<void>(
               context: context,
-              builder: (_) => AppFormPanel(
+              builder: (_) => AppFormDialog(
                 title: 'Panel de prueba',
+                dirty: dirty,
                 onSave: () {},
                 child: child,
               ),
@@ -252,7 +254,10 @@ void main() {
     final row = find
         .ancestor(of: find.text('Uno'), matching: find.byType(Container))
         .first;
-    expect(tester.widget<Container>(row).color, AppColors.primarySurface);
+    expect(
+      tester.widget<Container>(row).color,
+      AppThemeId.fallback.colors.primarySurface,
+    );
     expect(find.text('Vacante activa · Área de Uno'), findsOneWidget);
     expect(find.text('Borrador abierto'), findsWidgets);
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
@@ -291,7 +296,7 @@ void main() {
   });
 
   testWidgets(
-    'clic real dentro de showAppPanel selecciona sin perder la opción',
+    'clic real dentro de showAppDialog selecciona sin perder la opción',
     (tester) async {
       String? selected;
       await openOverlay(
@@ -313,7 +318,7 @@ void main() {
       await gesture.up();
       await tester.pumpAndSettle();
       expect(selected, 'Uno');
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
     },
   );
 
@@ -327,8 +332,32 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(find.text('Uno'), findsNothing);
-    expect(find.byType(AppFormPanel), findsOneWidget);
+    expect(find.byType(AppFormDialog), findsOneWidget);
   });
+
+  testWidgets(
+    'sin lista abierta, Escape en el selector cierra la ventana; con lista, '
+    'primero solo la lista',
+    (tester) async {
+      await openOverlay(
+        tester,
+        picker(suggest: true, search: (_) async => ['Uno']),
+        dirty: false,
+      );
+      await tester.tap(find.byType(TextFormField));
+      await tester.pumpAndSettle();
+      expect(find.text('Uno'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Uno'), findsNothing);
+      expect(find.byType(AppFormDialog), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(AppFormDialog), findsNothing);
+    },
+  );
 
   testWidgets(
     'Escape durante carga descarta la respuesta sin cerrar el panel',
@@ -349,7 +378,7 @@ void main() {
       result.complete(['Uno']);
       await tester.pumpAndSettle();
       expect(find.text('Uno'), findsNothing);
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
     },
   );
 

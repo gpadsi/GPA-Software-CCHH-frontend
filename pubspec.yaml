@@ -42,6 +42,13 @@ flutter:
   uses-material-design: true
   assets:
     - lib/core/design_system/company-logo.png
+    - lib/core/design_system/gpa-mark.png
+    - lib/core/design_system/agroindustry-gear.png
+    # Letras de los temas que no son el predeterminado: no van en `fonts`
+    # para que no se descarguen al abrir la app, solo al usar su tema.
+    - lib/core/design_system/fonts/Fraunces.ttf
+    - lib/core/design_system/fonts/PlusJakartaSans.ttf
+    - lib/core/design_system/fonts/Outfit.ttf
   fonts:
     - family: Manrope
       fonts:

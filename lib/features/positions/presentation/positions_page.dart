@@ -8,6 +8,7 @@ import '../../../core/widgets/app_badge.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/app_overlays.dart';
@@ -53,7 +54,7 @@ class _PositionsPageState extends ConsumerState<PositionsPage> {
   }
 
   Future<void> _addOrEdit([Posicion? posicion]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => PositionForm(posicion: posicion),
     );
@@ -84,10 +85,11 @@ class _PositionsPageState extends ConsumerState<PositionsPage> {
     final catalogs = ref.watch(positionCatalogsProvider);
     final page = ref.watch(posicionesPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Posiciones',
       title: 'Posiciones',
       description: 'Puestos ocupados y vacantes, con su línea de reporte.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/posiciones',
         destinations: positionsTabs,
       ),

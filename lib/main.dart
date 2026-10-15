@@ -5,16 +5,36 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'core/design_system/theme.dart';
+import 'core/design_system/font_controller.dart';
+import 'core/design_system/font_preference_store.dart';
+import 'core/design_system/theme_controller.dart';
+import 'core/design_system/theme_preference_store.dart';
 import 'core/auth/auth_models.dart';
 import 'core/auth/session_controller.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/routing/app_router.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
   Intl.defaultLocale = 'es_MX';
-  runApp(const ProviderScope(child: CapitalHumanoApp()));
+  final themes = SecureThemePreferenceStore();
+  final fonts = SecureFontPreferenceStore();
+  final themeLoading = loadLastTheme(themes);
+  final fontLoading = loadLastFont(fonts);
+  final initialTheme = await themeLoading;
+  final initialFont = await fontLoading;
+  runApp(
+    ProviderScope(
+      overrides: [
+        themePreferenceStoreProvider.overrideWithValue(themes),
+        initialThemeProvider.overrideWithValue(initialTheme),
+        fontPreferenceStoreProvider.overrideWithValue(fonts),
+        initialFontProvider.overrideWithValue(initialFont),
+      ],
+      child: const CapitalHumanoApp(),
+    ),
+  );
 }
 
 class CapitalHumanoApp extends ConsumerStatefulWidget {
@@ -54,7 +74,10 @@ class _CapitalHumanoAppState extends ConsumerState<CapitalHumanoApp> {
   Widget build(BuildContext context) => MaterialApp.router(
     debugShowCheckedModeBanner: false,
     onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-    theme: AppTheme.light,
+    theme: AppTheme.of(
+      ref.watch(themeControllerProvider),
+      font: ref.watch(fontControllerProvider),
+    ),
     locale: const Locale('es', 'MX'),
     supportedLocales: const [Locale('es', 'MX')],
     localizationsDelegates: AppLocalizations.localizationsDelegates,

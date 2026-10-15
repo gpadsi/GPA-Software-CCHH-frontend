@@ -4,7 +4,7 @@
 import 'package:capital_humano_front/core/auth/auth_models.dart';
 import 'package:capital_humano_front/core/auth/session_controller.dart';
 import 'package:capital_humano_front/core/routing/app_router.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/features/employment/application/employment_controller.dart';
 import 'package:capital_humano_front/features/locations/application/locations_controller.dart';
 import 'package:capital_humano_front/features/organizations/application/organizations_controller.dart';
@@ -240,7 +240,7 @@ void main() {
 
       await tester.tap(find.text('Agregar puesto'));
       await tester.pumpAndSettle();
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
 
       await tester.enterText(
         find.byType(TextFormField).first,
@@ -254,7 +254,7 @@ void main() {
       expect(positions.savedPuesto?.name, 'Jefe de Almacén');
       expect(positions.savedPuesto?.isActive, isTrue);
       expect(positions.savedPuesto?.esGerenciaDeUnidad, isTrue);
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
       expect(find.text('Puesto guardado.'), findsOneWidget);
     });
 
@@ -318,7 +318,7 @@ void main() {
         find.text('Nombre: Ya existe un puesto con ese nombre.'),
         findsOneWidget,
       );
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
     });
   });
 
@@ -429,6 +429,120 @@ void main() {
         expect(organizations.createdCompany?.legalName, isEmpty);
       },
     );
+  });
+
+  group('cerrar una ventana sin cambios no pregunta; con cambios sí', () {
+    // (ruta, toques para abrirla: botones, pestañas, menús o tooltips)
+    Finder text(String label) => find.text(label);
+    Finder tip(String label) => find.byTooltip(label);
+    final openers = <(String, List<Finder>)>[
+      ('/posiciones/puestos', [text('Agregar puesto')]),
+      ('/posiciones/puestos', [tip('Editar Auxiliar de Producción')]),
+      ('/horarios/tipos', [text('Agregar tipo de horario')]),
+      ('/horarios/tipos', [tip('Editar Horario 1')]),
+      ('/horarios/catorcenas', [text('Agregar catorcena')]),
+      ('/horarios/catorcenas', [tip('Editar catorcena')]),
+      ('/horarios/asignaciones-horario', [text('Agregar asignación')]),
+      ('/horarios/asignaciones-horario', [tip('Editar asignación')]),
+      ('/ubicaciones', [text('Agregar ubicación')]),
+      ('/ubicaciones', [tip('Editar MATRIZ')]),
+      ('/empleados', [text('Agregar empleado')]),
+      ('/empleados', [tip('Editar empleado ADV0001')]),
+      ('/organizacion/empresas', [text('Agregar empresa')]),
+      (
+        '/organizacion/organigrama',
+        [tip('Acciones de Empresa de prueba'), text('Agregar unidad dentro')],
+      ),
+      (
+        '/organizacion/organigrama',
+        [tip('Acciones de Unidad de negocio'), text('Editar')],
+      ),
+      (
+        '/personas/p1',
+        [text('Contacto de urgencia'), text('Agregar contacto')],
+      ),
+    ];
+
+    for (final (path, taps) in openers) {
+      testWidgets('$path · ${taps.last.describeMatch(Plurality.one)}', (
+        tester,
+      ) async {
+        await pumpAll(tester, path: path);
+        if (path == '/organizacion/organigrama') {
+          // Las unidades se ven al expandir la empresa (una sola vez).
+          await tester.tap(find.byTooltip('Expandir Empresa de prueba'));
+          await tester.pumpAndSettle();
+        }
+        Future<void> open() async {
+          for (final target in taps) {
+            await tester.ensureVisible(target.first);
+            await tester.tap(target.first);
+            await tester.pumpAndSettle();
+          }
+        }
+
+        await open();
+        expect(find.byType(AppFormDialog), findsOneWidget);
+
+        // Recién abierta no tiene cambios: el clic fuera la cierra.
+        await tester.tapAt(const Offset(4, 4));
+        await tester.pumpAndSettle();
+        expect(find.text('¿Descartar cambios?'), findsNothing);
+        expect(find.byType(AppFormDialog), findsNothing);
+
+        // Con algo escrito, pregunta antes de descartar.
+        await open();
+        final fields = find.descendant(
+          of: find.byType(AppFormDialog),
+          matching: find.byType(TextFormField),
+        );
+        if (fields.evaluate().isEmpty) return;
+        await tester.enterText(fields.last, '7');
+        await tester.pump();
+        await tester.tapAt(const Offset(4, 4));
+        await tester.pumpAndSettle();
+        expect(find.text('¿Descartar cambios?'), findsOneWidget);
+        await tester.tap(find.text('Descartar'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AppFormDialog), findsNothing);
+      });
+    }
+  });
+
+  group('empresas: cerrar la ventana', () {
+    testWidgets('sin cambios el clic fuera cierra; con cambios pregunta', (
+      tester,
+    ) async {
+      await pumpAll(tester, path: '/organizacion/empresas');
+      await tester.tap(find.byTooltip('Editar Empresa de prueba'));
+      await tester.pumpAndSettle();
+      // Cargar el nombre del nodo no cuenta como cambio.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(find.byType(AppFormDialog), findsNothing);
+
+      await tester.tap(find.byTooltip('Editar Empresa de prueba'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(2), 'AZI010203AB1');
+      await tester.pump();
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Descartar cambios?'), findsOneWidget);
+      await tester.tap(find.text('Seguir editando'));
+      await tester.pumpAndSettle();
+      expect(
+        find.widgetWithText(TextFormField, 'AZI010203AB1'),
+        findsOneWidget,
+      );
+
+      // Volver al valor original ya no cuenta como cambio.
+      await tester.enterText(find.byType(TextFormField).at(2), '');
+      await tester.pump();
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Descartar cambios?'), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
+    });
   });
 
   group('organigrama', () {
@@ -612,7 +726,7 @@ void main() {
 
       await tester.tap(find.text('Agregar empleado'));
       await tester.pumpAndSettle();
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
 
       await tester.enterText(find.byType(TextFormField).at(0), 'ana');
       await tester.pump(const Duration(milliseconds: 350));
@@ -632,7 +746,7 @@ void main() {
       expect(employment.created, isTrue);
       expect(employment.saved?.persona, 'p2');
       expect(employment.saved?.workNumber, 'ADV0200');
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
       expect(find.text('Empleado guardado.'), findsOneWidget);
     });
 
@@ -667,7 +781,7 @@ void main() {
 
       expect(find.text('Elige a la persona de la lista.'), findsOneWidget);
       expect(employment.saved, isNull);
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
     });
 
     testWidgets('si ya era empleada lo dice con claridad', (tester) async {
@@ -725,7 +839,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField), 'ADV0010');
       await _save(tester);
       expect(employment.saved?.workNumber, 'ADV0010');
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
     });
   });
 }

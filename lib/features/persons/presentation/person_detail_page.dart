@@ -8,6 +8,7 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -37,7 +38,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
   }
 
   Future<void> _editPersona(Persona persona) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => PersonForm(persona: persona),
     );
@@ -51,7 +52,8 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
       AsyncData(:final value) when value.fullName.isNotEmpty => value.fullName,
       _ => 'Persona',
     };
-    return FeaturePage(
+    return AppPage(
+      section: 'Personas',
       title: title,
       description: 'Datos generales, contacto de emergencia y perfil médico de esta persona.',
       actions: [
@@ -193,9 +195,11 @@ class _GeneralTab extends ConsumerWidget {
       children: [
         SizedBox(
           width: 180,
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.textSecondary),
+          child: Builder(
+            builder: (context) => Text(
+              label,
+              style: TextStyle(color: context.colors.textSecondary),
+            ),
           ),
         ),
         Expanded(
@@ -217,7 +221,7 @@ class _ContactosTab extends ConsumerWidget {
     WidgetRef ref, [
     ContactoUrgencia? contacto,
   ]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) =>
           ContactoUrgenciaForm(personaId: personaId, contacto: contacto),
@@ -339,7 +343,7 @@ class _PerfilTab extends ConsumerWidget {
     List<PersonCatalogEntry> tiposSangre, [
     PerfilMedico? perfil,
   ]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => PerfilMedicoForm(
         personaId: personaId,

@@ -1,3 +1,4 @@
+import 'package:capital_humano_front/core/design_system/app_themes.dart';
 import 'package:capital_humano_front/core/design_system/theme.dart';
 import 'package:capital_humano_front/core/routing/app_router.dart';
 import 'package:capital_humano_front/core/routing/navigation.dart';
@@ -177,7 +178,7 @@ void main() {
     final requestedPages = <int>[];
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.light,
+        theme: AppTheme.of(AppThemeId.fallback),
         home: Scaffold(
           body: AppDataTable(
             columns: const [DataColumn(label: Text('Nombre'))],

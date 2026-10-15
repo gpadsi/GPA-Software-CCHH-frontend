@@ -7,7 +7,7 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/persons_controller.dart';
 import '../data/person_models.dart';
 
@@ -149,7 +149,7 @@ class _PersonFormState extends ConsumerState<PersonForm> {
   @override
   Widget build(BuildContext context) {
     final catalogs = ref.watch(personCatalogsProvider);
-    return AppFormPanel(
+    return AppFormDialog(
       title: widget.persona == null ? 'Agregar persona' : 'Editar persona',
       busy: _busy,
       error: _error,

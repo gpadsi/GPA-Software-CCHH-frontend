@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/persons_controller.dart';
 import '../data/person_models.dart';
 
@@ -22,11 +21,25 @@ class PerfilMedicoForm extends ConsumerStatefulWidget {
   ConsumerState<PerfilMedicoForm> createState() => _PerfilMedicoFormState();
 }
 
-class _PerfilMedicoFormState extends ConsumerState<PerfilMedicoForm> {
+class _PerfilMedicoFormState extends ConsumerState<PerfilMedicoForm>
+    with FormChangeTracking {
   late final _allergies = TextEditingController(text: widget.perfil?.allergies);
   late int? _bloodType = widget.perfil?.bloodType;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_allergies]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.perfil;
+    return _allergies.text != (current?.allergies ?? '') ||
+        _bloodType != current?.bloodType;
+  }
 
   @override
   void dispose() {
@@ -64,15 +77,18 @@ class _PerfilMedicoFormState extends ConsumerState<PerfilMedicoForm> {
   }
 
   @override
-  Widget build(BuildContext context) => AppFormPanel(
+  Widget build(BuildContext context) => AppFormDialog(
     title: widget.perfil == null
         ? 'Agregar perfil médico'
         : 'Editar perfil médico',
+    subtitle: 'Los dos datos son opcionales.',
+    size: AppDialogSize.small,
+    dirty: hasChanges,
     busy: _busy,
     error: _error,
     onSave: _save,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    child: AppFormSection(
+      first: true,
       children: [
         DropdownButtonFormField<int>(
           key: ValueKey('tipo-sangre:$_bloodType'),
@@ -90,11 +106,12 @@ class _PerfilMedicoFormState extends ConsumerState<PerfilMedicoForm> {
               ? null
               : (value) => setState(() => _bloodType = value),
         ),
-        const SizedBox(height: AppSpacing.lg),
         AppTextField(
           label: 'Alergias (opcional)',
           controller: _allergies,
           enabled: !_busy,
+          maxLines: null,
+          minLines: 2,
         ),
       ],
     ),

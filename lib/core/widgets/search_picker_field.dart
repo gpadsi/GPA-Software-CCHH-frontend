@@ -284,7 +284,10 @@ class _SearchPickerFieldState<T extends Object>
           displayStringForOption: (option) => option is _PickerItem<T>
               ? widget.labelOf(option.item)
               : _controller.text,
-          optionsBuilder: (_) => _options,
+          // Sin nada que mostrar no hay lista: así Escape le llega a la
+          // ventana (la cierra) en lugar de «cerrar» una lista invisible.
+          optionsBuilder: (_) =>
+              _options.first is _PickerIdle<T> ? const [] : _options,
           onSelected: (option) {
             if (option is _PickerItem<T>) _select(option.item);
             if (option is _PickerCreate<T>) unawaited(_create(option.text));
@@ -293,7 +296,12 @@ class _SearchPickerFieldState<T extends Object>
               Actions(
                 actions: {
                   DismissIntent: CallbackAction<DismissIntent>(
-                    onInvoke: (_) {
+                    onInvoke: (intent) {
+                      // Sin lista ni búsqueda en curso, Escape sigue hacia
+                      // la ventana que contiene el selector (la cierra).
+                      if (_options.first is _PickerIdle<T>) {
+                        return Actions.maybeInvoke(this.context, intent);
+                      }
                       _timer?.cancel();
                       _search++;
                       _publish([_PickerIdle<T>()]);
@@ -330,8 +338,8 @@ class _SearchPickerFieldState<T extends Object>
               alignment: Alignment.topLeft,
               child: Material(
                 elevation: 4,
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(8),
+                color: context.colors.surface,
+                borderRadius: BorderRadius.circular(context.shape.control),
                 clipBehavior: Clip.antiAlias,
                 child: SizedBox(
                   width: math.min(480, constraints.maxWidth),
@@ -459,7 +467,9 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
             child: InkWell(
               onTap: () => widget.onSelected(option),
               child: Container(
-                color: index == highlighted ? AppColors.primarySurface : null,
+                color: index == highlighted
+                    ? context.colors.primarySurface
+                    : null,
                 padding: const EdgeInsets.all(12),
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -479,7 +489,9 @@ class _PickerOptionsState<T extends Object> extends State<_PickerOptions<T>> {
             child: InkWell(
               onTap: () => widget.onSelected(option),
               child: Container(
-                color: index == highlighted ? AppColors.primarySurface : null,
+                color: index == highlighted
+                    ? context.colors.primarySurface
+                    : null,
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

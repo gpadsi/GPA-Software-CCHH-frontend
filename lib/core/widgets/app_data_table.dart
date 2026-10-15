@@ -292,7 +292,7 @@ class AppDataTable extends StatelessWidget {
                             onPressed: onClearSearch,
                           ),
                   ),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: context.colors.border),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
@@ -311,7 +311,7 @@ class AppDataTable extends StatelessWidget {
                         ? 'Cargando resultados…'
                         : '$first–$last de $totalCount resultados',
                     style: type.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
@@ -387,16 +387,19 @@ class _HeadingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     height: height,
-    color: AppColors.background,
+    color: context.colors.tableHeader,
     child: Row(
       children: [
         for (final (index, column) in columns.indexed)
-          SizedBox(width: widths[index], child: _heading(index, column)),
+          SizedBox(
+            width: widths[index],
+            child: _heading(context, index, column),
+          ),
       ],
     ),
   );
 
-  Widget _heading(int index, DataColumn column) {
+  Widget _heading(BuildContext context, int index, DataColumn column) {
     final sorted = index == sortIndex;
     final content = Padding(
       padding: padding(index, columns.length),
@@ -418,7 +421,7 @@ class _HeadingRow extends StatelessWidget {
             Icon(
               sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
               size: 16,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ],
         ],
@@ -467,12 +470,12 @@ class _RowView extends StatelessWidget {
   Widget build(BuildContext context) => DecoratedBox(
     decoration: BoxDecoration(
       border: divider
-          ? const Border(bottom: BorderSide(color: AppColors.border))
+          ? Border(bottom: BorderSide(color: context.colors.border))
           : null,
     ),
     child: InkWell(
       onTap: onTap,
-      hoverColor: AppColors.primarySurface.withValues(alpha: 0.55),
+      hoverColor: context.colors.primarySurface.withValues(alpha: 0.55),
       child: SizedBox(
         height: height,
         child: DefaultTextStyle.merge(

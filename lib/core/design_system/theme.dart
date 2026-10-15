@@ -1,78 +1,106 @@
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
+import 'app_themes.dart';
 import 'motion.dart';
 import 'spacing.dart';
 import 'typography.dart';
 
 abstract final class AppTheme {
-  // El tema se construye una sola vez durante la ejecución de la app.
-  static final ThemeData light = _build();
+  // Cada tema se construye una sola vez durante la ejecución de la app.
+  static final _built = <(AppThemeId, AppFontChoice), ThemeData>{};
 
-  static ThemeData _build() {
+  static ThemeData of(
+    AppThemeId id, {
+    AppFontChoice font = AppFontChoice.themeDefault,
+  }) => _built[(id, font)] ??= _build(id, font);
+
+  static ThemeData _build(AppThemeId id, AppFontChoice font) {
+    final colors = id.colors;
+    final shape = id.shape;
+    final textTheme = AppTypography.textTheme(id, font: font);
     final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
+      seedColor: colors.primary,
       brightness: Brightness.light,
-      primary: AppColors.primary,
-      onPrimary: AppColors.surface,
-      secondary: AppColors.accent,
-      surface: AppColors.surface,
-      onSurface: AppColors.text,
-      error: AppColors.error,
-      outline: AppColors.border,
-      outlineVariant: AppColors.border,
+      primary: colors.primary,
+      onPrimary: colors.onPrimary,
+      secondary: colors.accent,
+      surface: colors.surface,
+      onSurface: colors.text,
+      onSurfaceVariant: colors.textSecondary,
+      error: colors.error,
+      outline: colors.border,
+      outlineVariant: colors.border,
       // Mantiene chips, diálogos y selectores dentro de la misma paleta.
-      primaryContainer: AppColors.primarySurface,
-      onPrimaryContainer: AppColors.primary,
-      secondaryContainer: AppColors.primarySurface,
-      onSecondaryContainer: AppColors.primary,
-      surfaceContainerLowest: AppColors.surface,
-      surfaceContainerLow: AppColors.surface,
-      surfaceContainer: AppColors.surface,
-      surfaceContainerHigh: AppColors.surface,
-      surfaceContainerHighest: AppColors.primarySurface,
+      primaryContainer: colors.primarySurface,
+      onPrimaryContainer: colors.onPrimarySurface,
+      secondaryContainer: colors.primarySurface,
+      onSecondaryContainer: colors.onPrimarySurface,
+      surfaceContainerLowest: colors.surface,
+      surfaceContainerLow: colors.surface,
+      surfaceContainer: colors.surface,
+      surfaceContainerHigh: colors.surface,
+      surfaceContainerHighest: colors.primarySurface,
+      inverseSurface: colors.text,
+      onInverseSurface: colors.surface,
+      // Sin el tinte de elevación de Material 3, que mancharía de color las
+      // superficies elevadas (menús, listas desplegables).
+      surfaceTint: Colors.transparent,
     );
     final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
-      borderSide: const BorderSide(color: AppColors.border),
+      borderRadius: BorderRadius.circular(shape.control),
+      borderSide: BorderSide(color: colors.border),
     );
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      fontFamily: AppTypography.family,
-      textTheme: AppTypography.textTheme,
-      scaffoldBackgroundColor: AppColors.background,
+      extensions: [colors, shape],
+      fontFamily: font.family ?? id.bodyFont,
+      fontFamilyFallback: const [AppFonts.manrope],
+      textTheme: textTheme,
+      scaffoldBackgroundColor: colors.background,
       visualDensity: VisualDensity.standard,
       materialTapTargetSize: MaterialTapTargetSize.padded,
-      dividerColor: AppColors.border,
+      dividerColor: colors.border,
       splashFactory: InkRipple.splashFactory,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.text,
-        surfaceTintColor: AppColors.transparent,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.surface,
+        foregroundColor: colors.text,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: colors.surface,
         border: border,
         enabledBorder: border,
         focusedBorder: border.copyWith(
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: colors.primary, width: 1.5),
         ),
         errorBorder: border.copyWith(
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: colors.error),
         ),
         contentPadding: const EdgeInsets.all(AppSpacing.md),
       ),
+      // Filtros y opciones en chip: fondo de superficie con borde, y el
+      // elegido con el tono suave del color principal.
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.surface,
+        selectedColor: colors.primarySurface,
+        side: BorderSide(color: colors.border),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(shape.card),
+        ),
+      ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: colors.text,
           borderRadius: BorderRadius.circular(AppSpacing.sm),
         ),
-        textStyle: AppTypography.textTheme.bodySmall!.copyWith(
-          color: AppColors.surface,
-        ),
+        textStyle: textTheme.bodySmall!.copyWith(color: colors.surface),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
@@ -80,10 +108,10 @@ abstract final class AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.surface,
-        surfaceTintColor: AppColors.transparent,
+        color: colors.surface,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
+          borderRadius: BorderRadius.circular(shape.control),
         ),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(

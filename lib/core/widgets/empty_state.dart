@@ -33,10 +33,14 @@ class EmptyState extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primarySurface,
+                color: context.colors.primarySurface,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(icon, size: 28, color: AppColors.primary),
+              child: Icon(
+                icon,
+                size: 28,
+                color: context.colors.onPrimarySurface,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
@@ -49,7 +53,7 @@ class EmptyState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: AppColors.textSecondary),
+                  ?.copyWith(color: context.colors.textSecondary),
             ),
             if (action != null) ...[
               const SizedBox(height: AppSpacing.lg),

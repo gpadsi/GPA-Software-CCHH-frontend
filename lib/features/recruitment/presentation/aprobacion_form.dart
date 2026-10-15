@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/session_controller.dart';
-import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_date_field.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
@@ -31,7 +30,8 @@ class AprobacionForm extends ConsumerStatefulWidget {
   ConsumerState<AprobacionForm> createState() => _AprobacionFormState();
 }
 
-class _AprobacionFormState extends ConsumerState<AprobacionForm> {
+class _AprobacionFormState extends ConsumerState<AprobacionForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late DateTime? _fecha =
       parseIsoDate(widget.aprobacion?.fecha) ?? DateTime.now();
@@ -42,8 +42,24 @@ class _AprobacionFormState extends ConsumerState<AprobacionForm> {
   late final _nombre = TextEditingController(
     text: widget.aprobacion?.nombreManual,
   );
+  late final DateTime? _fechaInicial;
+  late final bool _firmoYoInicial;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fechaInicial = _fecha;
+    _firmoYoInicial = _firmoYo;
+    watchChanges([_nombre]);
+  }
+
+  @override
+  bool get hasChanges =>
+      dateChanged(_fecha, _fechaInicial) ||
+      _firmoYo != _firmoYoInicial ||
+      _nombre.text != (widget.aprobacion?.nombreManual ?? '');
 
   @override
   void dispose() {
@@ -86,26 +102,24 @@ class _AprobacionFormState extends ConsumerState<AprobacionForm> {
   }
 
   @override
-  Widget build(BuildContext context) => AppFormPanel(
-    centered: true,
-    width: 600,
+  Widget build(BuildContext context) => AppFormDialog(
     title: 'Aprobación: ${widget.etapa.name}',
+    dirty: hasChanges,
     busy: _busy,
     error: _error,
     onSave: _save,
     child: Form(
       key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: AppFormSection(
+        first: true,
         children: [
           AppDateField(
             label: 'Fecha de aprobación',
             value: _fecha,
             isRequired: true,
             enabled: !_busy,
-            onChanged: (value) => _fecha = value,
+            onChanged: (value) => setState(() => _fecha = value),
           ),
-          const SizedBox(height: AppSpacing.md),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('La aprobé yo, dentro del sistema'),
@@ -118,8 +132,7 @@ class _AprobacionFormState extends ConsumerState<AprobacionForm> {
                 ? null
                 : (value) => setState(() => _firmoYo = value),
           ),
-          if (!_firmoYo) ...[
-            const SizedBox(height: AppSpacing.md),
+          if (!_firmoYo)
             AppTextField(
               label: 'Nombre de quien aprobó',
               controller: _nombre,
@@ -131,7 +144,6 @@ class _AprobacionFormState extends ConsumerState<AprobacionForm> {
                 return null;
               },
             ),
-          ],
         ],
       ),
     ),

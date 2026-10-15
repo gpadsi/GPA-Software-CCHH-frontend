@@ -24,15 +24,16 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filled =
-        variant == AppButtonVariant.primary ||
-        variant == AppButtonVariant.danger;
-    final foreground = filled ? AppColors.surface : AppColors.primary;
+    final foreground = switch (variant) {
+      AppButtonVariant.primary => context.colors.onPrimary,
+      AppButtonVariant.danger => context.colors.surface,
+      _ => context.colors.primary,
+    };
     final background = switch (variant) {
-      AppButtonVariant.primary => AppColors.primary,
-      AppButtonVariant.danger => AppColors.error,
-      AppButtonVariant.secondary => AppColors.surface,
-      AppButtonVariant.text => AppColors.transparent,
+      AppButtonVariant.primary => context.colors.primary,
+      AppButtonVariant.danger => context.colors.error,
+      AppButtonVariant.secondary => context.colors.surface,
+      AppButtonVariant.text => Colors.transparent,
     };
 
     return Semantics(
@@ -44,10 +45,10 @@ class AppButton extends StatelessWidget {
           backgroundColor: background,
           disabledForegroundColor: isLoading
               ? foreground
-              : AppColors.textSecondary,
+              : context.colors.textSecondary,
           disabledBackgroundColor: isLoading
               ? background
-              : AppColors.background,
+              : context.colors.background,
           minimumSize: const Size(44, 44),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
@@ -55,9 +56,9 @@ class AppButton extends StatelessWidget {
           ),
           animationDuration: AppMotion.duration(context, AppMotion.interaction),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(context.shape.button),
             side: variant == AppButtonVariant.secondary
-                ? const BorderSide(color: AppColors.border)
+                ? BorderSide(color: context.colors.border)
                 : BorderSide.none,
           ),
           textStyle: Theme.of(context).textTheme.labelLarge,

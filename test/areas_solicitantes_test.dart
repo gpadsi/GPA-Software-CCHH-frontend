@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_create_dialog.dart';
 import 'package:capital_humano_front/core/widgets/search_picker_field.dart';
 import 'package:capital_humano_front/features/recruitment/data/recruitment_models.dart';
@@ -101,7 +101,7 @@ void main() {
                 .hasFocus,
             isTrue,
           );
-          expect(find.byType(AppFormPanel), findsOneWidget);
+          expect(find.byType(AppFormDialog), findsOneWidget);
           expect(tester.takeException(), isNull);
         },
       );
@@ -217,9 +217,9 @@ void main() {
           }
           await tester.pumpAndSettle();
           expect(find.byType(SearchPickerCreateDialog<String>), findsNothing);
-          expect(find.text('Descartar cambios'), findsNothing);
+          expect(find.text('¿Descartar cambios?'), findsNothing);
           expect(creates, 0);
-          expect(find.byType(AppFormPanel), findsOneWidget);
+          expect(find.byType(AppFormDialog), findsOneWidget);
           expect(
             tester
                 .widget<EditableText>(find.byType(EditableText))
@@ -254,8 +254,8 @@ void main() {
             await tester.tapAt(const Offset(10, 10));
           }
           await tester.pumpAndSettle();
-          expect(find.text('Descartar cambios'), findsOneWidget);
-          await tester.tap(find.text('Cancelar').last);
+          expect(find.text('¿Descartar cambios?'), findsOneWidget);
+          await tester.tap(find.text('Seguir editando'));
           await tester.pumpAndSettle();
           expect(find.byType(SearchPickerCreateDialog<String>), findsOneWidget);
           expect(
@@ -267,7 +267,7 @@ void main() {
           await tester.tap(find.text('Descartar'));
           await tester.pumpAndSettle();
           expect(find.byType(SearchPickerCreateDialog<String>), findsNothing);
-          expect(find.byType(AppFormPanel), findsOneWidget);
+          expect(find.byType(AppFormDialog), findsOneWidget);
           expect(
             tester
                 .widget<EditableText>(find.byType(EditableText))

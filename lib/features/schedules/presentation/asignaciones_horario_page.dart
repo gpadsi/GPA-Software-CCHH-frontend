@@ -9,6 +9,7 @@ import '../../../core/network/api_page.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/app_overlays.dart';
@@ -52,7 +53,7 @@ class _AsignacionesHorarioPageState
   }
 
   Future<void> _addOrEdit([AsignacionHorario? asignacion]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => AsignacionHorarioForm(asignacion: asignacion),
     );
@@ -86,10 +87,11 @@ class _AsignacionesHorarioPageState
       asignacionesHorarioPageProvider(_page, query: _query),
     );
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Horarios',
       title: 'Asignaciones de horario',
       description: 'El horario asignado a cada empleado por catorcena.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/horarios/asignaciones-horario',
         destinations: schedulesTabs,
       ),

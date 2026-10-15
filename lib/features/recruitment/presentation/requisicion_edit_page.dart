@@ -12,15 +12,18 @@ import '../../../core/widgets/app_date_field.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/search_picker_field.dart';
+import '../../../core/widgets/app_page.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../application/recruitment_controller.dart';
 import '../application/requisicion_exit_guard.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
-import 'discard_changes_dialog.dart';
 import 'posicion_contexto_card.dart';
 import 'recruitment_ui.dart';
 import 'recruitment_design.dart';
+import 'requisicion_editor_layout.dart';
+import 'requisicion_review.dart';
 import 'requisiciones_page.dart';
 import 'requisicion_before_unload.dart';
 
@@ -47,11 +50,19 @@ class RequisicionEditPage extends ConsumerWidget {
         ? ref.watch(requisicionDetailProvider(requisicionId!))
         : AsyncData(initialRequisicion!);
     return data.when(
-      loading: () => const FeatureLoading(),
-      error: (error, _) => FeatureError(
-        error: error,
-        onRetry: () =>
-            ref.invalidate(requisicionDetailProvider(requisicionId!)),
+      loading: () => RequisicionEditorLayout(
+        title: 'Editar requisición',
+        onBack: () => context.go('/reclutamiento/requisiciones/$requisicionId'),
+        child: const FeatureLoading(),
+      ),
+      error: (error, _) => RequisicionEditorLayout(
+        title: 'Editar requisición',
+        onBack: () => context.go('/reclutamiento/requisiciones/$requisicionId'),
+        child: FeatureError(
+          error: error,
+          onRetry: () =>
+              ref.invalidate(requisicionDetailProvider(requisicionId!)),
+        ),
       ),
       data: (r) {
         if (!canEditRequisicion(
@@ -566,67 +577,64 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
       },
       child: FocusTraversalGroup(
         policy: WidgetOrderTraversalPolicy(),
-        child: RecruitmentEditorLayout(
-          header: RecruitmentEditorHeader(
-            title: _current == null
-                ? 'Nueva requisición'
-                : 'Editar requisición',
-            subtitle: 'Define la solicitud y las condiciones para cubrir la posición.',
-            onBack: _busy ? null : _back,
-            status: AppBadge(
-              label: draft
-                  ? 'Borrador'
-                  : entryIn(
-                          catalogs.value?.estados ?? [],
-                          _current?.estado,
-                        )?.name ??
-                        'Requisición',
-              tone: draft
-                  ? AppBadgeTone.neutral
-                  : estadoTone(
-                      entryIn(
+        child: RequisicionEditorLayout(
+          title: _current == null ? 'Nueva requisición' : 'Editar requisición',
+          onBack: _busy ? null : _back,
+          status: AppBadge(
+            label: draft
+                ? 'Borrador'
+                : entryIn(
                         catalogs.value?.estados ?? [],
                         _current?.estado,
-                      )?.code,
-                    ),
-            ),
+                      )?.name ??
+                      'Requisición',
+            tone: draft
+                ? AppBadgeTone.neutral
+                : estadoTone(
+                    entryIn(
+                      catalogs.value?.estados ?? [],
+                      _current?.estado,
+                    )?.code,
+                  ),
           ),
-          tabs: RecruitmentSectionTabs(
+          tabs: AppSectionTabs(
             labels: _sectionNames,
             selected: _active,
             onSelected: _jump,
           ),
-          footer: RecruitmentActionBar(
-            status: _busy
-                ? 'Guardando…'
-                : _dirty
-                ? 'Tienes cambios sin guardar.'
-                : _current == null
-                ? 'Nuevo borrador'
-                : 'Sin cambios pendientes',
-            dirty: _dirty,
-            actions: [
+          saveStatus: _busy
+              ? 'Guardando…'
+              : _dirty
+              ? 'Tienes cambios sin guardar.'
+              : _current == null
+              ? 'Nuevo borrador'
+              : 'Sin cambios pendientes',
+          compactSaveStatus: _busy
+              ? 'Guardando…'
+              : _dirty
+              ? 'Sin guardar'
+              : null,
+          actions: [
+            AppButton(
+              label: draft ? 'Guardar borrador' : 'Guardar cambios',
+              variant: draft
+                  ? AppButtonVariant.secondary
+                  : AppButtonVariant.primary,
+              isLoading: _busy && !_sending,
+              onPressed: !canSave || _busy
+                  ? null
+                  : () => _save(catalogs.requireValue, send: false),
+            ),
+            if (draft)
               AppButton(
-                label: draft ? 'Guardar borrador' : 'Guardar cambios',
-                variant: draft
-                    ? AppButtonVariant.secondary
-                    : AppButtonVariant.primary,
-                isLoading: _busy && !_sending,
+                label: 'Enviar a autorización',
+                icon: Icons.arrow_forward_rounded,
+                isLoading: _busy && _sending,
                 onPressed: !canSave || _busy
                     ? null
-                    : () => _save(catalogs.requireValue, send: false),
+                    : () => _save(catalogs.requireValue, send: true),
               ),
-              if (draft)
-                AppButton(
-                  label: 'Enviar a autorización',
-                  icon: Icons.arrow_forward_rounded,
-                  isLoading: _busy && _sending,
-                  onPressed: !canSave || _busy
-                      ? null
-                      : () => _save(catalogs.requireValue, send: true),
-                ),
-            ],
-          ),
+          ],
           child: SingleChildScrollView(
             controller: _scroll,
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
@@ -686,6 +694,7 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
     final canManage = ref.watch(canManageHrProvider);
     final creating = _current == null;
     final tipo = entryIn(catalogs.tipos, _tipo);
+    final puesto = _posicion?.puesto;
     return Form(
       key: _form,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -757,7 +766,7 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
                   ),
               ],
               const SizedBox(height: AppSpacing.lg),
-              RecruitmentFieldGrid(
+              AppFieldGrid(
                 children: [
                   _field(
                     'tipo',
@@ -883,7 +892,7 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
             title: 'Condiciones',
             description: 'Define el horario y los requisitos de la vacante.',
             children: [
-              RecruitmentFieldGrid(
+              AppFieldGrid(
                 children: [
                   _field(
                     'horario_a_cubrir',
@@ -952,7 +961,7 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
             description:
                 'Registra la propuesta salarial y el contrato ofrecido.',
             children: [
-              RecruitmentFieldGrid(
+              AppFieldGrid(
                 children: [
                   _field(
                     'nivel_tabulador',
@@ -1018,74 +1027,87 @@ class _RequisicionEditorState extends ConsumerState<_RequisicionEditor> {
               ),
             ],
           ),
-          RecruitmentFormSection(
+          RequisicionReview(
             key: _sections[3],
-            title: 'Revisión',
-            description:
-                'Comprueba la información antes de enviarla a autorización.',
-            children: [
-              for (final (label, value) in [
-                ('Posición', _current?.posicionEtiqueta ?? _posicion?.etiqueta),
-                ('Tipo de requisición', tipo?.name),
-                ('Justificación', _justificacion.text),
-                (
-                  'Fecha de solicitud',
-                  _fechaSolicitud == null
-                      ? null
-                      : shownDate(toIsoDate(_fechaSolicitud!)),
-                ),
-                (
-                  'Fecha a cubrir la vacante',
-                  _fechaACubrir == null
-                      ? null
-                      : shownDate(toIsoDate(_fechaACubrir!)),
-                ),
-                (
-                  'Fecha de entrega a Capital Humano',
-                  _fechaEntrega == null
-                      ? null
-                      : shownDate(toIsoDate(_fechaEntrega!)),
-                ),
-                ('Área solicitante', _area?.name),
-                ('Horario a cubrir', nameIn(catalogs.horarios, _horario)),
-                ('Idiomas requeridos', _idiomas.text),
-                (
-                  'Disposición para viajar',
-                  _viajar == null
-                      ? null
-                      : _viajar!
-                      ? 'Sí'
-                      : 'No',
-                ),
-                ('Nivel de tabulador', _nivel.text),
-                ('Sueldo mensual compuesto', _compuesto.text),
-                ('Sueldo mensual bruto', _bruto.text),
-                ('Sueldo mensual neto', _neto.text),
-                (
-                  'Tipo de contrato ofrecido',
-                  nameIn(catalogs.tiposContrato, _contrato),
-                ),
-              ])
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: Text(
-                    '$label: ${value == null || value.isEmpty ? 'Sin definir' : value}',
-                  ),
-                ),
-              if ((tipo?.requiereJustificacion ?? false) &&
-                  _justificacion.text.trim().isEmpty) ...[
-                const Text(
-                  'Falta la justificación para enviar a autorización.',
-                ),
-                TextButton(
-                  onPressed: () => _jump(0),
-                  child: const Text('Ir a Solicitud'),
-                ),
-              ],
+            posicion: puesto?.trim().isNotEmpty == true
+                ? puesto
+                : _current?.posicionEtiqueta ?? _posicion?.etiqueta,
+            contexto: _posicionContextoId == null
+                ? null
+                : [
+                        ref
+                            .read(
+                              posicionContextoProvider((
+                                _posicionContextoId!,
+                                'requisicion',
+                              )),
+                            )
+                            .value
+                            ?.empresa,
+                        _posicion?.unidad,
+                        _posicion?.area,
+                      ]
+                      .whereType<String>()
+                      .where((v) => v.trim().isNotEmpty)
+                      .join(' · '),
+            solicitud: [
+              ('Tipo de requisición', tipo?.name),
+              ('Área solicitante', _area?.name),
+              (
+                'Fecha de solicitud',
+                _fechaSolicitud == null
+                    ? null
+                    : shownDate(toIsoDate(_fechaSolicitud!)),
+              ),
+              (
+                'Fecha a cubrir la vacante',
+                _fechaACubrir == null
+                    ? null
+                    : shownDate(toIsoDate(_fechaACubrir!)),
+              ),
+              (
+                'Fecha de entrega a Capital Humano',
+                _fechaEntrega == null
+                    ? null
+                    : shownDate(toIsoDate(_fechaEntrega!)),
+              ),
             ],
+            justificacion: _justificacion.text,
+            condiciones: [
+              ('Horario a cubrir', nameIn(catalogs.horarios, _horario)),
+              ('Idiomas requeridos', _idiomas.text),
+              (
+                'Disposición para viajar',
+                _viajar == null
+                    ? null
+                    : _viajar!
+                    ? 'Sí'
+                    : 'No',
+              ),
+            ],
+            compensacion: [
+              ('Sueldo mensual compuesto', _reviewMoney(_compuesto.text)),
+              ('Sueldo mensual bruto', _reviewMoney(_bruto.text)),
+              ('Sueldo mensual neto', _reviewMoney(_neto.text)),
+              ('Nivel de tabulador', _nivel.text),
+              (
+                'Tipo de contrato ofrecido',
+                nameIn(catalogs.tiposContrato, _contrato),
+              ),
+            ],
+            faltaJustificacion:
+                (tipo?.requiereJustificacion ?? false) &&
+                _justificacion.text.trim().isEmpty,
+            onEdit: _busy ? null : _jump,
           ),
         ],
       ),
     );
+  }
+
+  String? _reviewMoney(String value) {
+    if (value.trim().isEmpty) return null;
+    // Usa la misma normalización del guardado y conserva el texto si es inválido.
+    return shownMoney(decimalOrNull(value)) ?? value;
   }
 }

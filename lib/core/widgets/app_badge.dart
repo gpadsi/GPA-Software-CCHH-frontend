@@ -18,10 +18,19 @@ class AppBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (foreground, background) = switch (tone) {
-      AppBadgeTone.neutral => (AppColors.primary, AppColors.primarySurface),
-      AppBadgeTone.success => (AppColors.success, AppColors.successSurface),
-      AppBadgeTone.warning => (AppColors.warning, AppColors.warningSurface),
-      AppBadgeTone.error => (AppColors.error, AppColors.errorSurface),
+      AppBadgeTone.neutral => (
+        context.colors.onPrimarySurface,
+        context.colors.primarySurface,
+      ),
+      AppBadgeTone.success => (
+        context.colors.success,
+        context.colors.successSurface,
+      ),
+      AppBadgeTone.warning => (
+        context.colors.warning,
+        context.colors.warningSurface,
+      ),
+      AppBadgeTone.error => (context.colors.error, context.colors.errorSurface),
     };
 
     return DecoratedBox(

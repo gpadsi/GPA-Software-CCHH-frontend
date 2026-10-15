@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/organizations_controller.dart';
 import '../data/organization_models.dart';
 import '../data/organizations_repository.dart';
@@ -41,7 +41,7 @@ class NodeForm extends ConsumerStatefulWidget {
   ConsumerState<NodeForm> createState() => _NodeFormState();
 }
 
-class _NodeFormState extends ConsumerState<NodeForm> {
+class _NodeFormState extends ConsumerState<NodeForm> with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _code = TextEditingController(text: widget.node?.code);
   late final _name = TextEditingController(text: widget.node?.name);
@@ -50,8 +50,24 @@ class _NodeFormState extends ConsumerState<NodeForm> {
       ? const []
       : childLevelsFor(widget.tree.levels, widget.parent!);
   late int? _level = widget.node?.level ?? _defaultLevel();
+  late final int? _initialLevel = _level;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_code, _name]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.node;
+    return _name.text != (current?.name ?? '') ||
+        _code.text != (current?.code ?? '') ||
+        _active != (current?.isActive ?? true) ||
+        _level != _initialLevel;
+  }
 
   int? _defaultLevel() {
     if (_options.isEmpty) return null;
@@ -131,70 +147,72 @@ class _NodeFormState extends ConsumerState<NodeForm> {
   Widget build(BuildContext context) {
     final creating = widget.node == null;
     final parent = _parent;
-    return AppFormPanel(
+    return AppFormDialog(
       title: creating ? 'Agregar unidad' : 'Editar unidad',
       subtitle: creating ? 'Dentro de ${widget.parent!.name}' : null,
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       canSave: !creating || _options.isNotEmpty,
       onSave: _save,
       child: Form(
         key: _form,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: AppFormSection(
+          first: true,
           children: [
             if (creating && _options.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: Text(
-                  'Este nodo ya está en el último nivel y no admite unidades dentro.',
-                  style: Theme.of(context).textTheme.bodyMedium,
+              Text(
+                'Este nodo ya está en el último nivel y no admite unidades dentro.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            AppFieldGrid(
+              minTwoColumnWidth: 480,
+              children: [
+                AppTextField(
+                  label: 'Nombre',
+                  controller: _name,
+                  enabled: !_busy,
+                  autofocus: creating,
+                  validator: (value) => _validate(value, 200),
                 ),
-              ),
-            AppTextField(
-              label: 'Nombre',
-              controller: _name,
-              enabled: !_busy,
-              validator: (value) => _validate(value, 200),
+                AppTextField(
+                  label: 'Código',
+                  hint: 'Ej. GPA-AZM-01',
+                  controller: _code,
+                  enabled: !_busy,
+                  validator: (value) => _validate(value, 50),
+                ),
+                if (creating)
+                  DropdownButtonFormField<int>(
+                    key: ValueKey('nivel:$_level'),
+                    initialValue: _level,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Nivel'),
+                    items: [
+                      for (final level in _options)
+                        DropdownMenuItem(
+                          value: level.id,
+                          child: Text(level.name),
+                        ),
+                    ],
+                    onChanged: _busy
+                        ? null
+                        : (value) => setState(() => _level = value),
+                    validator: (value) =>
+                        value == null ? 'Selecciona un nivel.' : null,
+                  )
+                else
+                  InputDecorator(
+                    decoration: const InputDecoration(labelText: 'Nivel'),
+                    child: Text(_levelName(widget.node!.level)),
+                  ),
+                if (!creating && parent != null)
+                  InputDecorator(
+                    decoration: const InputDecoration(labelText: 'Dentro de'),
+                    child: Text(parent.name),
+                  ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
-            AppTextField(
-              label: 'Código',
-              hint: 'Ej. GPA-AZM-01',
-              controller: _code,
-              enabled: !_busy,
-              validator: (value) => _validate(value, 50),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            if (creating)
-              DropdownButtonFormField<int>(
-                key: ValueKey('nivel:$_level'),
-                initialValue: _level,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'Nivel'),
-                items: [
-                  for (final level in _options)
-                    DropdownMenuItem(value: level.id, child: Text(level.name)),
-                ],
-                onChanged: _busy
-                    ? null
-                    : (value) => setState(() => _level = value),
-                validator: (value) =>
-                    value == null ? 'Selecciona un nivel.' : null,
-              )
-            else
-              InputDecorator(
-                decoration: const InputDecoration(labelText: 'Nivel'),
-                child: Text(_levelName(widget.node!.level)),
-              ),
-            if (!creating && parent != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              InputDecorator(
-                decoration: const InputDecoration(labelText: 'Dentro de'),
-                child: Text(parent.name),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.md),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Activo'),

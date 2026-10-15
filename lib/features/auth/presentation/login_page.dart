@@ -67,7 +67,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Text(
                   strings.loginSubtitle,
                   style: type.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -114,7 +114,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     child: Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.errorSurface,
+                        color: context.colors.errorSurface,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.controlRadius,
                         ),
@@ -122,17 +122,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.error_outline,
                             size: 20,
-                            color: AppColors.error,
+                            color: context.colors.error,
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: Text(
                               session.message!,
                               style: type.bodyMedium?.copyWith(
-                                color: AppColors.error,
+                                color: context.colors.error,
                               ),
                             ),
                           ),
@@ -189,7 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Text(
                                   strings.workspaceSubtitle,
                                   style: type.bodyLarge?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.xl),

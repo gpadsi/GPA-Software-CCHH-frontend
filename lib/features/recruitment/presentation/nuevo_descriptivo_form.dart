@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design_system/spacing.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../../../core/widgets/search_picker_field.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
@@ -82,10 +82,12 @@ class _NuevoDescriptivoFormState extends ConsumerState<NuevoDescriptivoForm> {
         posicionContextoProvider((_posicionContextoId!, 'descriptivo')),
       );
     }
-    return AppFormPanel(
-      centered: true,
-      width: 640,
+    return AppFormDialog(
       title: 'Nuevo descriptivo de puesto',
+      // Elegir la posición se rehace en un momento: cerrar no pregunta.
+      dirty: false,
+      // La lista de posiciones se abre bajo el campo: que quepa en la ventana.
+      minBodyHeight: 440,
       saveLabel: _posicion?.tramiteAbierto == null
           ? 'Crear borrador'
           : 'Continuar borrador',

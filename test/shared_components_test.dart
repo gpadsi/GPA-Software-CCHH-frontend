@@ -1,19 +1,21 @@
 // Componentes compartidos del bloque de fundamentos de diseño (2026-10-02):
 // diálogo de confirmación único, panel de formulario, fundido de contenido y
 // esqueleto de carga con movimiento.
+import 'package:capital_humano_front/core/design_system/app_themes.dart';
 import 'package:capital_humano_front/core/design_system/theme.dart';
 import 'package:capital_humano_front/core/widgets/app_fade_switcher.dart';
 import 'package:capital_humano_front/core/widgets/app_overlays.dart';
 import 'package:capital_humano_front/core/widgets/app_shimmer.dart';
 import 'package:capital_humano_front/core/widgets/confirm_dialog.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/core/widgets/loading_skeleton.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _app(Widget home, {bool disableAnimations = false}) => MaterialApp(
-  theme: AppTheme.light,
+  theme: AppTheme.of(AppThemeId.fallback),
   home: MediaQuery(
     data: MediaQueryData(disableAnimations: disableAnimations),
     child: home,
@@ -174,7 +176,7 @@ void main() {
     });
   });
 
-  group('AppFormPanel', () {
+  group('AppFormDialog', () {
     Future<void> abrir(
       WidgetTester tester, {
       required Size size,
@@ -183,6 +185,7 @@ void main() {
       bool canSave = true,
       VoidCallback? onSave,
       double textScale = 1,
+      bool? dirty,
     }) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = size;
@@ -195,14 +198,15 @@ void main() {
           Builder(
             builder: (context) => Scaffold(
               body: TextButton(
-                onPressed: () => showAppPanel<bool>(
+                onPressed: () => showAppDialog<bool>(
                   context: context,
-                  builder: (_) => AppFormPanel(
+                  builder: (_) => AppFormDialog(
                     title: 'Agregar persona',
                     subtitle: 'Los datos obligatorios están marcados.',
                     busy: busy,
                     error: error,
                     canSave: canSave,
+                    dirty: dirty,
                     onSave: onSave ?? () {},
                     child: Column(
                       children: [for (var i = 0; i < 30; i++) Text('Campo $i')],
@@ -226,40 +230,73 @@ void main() {
       }
     }
 
-    testWidgets('en pantalla ancha se ancla a la derecha con ancho acotado', (
+    Rect superficie(WidgetTester tester) => tester.getRect(
+      find
+          .ancestor(
+            of: find.text('Agregar persona'),
+            matching: find.byType(Material),
+          )
+          .first,
+    );
+
+    testWidgets('en pantalla ancha es una ventana centrada de ancho acotado', (
       tester,
     ) async {
       await abrir(tester, size: const Size(1440, 900));
-      final panel = tester.getRect(find.byType(AppFormPanel));
-      final contenido = tester.getRect(
-        find
-            .ancestor(
-              of: find.text('Agregar persona'),
-              matching: find.byType(SizedBox),
-            )
-            .first,
-      );
-      expect(contenido.right, 1440); // pegado al borde derecho
-      expect(contenido.width, 520);
-      expect(contenido.height, 900); // altura completa
-      expect(panel.width, 1440);
+      final ventana = superficie(tester);
+      expect(ventana.center.dx, closeTo(720, 1));
+      expect(ventana.center.dy, closeTo(450, 1));
+      expect(ventana.width, AppDialogSize.medium.width);
+      // Mide lo que su contenido hasta el alto de la pantalla, sin tocarla.
+      expect(ventana.height, lessThanOrEqualTo(900 - 48));
     });
 
-    testWidgets('en móvil sube desde abajo y ocupa casi toda la altura', (
-      tester,
-    ) async {
+    testWidgets('en un teléfono ocupa toda la pantalla', (tester) async {
       await abrir(tester, size: const Size(390, 844));
-      final contenido = tester.getRect(
+      final ventana = superficie(tester);
+      expect(ventana, const Rect.fromLTWH(0, 0, 390, 844));
+      // El pie queda abajo aunque el cuerpo sea corto o largo.
+      expect(
+        tester.getRect(find.text('Guardar')).bottom,
+        greaterThan(844 - 80),
+      );
+    });
+
+    testWidgets('un formulario corto no deja la ventana vacía', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1440, 900);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        _app(
+          Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => showAppDialog<bool>(
+                  context: context,
+                  builder: (_) => AppFormDialog(
+                    title: 'Agregar puesto',
+                    onSave: () {},
+                    child: const Text('Un solo campo'),
+                  ),
+                ),
+                child: const Text('abrir'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      final ventana = tester.getRect(
         find
             .ancestor(
-              of: find.text('Agregar persona'),
-              matching: find.byType(SizedBox),
+              of: find.text('Agregar puesto'),
+              matching: find.byType(Material),
             )
             .first,
       );
-      expect(contenido.bottom, 844);
-      expect(contenido.width, 390);
-      expect(contenido.height, closeTo(844 * 0.92, 1));
+      expect(ventana.height, lessThan(300));
     });
 
     testWidgets('los botones siguen a la vista aunque el cuerpo sea largo', (
@@ -289,14 +326,14 @@ void main() {
 
       await tester.tap(find.text('Cancelar'));
       await tester.pumpAndSettle();
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
     });
 
     testWidgets('la X de cerrar también cierra', (tester) async {
       await abrir(tester, size: const Size(1440, 900));
       await tester.tap(find.byTooltip('Cerrar'));
       await tester.pumpAndSettle();
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
     });
 
     testWidgets('mientras guarda no se puede cerrar ni con atrás', (
@@ -315,10 +352,61 @@ void main() {
       );
       expect(cerrar.onPressed, isNull);
       expect(
-        tester.widget<PopScope>(find.byType(PopScope).last).canPop,
+        tester
+            .widget<PopScope<Object?>>(
+              find.byWidgetPredicate((widget) => widget is PopScope).last,
+            )
+            .canPop,
         isFalse,
       );
     });
+
+    testWidgets('sin saber si hay cambios, Escape y el clic fuera no cierran', (
+      tester,
+    ) async {
+      await abrir(tester, size: const Size(1440, 900));
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(find.byType(AppFormDialog), findsOneWidget);
+      expect(find.text('¿Descartar cambios?'), findsNothing);
+    });
+
+    for (final escape in [false, true]) {
+      final how = escape ? 'Escape' : 'el clic fuera';
+      testWidgets('sin cambios, $how cierra directo', (tester) async {
+        await abrir(tester, size: const Size(1440, 900), dirty: false);
+        if (escape) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        } else {
+          await tester.tapAt(const Offset(10, 10));
+        }
+        await tester.pumpAndSettle();
+        expect(find.byType(AppFormDialog), findsNothing);
+      });
+
+      testWidgets('con cambios, $how pregunta antes de descartar', (
+        tester,
+      ) async {
+        await abrir(tester, size: const Size(1440, 900), dirty: true);
+        if (escape) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        } else {
+          await tester.tapAt(const Offset(10, 10));
+        }
+        await tester.pumpAndSettle();
+        expect(find.text('¿Descartar cambios?'), findsOneWidget);
+        await tester.tap(find.text('Seguir editando'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AppFormDialog), findsOneWidget);
+
+        await tester.tap(find.text('Cancelar'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Descartar'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AppFormDialog), findsNothing);
+      });
+    }
 
     testWidgets('muestra el error arriba de los botones', (tester) async {
       await abrir(

@@ -2,7 +2,7 @@
 // (2026-10-02): filas clicables, edición desde la lista, formularios en panel
 // y borrados que ya no fallan en silencio.
 import 'package:capital_humano_front/core/widgets/confirm_dialog.dart';
-import 'package:capital_humano_front/core/widgets/form_panel.dart';
+import 'package:capital_humano_front/core/widgets/form_dialog.dart';
 import 'package:capital_humano_front/features/persons/presentation/person_form.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // El formulario vive en un panel, no en un diálogo centrado.
-      expect(find.byType(AppFormPanel), findsOneWidget);
+      expect(find.byType(AppFormDialog), findsOneWidget);
       expect(find.byType(PersonForm), findsOneWidget);
       expect(find.text('Editar persona'), findsOneWidget);
       expect(find.widgetWithText(TextFormField, 'Juan'), findsOneWidget);
@@ -54,7 +54,7 @@ void main() {
       expect(repository.created, false); // edición, no alta
       expect(repository.saved?.id, 'p1');
       expect(repository.saved?.firstName, 'Juanito');
-      expect(find.byType(AppFormPanel), findsNothing);
+      expect(find.byType(AppFormDialog), findsNothing);
       expect(find.text('Persona guardada.'), findsOneWidget);
     },
   );
@@ -65,7 +65,7 @@ void main() {
     await pumpPhaseThree(tester, path: '/personas');
     await tester.tap(find.text('Agregar persona'));
     await tester.pumpAndSettle();
-    expect(find.byType(AppFormPanel), findsOneWidget);
+    expect(find.byType(AppFormDialog), findsOneWidget);
     expect(find.text('Agregar persona'), findsWidgets);
     expect(find.widgetWithText(TextFormField, 'Juan'), findsNothing);
   });

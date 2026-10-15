@@ -12,6 +12,7 @@ import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_fade_switcher.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
@@ -50,7 +51,7 @@ class _TiposHorarioPageState extends ConsumerState<TiposHorarioPage> {
   });
 
   Future<void> _edit([TipoHorarioRef? tipo]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => TipoHorarioForm(tipo: tipo),
     );
@@ -66,10 +67,11 @@ class _TiposHorarioPageState extends ConsumerState<TiposHorarioPage> {
   Widget build(BuildContext context) {
     final catalog = ref.watch(tiposHorarioCatalogProvider);
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Horarios',
       title: 'Tipos de horario',
       description: 'Las modalidades de horario de la organización.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/horarios/tipos',
         destinations: schedulesTabs,
       ),

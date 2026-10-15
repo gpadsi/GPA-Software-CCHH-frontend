@@ -10,6 +10,7 @@ class AppTextField extends StatefulWidget {
     super.key,
     required this.label,
     this.hint,
+    this.helper,
     this.controller,
     this.onChanged,
     this.prefixIcon,
@@ -25,10 +26,14 @@ class AppTextField extends StatefulWidget {
     this.minLines,
     this.keyboardType,
     this.inputFormatters,
+    this.autofocus = false,
   });
 
   final String label;
   final String? hint;
+
+  /// Ayuda breve bajo el campo (qué escribir o qué pasa si se deja vacío).
+  final String? helper;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final IconData? prefixIcon;
@@ -49,6 +54,7 @@ class AppTextField extends StatefulWidget {
   final int? minLines;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final bool autofocus;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -79,14 +85,15 @@ class _AppTextFieldState extends State<AppTextField> {
       boxShadow: [
         BoxShadow(
           color: _focus.hasFocus
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.transparent,
+              ? context.colors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           spreadRadius: 3,
         ),
       ],
     ),
     child: TextFormField(
       focusNode: _focus,
+      autofocus: widget.autofocus,
       controller: widget.controller,
       onChanged: widget.onChanged,
       obscureText: widget.obscureText,
@@ -108,6 +115,8 @@ class _AppTextFieldState extends State<AppTextField> {
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,
+        helperText: widget.helper,
+        helperMaxLines: 3,
         prefixIcon: widget.prefixIcon == null
             ? null
             : Icon(widget.prefixIcon, size: 20),

@@ -15,13 +15,13 @@ import '../../../core/widgets/app_filter_field.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_table_toolbar.dart';
 import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_catalogs.dart';
 import '../data/recruitment_models.dart';
 import '../data/recruitment_repository.dart';
 import 'recruitment_ui.dart';
-import 'recruitment_design.dart';
 import 'recruitment_creation.dart';
 
 /// Quién puede editar una requisición: Capital Humano y Admin las de todos, y
@@ -115,10 +115,14 @@ class _RequisicionesPageState extends ConsumerState<RequisicionesPage> {
     return PrimaryScrollController(
       controller: _scroll,
       automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
-      child: RecruitmentPage(
+      child: AppPage(
+        section: 'Reclutamiento',
         title: 'Reclutamiento',
         description: 'Las requisiciones para cubrir una posición, ya sea por reemplazo o por una posición nueva.',
-        tabs: const RecruitmentModuleTabs(current: '/reclutamiento'),
+        tabs: const AppRouteTabs(
+          current: '/reclutamiento',
+          destinations: recruitmentTabs,
+        ),
         actions: [
           AppButton(
             label: 'Nueva requisición',
@@ -326,7 +330,7 @@ class _PosicionCell extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: AppColors.textSecondary),
+                ?.copyWith(color: context.colors.textSecondary),
           ),
       ],
     ),

@@ -53,7 +53,9 @@ class ModulePlaceholderPage extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 destination.description,
-                style: type.bodyLarge?.copyWith(color: AppColors.textSecondary),
+                style: type.bodyLarge?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
               if (siblings.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.lg),

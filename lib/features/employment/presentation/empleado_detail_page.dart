@@ -10,6 +10,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/jefe_inmediato_card.dart';
 import '../../../core/network/jefe_inmediato.dart';
@@ -35,7 +36,7 @@ class EmpleadoDetailPage extends ConsumerWidget {
     WidgetRef ref,
     Empleado empleado,
   ) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => EmpleadoForm(empleado: empleado),
     );
@@ -53,7 +54,8 @@ class EmpleadoDetailPage extends ConsumerWidget {
       AsyncData(:final value) => value.workNumber ?? 'Empleado',
       _ => 'Empleado',
     };
-    return FeaturePage(
+    return AppPage(
+      section: 'Empleados',
       title: title,
       description: 'Contrato vigente y posición actual de este empleado.',
       actions: [
@@ -97,9 +99,11 @@ Widget _field(String label, String? value) => Padding(
     children: [
       SizedBox(
         width: 160,
-        child: Text(
-          label,
-          style: const TextStyle(color: AppColors.textSecondary),
+        child: Builder(
+          builder: (context) => Text(
+            label,
+            style: TextStyle(color: context.colors.textSecondary),
+          ),
         ),
       ),
       Expanded(

@@ -11,7 +11,7 @@ import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../../employment/presentation/persona_picker_field.dart';
 import '../application/recruitment_controller.dart';
 import '../data/recruitment_models.dart';
@@ -41,7 +41,7 @@ class ConformidadesCard extends ConsumerWidget {
     RecruitmentCatalogEntry rol,
     Conformidad? current,
   ) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => ConformidadForm(
         descriptivoId: descriptivo.id,
@@ -173,7 +173,8 @@ class ConformidadForm extends ConsumerStatefulWidget {
   ConsumerState<ConformidadForm> createState() => _ConformidadFormState();
 }
 
-class _ConformidadFormState extends ConsumerState<ConformidadForm> {
+class _ConformidadFormState extends ConsumerState<ConformidadForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late DateTime? _fecha =
       parseIsoDate(widget.conformidad?.fecha) ?? DateTime.now();
@@ -186,10 +187,27 @@ class _ConformidadFormState extends ConsumerState<ConformidadForm> {
   late final _nombre = TextEditingController(
     text: widget.conformidad?.nombreManual,
   );
+  late final DateTime? _fechaInicial;
+  late final bool _firmoYoInicial;
   bool _busy = false;
   String? _error;
 
   bool get _editing => widget.conformidad != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _fechaInicial = _fecha;
+    _firmoYoInicial = _firmoYo;
+    watchChanges([_nombre]);
+  }
+
+  @override
+  bool get hasChanges =>
+      dateChanged(_fecha, _fechaInicial) ||
+      _personaId != null ||
+      _firmoYo != _firmoYoInicial ||
+      _nombre.text != (widget.conformidad?.nombreManual ?? '');
 
   @override
   void dispose() {
@@ -243,24 +261,26 @@ class _ConformidadFormState extends ConsumerState<ConformidadForm> {
   @override
   Widget build(BuildContext context) {
     final persona = widget.rol.requierePersona;
-    return AppFormPanel(
+    return AppFormDialog(
       title: 'Conformidad: ${widget.rol.name}',
+      dirty: hasChanges,
+      // La lista de personas se abre bajo el campo: que quepa en la ventana.
+      minBodyHeight: persona && !_editing ? 460 : null,
       busy: _busy,
       error: _error,
       onSave: _save,
       child: Form(
         key: _form,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: AppFormSection(
+          first: true,
           children: [
             AppDateField(
               label: 'Fecha de conformidad',
               value: _fecha,
               isRequired: true,
               enabled: !_busy,
-              onChanged: (value) => _fecha = value,
+              onChanged: (value) => setState(() => _fecha = value),
             ),
-            const SizedBox(height: AppSpacing.lg),
             if (persona && !_editing)
               PersonaPickerField(
                 enabled: !_busy,
@@ -288,8 +308,7 @@ class _ConformidadFormState extends ConsumerState<ConformidadForm> {
                     ? null
                     : (value) => setState(() => _firmoYo = value),
               ),
-              if (!_firmoYo) ...[
-                const SizedBox(height: AppSpacing.md),
+              if (!_firmoYo)
                 AppTextField(
                   label: 'Nombre de quien dio su conformidad',
                   controller: _nombre,
@@ -303,7 +322,6 @@ class _ConformidadFormState extends ConsumerState<ConformidadForm> {
                     return null;
                   },
                 ),
-              ],
             ],
           ],
         ),

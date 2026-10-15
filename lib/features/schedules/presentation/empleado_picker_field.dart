@@ -57,7 +57,7 @@ class EmpleadoPickerField extends ConsumerWidget {
                   child: Text(
                     field.errorText!,
                     style: Theme.of(context).textTheme.bodySmall
-                        ?.copyWith(color: AppColors.error),
+                        ?.copyWith(color: context.colors.error),
                   ),
                 ),
             ],
@@ -72,10 +72,10 @@ class EmpleadoPickerField extends ConsumerWidget {
         ),
         error: (error, _) => Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
                 'No se pudo cargar la lista de empleados.',
-                style: TextStyle(color: AppColors.error),
+                style: TextStyle(color: context.colors.error),
               ),
             ),
             TextButton(

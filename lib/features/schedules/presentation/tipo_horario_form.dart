@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/schedules_controller.dart';
 import '../data/schedule_models.dart';
 import '../data/schedules_repository.dart';
@@ -15,7 +15,8 @@ class TipoHorarioForm extends ConsumerStatefulWidget {
   ConsumerState<TipoHorarioForm> createState() => _TipoHorarioFormState();
 }
 
-class _TipoHorarioFormState extends ConsumerState<TipoHorarioForm> {
+class _TipoHorarioFormState extends ConsumerState<TipoHorarioForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _name = TextEditingController(text: widget.tipo?.name);
   late final _descripcion = TextEditingController(
@@ -24,6 +25,20 @@ class _TipoHorarioFormState extends ConsumerState<TipoHorarioForm> {
   late bool _active = widget.tipo?.isActive ?? true;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_name, _descripcion]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.tipo;
+    return _name.text != (current?.name ?? '') ||
+        _descripcion.text != (current?.descripcion ?? '') ||
+        _active != (current?.isActive ?? true);
+  }
 
   @override
   void dispose() {
@@ -71,38 +86,43 @@ class _TipoHorarioFormState extends ConsumerState<TipoHorarioForm> {
   }
 
   @override
-  Widget build(BuildContext context) => AppFormPanel(
+  Widget build(BuildContext context) => AppFormDialog(
     title: widget.tipo == null
         ? 'Agregar tipo de horario'
         : 'Editar tipo de horario',
+    dirty: hasChanges,
     busy: _busy,
     error: _error,
     onSave: _save,
     child: Form(
       key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: AppFormSection(
+        first: true,
         children: [
-          AppTextField(
-            label: 'Nombre (ej. H01)',
-            controller: _name,
-            enabled: !_busy,
-            validator: (value) => _validate(value, 150),
+          AppFieldGrid(
+            minTwoColumnWidth: 480,
+            children: [
+              AppTextField(
+                label: 'Nombre',
+                hint: 'Ej. H01',
+                controller: _name,
+                enabled: !_busy,
+                autofocus: widget.tipo == null,
+                validator: (value) => _validate(value, 150),
+              ),
+              AppTextField(
+                label: 'Horario (opcional)',
+                hint: 'Ej. 07:00 - 16:00',
+                controller: _descripcion,
+                enabled: !_busy,
+                validator: (value) => _validate(value, 255, required: false),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            label: 'Horario (opcional)',
-            hint: 'Ej. 07:00 - 16:00',
-            controller: _descripcion,
-            enabled: !_busy,
-            validator: (value) => _validate(value, 255, required: false),
-          ),
-          const SizedBox(height: AppSpacing.sm),
           Text(
-            'Escríbelo como lo maneja GPA. Si el código rota entre varios rangos, sepáralos con «/».',
+            'Escribe el horario como lo maneja GPA. Si el código rota entre varios rangos, sepáralos con «/».',
             style: Theme.of(context).textTheme.bodySmall,
           ),
-          const SizedBox(height: AppSpacing.md),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Activo'),

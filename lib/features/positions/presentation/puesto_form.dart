@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/form_panel.dart';
+import '../../../core/widgets/form_dialog.dart';
 import '../application/positions_controller.dart';
 import '../data/position_models.dart';
 import '../data/positions_repository.dart';
@@ -15,13 +14,28 @@ class PuestoForm extends ConsumerStatefulWidget {
   ConsumerState<PuestoForm> createState() => _PuestoFormState();
 }
 
-class _PuestoFormState extends ConsumerState<PuestoForm> {
+class _PuestoFormState extends ConsumerState<PuestoForm>
+    with FormChangeTracking {
   final _form = GlobalKey<FormState>();
   late final _name = TextEditingController(text: widget.puesto?.name);
   late bool _active = widget.puesto?.isActive ?? true;
   late bool _gerencia = widget.puesto?.esGerenciaDeUnidad ?? false;
   bool _busy = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    watchChanges([_name]);
+  }
+
+  @override
+  bool get hasChanges {
+    final current = widget.puesto;
+    return _name.text != (current?.name ?? '') ||
+        _active != (current?.isActive ?? true) ||
+        _gerencia != (current?.esGerenciaDeUnidad ?? false);
+  }
 
   @override
   void dispose() {
@@ -63,20 +77,24 @@ class _PuestoFormState extends ConsumerState<PuestoForm> {
   @override
   Widget build(BuildContext context) {
     final small = Theme.of(context).textTheme.bodySmall;
-    return AppFormPanel(
+    return AppFormDialog(
       title: widget.puesto == null ? 'Agregar puesto' : 'Editar puesto',
+      subtitle: 'Un puesto del catálogo de Grupo GPA; las posiciones lo usan.',
+      dirty: hasChanges,
       busy: _busy,
       error: _error,
       onSave: _save,
       child: Form(
         key: _form,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: AppFormSection(
+          first: true,
           children: [
             AppTextField(
               label: 'Nombre',
+              hint: 'Ej. Almacenista Senior',
               controller: _name,
               enabled: !_busy,
+              autofocus: widget.puesto == null,
               validator: (value) {
                 final text = value?.trim() ?? '';
                 if (text.isEmpty) return 'Este dato es obligatorio.';
@@ -84,7 +102,6 @@ class _PuestoFormState extends ConsumerState<PuestoForm> {
                 return null;
               },
             ),
-            const SizedBox(height: AppSpacing.md),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Activo'),

@@ -50,7 +50,7 @@ class DashboardPage extends ConsumerWidget {
                     Text(
                       'Este es el resumen general de tu organización.',
                       style: type.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],
@@ -115,7 +115,7 @@ class DashboardPage extends ConsumerWidget {
                     Text(
                       'Entra directamente a las secciones más usadas.',
                       style: type.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -178,10 +178,10 @@ class _CountCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
+                  color: context.colors.primarySurface,
                   borderRadius: BorderRadius.circular(AppSpacing.controlRadius),
                 ),
-                child: Icon(icon, color: AppColors.primary),
+                child: Icon(icon, color: context.colors.onPrimarySurface),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(child: Text(label, style: type.titleSmall)),

@@ -7,6 +7,7 @@ import '../../../core/widgets/app_badge.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -46,7 +47,7 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
   }
 
   Future<void> _edit([LocationRecord? record]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => LocationForm(kind: widget.kind, record: record),
     );
@@ -87,7 +88,8 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
     final path = kind == LocationKind.ubicaciones
         ? '/ubicaciones'
         : '/ubicaciones/${kind.name}';
-    return FeaturePage(
+    return AppPage(
+      section: 'Ubicaciones',
       title: kind.label,
       description: switch (kind) {
         LocationKind.ubicaciones =>
@@ -96,7 +98,7 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
           'Cada nave pertenece a una ubicación. Su nombre es opcional.',
         LocationKind.areas => 'Cada área puede vincularse a una nave; las que siguen sin confirmar se muestran como pendientes.',
       },
-      tabs: FeatureTabs(
+      tabs: AppRouteTabs(
         current: path,
         destinations: const [
           (label: 'Ubicaciones', path: '/ubicaciones'),

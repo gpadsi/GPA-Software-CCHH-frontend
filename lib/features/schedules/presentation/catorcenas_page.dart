@@ -7,6 +7,7 @@ import '../../../core/design_system/spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_row_actions.dart';
 import '../../../core/widgets/app_data_table.dart';
+import '../../../core/widgets/app_page.dart';
 import '../../../core/widgets/feature_page.dart';
 import '../../../core/widgets/app_overlays.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -57,7 +58,7 @@ class _CatorcenasPageState extends ConsumerState<CatorcenasPage> {
   }
 
   Future<void> _addOrEdit([Catorcena? catorcena]) async {
-    final saved = await showAppPanel<bool>(
+    final saved = await showAppDialog<bool>(
       context: context,
       builder: (_) => CatorcenaForm(catorcena: catorcena),
     );
@@ -88,10 +89,11 @@ class _CatorcenasPageState extends ConsumerState<CatorcenasPage> {
   Widget build(BuildContext context) {
     final page = ref.watch(catorcenasPageProvider(_page, query: _query));
     final canManage = ref.watch(canManageHrProvider);
-    return FeaturePage(
+    return AppPage(
+      section: 'Horarios',
       title: 'Catorcenas',
       description: 'Los periodos de catorcena que organizan la nómina y el calendario laboral.',
-      tabs: const FeatureTabs(
+      tabs: const AppRouteTabs(
         current: '/horarios/catorcenas',
         destinations: schedulesTabs,
       ),
